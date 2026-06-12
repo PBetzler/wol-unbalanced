@@ -1,0 +1,30 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python scripts compile
+        run: python -m py_compile scripts/*.py
+      - name: Repo hygiene — no third-party or generated content committed
+        run: |
+          test ! -e mods && test ! -e vendor && test ! -e build && test ! -e dist
+          if git ls-files | grep -E '\.(SC2Map|zip|exe|dll)$'; then
+            echo "forbidden file types committed"; exit 1
+          fi
+      - name: Galaxy library sanity (balanced braces/parens)
+        run: |
+          python - <<'EOF'
+          import glob
+          for p in glob.glob("src/mod/Base.SC2Data/*.galaxy"):
+              s = open(p).read()
+              assert s.count("{") == s.count("}"), f"unbalanced braces in {p}"
+              assert s.count("(") == s.count(")"), f"unbalanced parens in {p}"
+              print("ok", p)
+          EOF

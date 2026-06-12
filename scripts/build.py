@@ -22,6 +22,8 @@ MPQPATCH = os.path.join(ROOT, "tools", "mpqpatch")
 SC2 = "/Applications/StarCraft II"
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
+TITLE = "WoL Unbalanced"
+VERSION = "0.1.0"
 
 
 def patch_document_info(map_path: str) -> None:
@@ -149,12 +151,34 @@ def build() -> None:
 
     shutil.copytree(MOD_SRC, os.path.join(mods_out, MOD_NAME))
     with open(os.path.join(BUILD, "metadata.txt"), "w") as f:
-        f.write("title=WoL Unbalanced\n"
+        f.write(f"title={TITLE}\n"
                 "desc=Funnily overpowered Wings of Liberty: your units only, enemies stay vanilla. Not to be taken seriously.\n"
                 "author=Philip (vibe coded with Claude)\n"
                 "campaign=WoL\n"
-                "version=0.1.0\n")
+                f"version={VERSION}\n")
     print(f"built -> {BUILD}")
+
+
+def package() -> None:
+    """Zip the build in the CCM campaign layout: one top-level folder, flat maps +
+    metadata.txt + the mod component folder (same shape as the reference zips)."""
+    import zipfile
+
+    build()
+    dist = os.path.join(ROOT, "dist")
+    os.makedirs(dist, exist_ok=True)
+    zpath = os.path.join(dist, f"WoL-Unbalanced-v{VERSION}.zip")
+    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(os.path.join(BUILD, "metadata.txt"), f"{TITLE}/metadata.txt")
+        for name in sorted(os.listdir(os.path.join(BUILD, "Campaign"))):
+            z.write(os.path.join(BUILD, "Campaign", name), f"{TITLE}/{name}")
+        modroot = os.path.join(BUILD, "Mods", MOD_NAME)
+        for dirpath, _, files in os.walk(modroot):
+            for fn in sorted(files):
+                full = os.path.join(dirpath, fn)
+                rel = os.path.relpath(full, modroot)
+                z.write(full, f"{TITLE}/{MOD_NAME}/{rel}")
+    print(f"packaged -> {zpath}")
 
 
 def install() -> None:
@@ -191,4 +215,4 @@ def uninstall() -> None:
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "build"
-    {"build": build, "install": install, "clean": lambda: shutil.rmtree(BUILD, ignore_errors=True), "uninstall": uninstall}[cmd]()
+    {"build": build, "install": install, "package": package, "clean": lambda: shutil.rmtree(BUILD, ignore_errors=True), "uninstall": uninstall}[cmd]()

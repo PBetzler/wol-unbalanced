@@ -4,9 +4,13 @@ mods/
 # Vendored third-party sources and build output
 vendor/
 build/
+dist/
 
 # Compiled tools (source lives in tools/)
 tools/mpqpatch
+
+# Claude Code session/permission settings — never publish
+.claude/
 
 # OS / Python noise
 .DS_Store

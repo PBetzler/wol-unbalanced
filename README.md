@@ -22,6 +22,12 @@ All changes apply **only to the player's units** — enemies keep vanilla stats.
 
 The campaign maps stay vanilla — the build pipeline only patches each map's dependency list (`DocumentInfo` + `DocumentHeader`) to load our data mod, injects one `include` into the compiled `MapScript.galaxy`, and rebrands a leftover popup. The mod itself is a component-folder `.SC2Mod` whose Galaxy library applies every change **per player** at mission start (catalog modifications + the campaign's own tech-granting functions, e.g. `libCamp_gf_TS_BuyAllTech`). No maps are ever re-saved in the editor. Details in [plan.md](plan.md).
 
+## Download & install
+
+Grab the latest `WoL-Unbalanced-*.zip` from the [Releases page](../../releases) and import it with [GiantGrantGames' Custom Campaign Manager](https://github.com/7thAce/SC2CCM) like any other custom campaign (the zip follows the standard CCM layout: one folder with the mission maps, the mod, and `metadata.txt`). The maps in the zip are Blizzard's own Wings of Liberty campaign maps with one changed dependency line, as is standard for CCM campaigns.
+
+Releases for mod-only changes are automated: pushing a `v*` tag repacks the previous release zip with the current mod ([release workflow](.github/workflows/release.yml)). Map-affecting changes need a local `python3 scripts/build.py package` once.
+
 ## Building
 
 This repo contains **only our own code and data** — no Blizzard content and no third-party mod files are redistributed. To build you need to provide (under the gitignored `mods/` folder):
