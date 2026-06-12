@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Rule 10: heroes join their base units' armory upgrade effect lists (the campaign
+         already lists mercs here — e.g. CombatShield covers Marine AND WarPig; we append
+         the heroes). Hero units are player-exclusive, so this is rule-9-safe. -->
+    <CUpgrade id="CombatShield">
+        <EffectArray Reference="Unit,Raynor01,LifeMax" Value="10"/>
+        <EffectArray Reference="Unit,Raynor01,LifeStart" Value="10"/>
+        <EffectArray Reference="Unit,RaynorCommando,LifeMax" Value="10"/>
+        <EffectArray Reference="Unit,RaynorCommando,LifeStart" Value="10"/>
+        <EffectArray Reference="Unit,Raynor,LifeMax" Value="10"/>
+        <EffectArray Reference="Unit,Raynor,LifeStart" Value="10"/>
+    </CUpgrade>
+    <CUpgrade id="FirebatJuggernautPlating">
+        <EffectArray Reference="Unit,TychusCommando,LifeArmor" Value="2"/>
+        <EffectArray Reference="Unit,TychusChaingun,LifeArmor" Value="2"/>
+    </CUpgrade>
+    <CUpgrade id="JuggernautPlating">
+        <EffectArray Reference="Unit,Swann,LifeArmor" Value="2"/>
+    </CUpgrade>
+    <CUpgrade id="MarauderLifeBoost">
+        <EffectArray Reference="Unit,Swann,LifeMax" Value="25"/>
+        <EffectArray Reference="Unit,Swann,LifeStart" Value="25"/>
+    </CUpgrade>
+</Catalog>

@@ -241,23 +241,10 @@ def emit():
     for idx in ("Research3", "Research4", "Research5", "Research7", "Research8", "Research9"):
         lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[{idx}].Time", p, "30", c_upgradeOperationSet);')
 
-    lines.append("")
-    lines.append("    // --- Heroes get the base units' abilities (rule 10): stim for the bio heroes ---")
-    lines.append("    // EXPERIMENTAL: appends ability + command-card button via catalog; verify in game.")
-    hero_abils = [
-        # (unit, free AbilArray index, ability, button face, abil cmd)
-        ("Raynor01", 3, "Stimpack", "Stim", "Stimpack,Execute"),
-        ("RaynorCommando", 4, "Stimpack", "Stim", "Stimpack,Execute"),
-        ("Raynor", 7, "Stimpack", "Stim", "Stimpack,Execute"),
-        ("TychusCommando", 4, "Stimpack", "Stim", "Stimpack,Execute"),
-        ("TychusChaingun", 3, "Stimpack", "Stim", "Stimpack,Execute"),
-        ("Swann", 4, "StimpackMarauder", "Stim", "StimpackMarauder,Execute"),
-    ]
-    BTN = 13  # well past any existing command-card button index
-    for unit, ai, abil, face, cmd in hero_abils:
-        lines.append(f'    CatalogFieldValueModify(c_gameCatalogUnit, "{unit}", "AbilArray[{ai}].Link", p, "{abil}", c_upgradeOperationSet);')
-        for field, val in (("Face", face), ("Type", "AbilCmd"), ("AbilCmd", cmd), ("Row", "2"), ("Column", "1")):
-            lines.append(f'    CatalogFieldValueModify(c_gameCatalogUnit, "{unit}", "CardLayouts[0].LayoutButtons[{BTN}].{field}", p, "{val}", c_upgradeOperationSet);')
+    # NOTE: hero stim abilities/buttons are NOT granted here — CatalogFieldValueModify
+    # cannot CREATE array entries (AbilArray/LayoutButtons), only edit existing ones.
+    # They live in src/mod/Base.SC2Data/GameData/UnitData.xml instead (hero units are
+    # player-exclusive, so static XML is rule-9-safe for them).
 
     lines.append("}")
     lines.append("")

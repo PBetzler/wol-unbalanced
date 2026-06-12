@@ -1,0 +1,2 @@
+Button/Name/Stim=Super Stimpack
+Button/Tooltip/Stim=Increases movement and attack speed and <c val="00FF40">heals 30 life</c>.<n/>WoL Unbalanced: stims heal instead of hurting.

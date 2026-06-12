@@ -179,43 +179,4 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research7].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research8].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research9].Time", p, "30", c_upgradeOperationSet);
-
-    // --- Heroes get the base units' abilities (rule 10): stim for the bio heroes ---
-    // EXPERIMENTAL: appends ability + command-card button via catalog; verify in game.
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "AbilArray[3].Link", p, "Stimpack", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "AbilArray[4].Link", p, "Stimpack", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "AbilArray[7].Link", p, "Stimpack", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "AbilArray[4].Link", p, "Stimpack", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "AbilArray[3].Link", p, "Stimpack", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "AbilArray[4].Link", p, "StimpackMarauder", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "StimpackMarauder,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
 }

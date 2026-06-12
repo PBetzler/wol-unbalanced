@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Catalog>
     <!-- Definitions only (rule 9): anything here applies to ALL players, so no direct stat
-         edits on existing units. Player-scoped changes live in LibWoLUnbalanced.galaxy. -->
+         edits on player-shared units. Player-scoped changes live in LibWoLUnbalanced.galaxy.
+         Hero units are PLAYER-EXCLUSIVE, so giving them base-unit abilities here is safe —
+         and necessary: CatalogFieldValueModify cannot create new array entries at runtime. -->
+
+    <!-- Rule 10: bio heroes inherit Stimpack from their base units -->
+    <CUnit id="Raynor01">
+        <AbilArray Link="Stimpack"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="RaynorCommando">
+        <AbilArray Link="Stimpack"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Raynor">
+        <AbilArray Link="Stimpack"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="TychusCommando">
+        <AbilArray Link="Stimpack"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="TychusChaingun">
+        <AbilArray Link="Stimpack"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Swann">
+        <AbilArray Link="StimpackMarauder"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauder,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
 </Catalog>
