@@ -1,0 +1,14 @@
+# Downloaded third-party mods, reference data, and game files — never commit/republish
+mods/
+
+# Vendored third-party sources and build output
+vendor/
+build/
+
+# Compiled tools (source lives in tools/)
+tools/mpqpatch
+
+# OS / Python noise
+.DS_Store
+__pycache__/
+*.pyc

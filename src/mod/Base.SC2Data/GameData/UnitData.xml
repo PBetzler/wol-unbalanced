@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Definitions only (rule 9): anything here applies to ALL players, so no direct stat
+         edits on existing units. Player-scoped changes live in LibWoLUnbalanced.galaxy. -->
+</Catalog>

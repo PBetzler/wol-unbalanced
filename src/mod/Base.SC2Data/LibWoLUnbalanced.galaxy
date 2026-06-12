@@ -1,0 +1,93 @@
+//==================================================================================================
+// WoL Unbalanced — per-player data application library
+//
+// Rule 9: all stat changes apply ONLY to the human player (player 1); enemies keep vanilla
+// values. Therefore stat edits happen here via per-player catalog modification, not in the
+// static XML catalogs (those only carry definitions: new abilities, effects, buttons, upgrades).
+//
+// The build pipeline injects `include "LibWoLUnbalanced"` and a `libWoLU_InitLib()` call into every
+// map's MapScript.galaxy — maps are never re-saved in the editor.
+//==================================================================================================
+include "TriggerLibs/NativeLib"
+include "LibWoLUnbalancedGen"
+
+const int libWoLU_Player = 1;
+
+void libWoLU_ApplyPlayer (int p) {
+    libWoLUGen_Apply(p);
+}
+
+bool libWoLU_OnMapInit (bool testConds, bool runActions) {
+    libWoLU_ApplyPlayer(libWoLU_Player);
+    // Visible proof that the mod's library actually ran (not just the map patches).
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced: player data applied."));
+    return true;
+}
+
+// Rules 2/3/6 + "both sides of every choice": grant the full armory, purchase every
+// non-locked merc (locked = counterpart not yet unlocked, which keeps rule 3 intact),
+// sync both halves of each lab-research pair, and unlock both story-branch units.
+// Runs AFTER the mission's own libCamp_gf_ApplyCampaignTech (we re-apply on top via
+// Blizzard's own functions, so UI/help/merc panels stay consistent).
+void libWoLU_GrantCampaignTech (int p) {
+    int i;
+
+    if (PlayerRace(p) != "Terr") {
+        return; // Protoss interludes manage their own tech; nothing to grant there.
+    }
+
+    // Ghost/Spectre story branch: if either side is unlocked, enable both groups.
+    if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled) || (libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionSpectre] == c_purchaseCategoryStateEnabled)) {
+        libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] = c_purchaseCategoryStateEnabled;
+        libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionSpectre] = c_purchaseCategoryStateEnabled;
+    }
+
+    // Lab research: both sides of every pair (ids 1/2, 3/4, ... 19/20 — includes
+    // Raven/Science Vessel and Predator/Hercules).
+    i = 1;
+    while (i <= 19) {
+        if ((libCamp_gv_tSX_ResearchState[i] == libCamp_ge_StoryResearchState_ResearchStatePurchased) || (libCamp_gv_tSX_ResearchState[(i + 1)] == libCamp_ge_StoryResearchState_ResearchStatePurchased)) {
+            libCamp_gv_tSX_ResearchState[i] = libCamp_ge_StoryResearchState_ResearchStatePurchased;
+            libCamp_gv_tSX_ResearchState[(i + 1)] = libCamp_ge_StoryResearchState_ResearchStatePurchased;
+        }
+        i = i + 2;
+    }
+
+    // Rule 2: every armory upgrade counts as purchased.
+    libCamp_gf_TS_BuyAllTech();
+
+    // Rules 3/6: every merc whose counterpart is unlocked counts as hired.
+    i = libCamp_gv_TSC_MERC_FIRST;
+    while (i <= libCamp_gv_TSC_MERC_LAST) {
+        if ((libCamp_gf_MercStatusCheck(libCamp_gv_tS_MercID[i], libCamp_ge_StoryMercStatus_Locked) == false)) {
+            libCamp_gf_SetMercStatus(libCamp_gv_tS_MercID[i], libCamp_ge_StoryMercStatus_Purchased);
+        }
+        i = i + 1;
+    }
+
+    // Re-apply everything through the campaign's own code paths.
+    libCamp_gf_ApplyCampaignTech(p);
+    libCamp_gf_TS_ApplyMercenaryTech(p);
+    libCamp_gf_TS_ApplyMercUpgrades(p);
+
+    // Branch units last — the apply pass above may have re-restricted them.
+    if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled)) {
+        TechTreeUnitAllow(p, "Ghost", true);
+        TechTreeUnitAllow(p, "Spectre", true);
+    }
+}
+
+bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
+    libWoLU_GrantCampaignTech(libWoLU_Player);
+    return true;
+}
+
+void libWoLU_InitLib () {
+    trigger t;
+    TriggerAddEventMapInit(TriggerCreate("libWoLU_OnMapInit"));
+    // Grant slightly after init (mission setup applies vanilla tech first), with a
+    // late second pass for missions that set up tech after intro sequences.
+    t = TriggerCreate("libWoLU_OnGrantTech");
+    TriggerAddEventTimeElapsed(t, 1.0, c_timeGame);
+    TriggerAddEventTimeElapsed(t, 10.0, c_timeGame);
+}
