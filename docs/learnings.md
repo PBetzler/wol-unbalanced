@@ -43,6 +43,20 @@ gotcha; authoritative details live in the code/plan, not here.
   XML). Per-player runtime LINK edits (`AbilArray[i].Link`, `WeaponArray[i].Link`,
   `LayoutButtons[j].AbilCmd` via `CatalogFieldValueModify`) are **silent no-ops** —
   only scalar stat-like fields apply per player.
+- **Append, don't override, abilities that enemies actively use** (Snipe, Obliterate):
+  replacing the AbilArray slot would lock the requirement-gated clone for AI too and
+  change enemy behavior. Append the clone as a NEW ability slot and index-override
+  only the card BUTTON's `AbilCmd` — cards are pure UI, the AI never reads them.
+  (Override-in-place is fine only when the vanilla ability was requirement-gated and
+  never granted to AI — the stim case.)
+- A `CAbilEffectTarget`/`CWeaponLegacy` with **no `Effect` element defaults the link
+  to its own id** (vanilla `Obliterate` ability → `Obliterate` damage effect). Clones
+  must set `Effect` explicitly or they point at a nonexistent `<clone-id>` effect.
+- **Verify Blizzard ids letter-by-letter** — the Marine rifle is `GuassRifle`
+  (Blizzard's typo). A runtime edit on a misspelled id is a silent no-op; our Marine
+  +1 range was dead for a whole batch. Same for card cells: audit the unit's vanilla
+  card before placing buttons (hero rows 2,0–2,3 are often fully occupied; a
+  colliding button silently hides one of the two).
 - XML index-overrides are GLOBAL, so the player gate lives inside the clone:
   **abilities** gate their button on the `WoLUHaveFlag` requirement (flag upgrade
   only our library grants); **weapons** fire without buttons, so the clone must stay
