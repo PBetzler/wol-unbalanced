@@ -18,6 +18,7 @@ const int libWoLU_Player = 1;
 void libWoLU_SyncWeaponArmorLevels (int p);
 void libWoLU_DisableArmoryResearch (int p);
 void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
+void libWoLU_ForceGrantAllTechRewards (int p);
 
 void libWoLU_ApplyPlayer (int p) {
     libWoLUGen_Apply(p);
@@ -83,6 +84,37 @@ void libWoLU_GrantCampaignTech (int p) {
     if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled)) {
         TechTreeUnitAllow(p, "Ghost", true);
         TechTreeUnitAllow(p, "Spectre", true);
+    }
+
+    // Rule 2, strict reading: upgrades exist already in the unit's UNLOCK mission.
+    // BuyAllTech is undone by the engine for tech groups the story hasn't introduced
+    // yet (e.g. everything during Liberation Day), so grant every armory tech's
+    // rewards directly, bypassing the group gate. Mercs stay group-gated (rule 3).
+    libWoLU_ForceGrantAllTechRewards(p);
+}
+
+void libWoLU_ForceGrantAllTechRewards (int p) {
+    int i;
+    int j;
+    int techID;
+    i = libCamp_gv_TSC_TECH_FIRST;
+    while (i <= libCamp_gv_TSC_TECH_LAST) {
+        techID = libCamp_gv_tS_TechID[i];
+        j = 1;
+        while (j <= libCamp_gv_tSC_TECH_AC_COUNT) {
+            if ((libCamp_gf_StoryTechAbilityCommand(techID, j) != null)) {
+                TechTreeAbilityAllow(p, libCamp_gf_StoryTechAbilityCommand(techID, j), true);
+            }
+            j = j + 1;
+        }
+        j = 1;
+        while (j <= libCamp_gv_tSC_TECH_UG_COUNT) {
+            if ((libCamp_gf_StoryTechUpgrade(techID, j) != null)) {
+                libNtve_gf_SetUpgradeLevelForPlayer(p, libCamp_gf_StoryTechUpgrade(techID, j), 1);
+            }
+            j = j + 1;
+        }
+        i = i + 1;
     }
 }
 
