@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Catalog>
+    <!-- Marker upgrade: granted only to the human player by our library; gates all
+         WoLU clone abilities via the WoLUHaveFlag requirement. -->
+    <CUpgrade id="WoLUnbalancedFlag">
+        <EditorCategories value="Race:Terran"/>
+    </CUpgrade>
+
     <!-- Rule 10: heroes join their base units' armory upgrade effect lists (the campaign
          already lists mercs here — e.g. CombatShield covers Marine AND WarPig; we append
          the heroes). Hero units are player-exclusive, so this is rule-9-safe. -->

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Clone approach: the player gets improved "WoLU" versions of abilities while
+         vanilla stays untouched for enemies. These are instant-EFFECT abilities (not
+         behavior abilities like vanilla stim) because only effect-style abilities
+         support engine autocast — which gives the real autocast button circle.
+         Autocast triggers when an enemy is in range and the stim buff is not active. -->
+    <CAbilEffectInstant id="StimpackWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect value="WoLUStimSet"/>
+        <Flags index="Transient" value="1"/>
+        <AutoCastRange value="8"/>
+        <AutoCastFilters value="Visible;Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastValidatorArray value="WoLUNoStimBuff"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="Stim" Requirements="WoLUHaveFlag">
+            <Flags index="AutoCast" value="1"/>
+            <Flags index="AutoCastOn" value="1"/>
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectInstant>
+    <CAbilEffectInstant id="StimpackMarauderWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect value="WoLUStimMarauderSet"/>
+        <Flags index="Transient" value="1"/>
+        <AutoCastRange value="8"/>
+        <AutoCastFilters value="Visible;Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastValidatorArray value="WoLUNoStimMarauderBuff"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="Stim" Requirements="WoLUHaveFlag">
+            <Flags index="AutoCast" value="1"/>
+            <Flags index="AutoCastOn" value="1"/>
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectInstant>
+</Catalog>

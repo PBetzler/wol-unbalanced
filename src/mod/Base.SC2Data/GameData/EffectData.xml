@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Super Stimpack: apply the vanilla stim buff + heal 30 (instead of vanilla's
+         self-damage). Used by the StimpackWoLU clone abilities. -->
+    <CEffectApplyBehavior id="WoLUStimApply">
+        <Behavior value="Stimpack"/>
+    </CEffectApplyBehavior>
+    <CEffectApplyBehavior id="WoLUStimMarauderApply">
+        <Behavior value="StimpackMarauder"/>
+    </CEffectApplyBehavior>
+    <CEffectModifyUnit id="WoLUStimHeal">
+        <ImpactUnit Value="Caster"/>
+        <VitalArray index="Life">
+            <Change value="30"/>
+        </VitalArray>
+    </CEffectModifyUnit>
+    <CEffectSet id="WoLUStimSet">
+        <EffectArray value="WoLUStimApply"/>
+        <EffectArray value="WoLUStimHeal"/>
+    </CEffectSet>
+    <CEffectSet id="WoLUStimMarauderSet">
+        <EffectArray value="WoLUStimMarauderApply"/>
+        <EffectArray value="WoLUStimHeal"/>
+    </CEffectSet>
+
+    <!-- Thor ground attack with sieged-tank-style splash (clone of ThorsHammerDamage;
+         the player's Thor weapon link is swapped to ThorsHammerWoLU at runtime). -->
+    <CEffectDamage id="ThorsHammerDamageWoLU" parent="ThorsHammerDamage">
+        <Kind value="Splash"/>
+        <KindSplash value="Splash"/>
+        <AreaArray Radius="0.8" Fraction="1"/>
+        <AreaArray Radius="1.25" Fraction="0.5"/>
+    </CEffectDamage>
+</Catalog>

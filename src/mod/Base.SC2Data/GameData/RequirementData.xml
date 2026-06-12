@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Satisfied only by players holding the WoLUnbalancedFlag upgrade — which only
+         our library ever grants (to the human player). Gates all WoLU clone abilities. -->
+    <CRequirement id="WoLUHaveFlag">
+        <NodeArray index="Use" Link="WoLUCountFlag"/>
+    </CRequirement>
+</Catalog>

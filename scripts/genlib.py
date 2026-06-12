@@ -100,6 +100,45 @@ def train_entries():
     return entries
 
 
+# Vanilla->clone swaps: the player's units get the improved WoLU versions by editing
+# their EXISTING ability/weapon/button links (catalog modify can edit, not create).
+# Indices are derived from the reference XML so they can't drift.
+STIM_SWAPS = {"Marine": ("Stimpack", "StimpackWoLU"),
+              "Marauder": ("StimpackMarauder", "StimpackMarauderWoLU"),
+              "WarPig": ("Stimpack", "StimpackWoLU"),
+              "HammerSecurity": ("StimpackMarauder", "StimpackMarauderWoLU")}
+WEAPON_SWAPS = {"Thor": ("ThorsHammer", "ThorsHammerWoLU")}
+
+
+def clone_swaps():
+    out = []
+    seen = set()
+    for _, root in load("UnitData.xml"):
+        for unit in root.iter("CUnit"):
+            uid = unit.get("id")
+            if uid in STIM_SWAPS:
+                old, new = STIM_SWAPS[uid]
+                for i, a in enumerate(unit.findall("AbilArray")):
+                    key = (uid, "abil", i)
+                    if a.get("Link") == old and key not in seen:
+                        seen.add(key)
+                        out.append((uid, f"AbilArray[{i}].Link", new, f"{uid}: {old} -> {new}"))
+                for ci, card in enumerate(unit.findall("CardLayouts")):
+                    for bi, b in enumerate(card.findall("LayoutButtons")):
+                        key = (uid, "btn", ci, bi)
+                        if b.get("AbilCmd") == f"{old},Execute" and key not in seen:
+                            seen.add(key)
+                            out.append((uid, f"CardLayouts[{ci}].LayoutButtons[{bi}].AbilCmd", f"{new},Execute", ""))
+            if uid in WEAPON_SWAPS:
+                old, new = WEAPON_SWAPS[uid]
+                for i, w in enumerate(unit.findall("WeaponArray")):
+                    key = (uid, "weap", i)
+                    if w.get("Link") == old and key not in seen:
+                        seen.add(key)
+                        out.append((uid, f"WeaponArray[{i}].Link", new, f"{uid}: {old} -> {new}"))
+    return out
+
+
 def emit():
     lines = [
         "//==================================================================================================",
@@ -180,12 +219,8 @@ def emit():
         ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA: HIP floor 35/rocket (LotV Punisher)"),
         ("Effect", "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", "0", "Set", ""),
         ("Weapon", "JavelinMissileLaunchers", "Range", "12", "Set", "Thor AA range = HIP range 11 + 1"),
-        # Thor ground attack: sieged-tank-like splash
-        ("Effect", "ThorsHammerDamage", "Kind", "Splash", "Set", "Thor ground: splash like sieged tank"),
-        ("Effect", "ThorsHammerDamage", "AreaArray[0].Radius", "0.8", "Set", ""),
-        ("Effect", "ThorsHammerDamage", "AreaArray[0].Fraction", "1", "Set", ""),
-        ("Effect", "ThorsHammerDamage", "AreaArray[1].Radius", "1.25", "Set", ""),
-        ("Effect", "ThorsHammerDamage", "AreaArray[1].Fraction", "0.5", "Set", ""),
+        # (Thor ground splash lives in the ThorsHammerWoLU weapon clone — runtime catalog
+        #  modify cannot CREATE AreaArray entries; the weapon link swap is emitted below.)
         # Siege tank: no friendly fire (campaign implements FF via separate friendly effects)
         ("Effect", "CrucioShockCannonFriendlyDamage", "Amount", "0", "Set", "tank sieged splash: no friendly fire"),
         ("Effect", "CrucioShockCannonFriendlyTargetDamage", "Amount", "0", "Set", ""),
@@ -213,10 +248,8 @@ def emit():
         ("Unit", "DuskWing", "Speed", "1.25", "Multiply", "Banshee line: Hyperflight Rotors"),
         ("Weapon", "OdinAntiAir", "Range", "12", "Set", "Odin mirrors Thor AA range"),
         # --- AP ports, direct-field batch ---
-        ("Abil", "Stimpack", "Cost[0].Vital[Life]", "-30", "Set", "AP Super Stimpack: stim HEALS 30 (both path forms emitted)"),
-        ("Abil", "Stimpack", "Cost.Vital[Life]", "-30", "Set", ""),
-        ("Abil", "StimpackMarauder", "Cost[0].Vital[Life]", "-30", "Set", ""),
-        ("Abil", "StimpackMarauder", "Cost.Vital[Life]", "-30", "Set", ""),
+        # (Super Stimpack lives in the StimpackWoLU clone abilities now — see AbilData.xml
+        #  and the clone link swaps emitted below.)
         ("Weapon", "GaussRifle", "Range", "6", "Set", "Marine Laser Targeting System: +1 range"),
         ("Unit", "SCV", "LifeMax", "15", "Add", "AP Hostile Environment Adaptation"),
         ("Unit", "SCV", "LifeStart", "15", "Add", ""),
@@ -245,6 +278,12 @@ def emit():
     # cannot CREATE array entries (AbilArray/LayoutButtons), only edit existing ones.
     # They live in src/mod/Base.SC2Data/GameData/UnitData.xml instead (hero units are
     # player-exclusive, so static XML is rule-9-safe for them).
+
+    lines.append("")
+    lines.append("    // --- Clone swaps: player units use the improved WoLU versions (vanilla stays enemy-side) ---")
+    for uid, field, val, comment in clone_swaps():
+        suffix = f"  // {comment}" if comment else ""
+        lines.append(f'    CatalogFieldValueModify(c_gameCatalogUnit, "{uid}", "{field}", p, "{val}", c_upgradeOperationSet);{suffix}')
 
     lines.append("}")
     lines.append("")

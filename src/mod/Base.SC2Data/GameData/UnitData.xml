@@ -7,54 +7,54 @@
 
     <!-- Rule 10: bio heroes inherit Stimpack from their base units -->
     <CUnit id="Raynor01">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="RaynorCommando">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Raynor">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusCommando">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusChaingun">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Swann">
-        <AbilArray Link="StimpackMarauder"/>
+        <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauder,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
 
     <!-- AP port: Firebats get Stimpack (vanilla campaign firebats have none). The button is
          requirement-gated (UseStimpack), which enemy players never have granted. -->
     <CUnit id="Firebat">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="DevilDog">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
 </Catalog>

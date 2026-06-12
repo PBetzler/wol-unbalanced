@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Player Thor's ground weapon: vanilla + splash + capped windup. -->
+    <CWeaponLegacy id="ThorsHammerWoLU" parent="ThorsHammer">
+        <DisplayEffect value="ThorsHammerDamageWoLU"/>
+        <Effect value="ThorsHammerDamageWoLU"/>
+        <DamagePoint value="0.1"/>
+    </CWeaponLegacy>
+</Catalog>

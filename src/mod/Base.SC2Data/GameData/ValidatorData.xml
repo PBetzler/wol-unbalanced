@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Autocast gate: don't re-stim while the buff is active. -->
+    <CValidatorUnitCompareBehaviorCount id="WoLUNoStimBuff">
+        <Unit Value="Caster"/>
+        <Behavior value="Stimpack"/>
+        <Compare value="LT"/>
+        <Value value="1"/>
+    </CValidatorUnitCompareBehaviorCount>
+    <CValidatorUnitCompareBehaviorCount id="WoLUNoStimMarauderBuff">
+        <Unit Value="Caster"/>
+        <Behavior value="StimpackMarauder"/>
+        <Compare value="LT"/>
+        <Value value="1"/>
+    </CValidatorUnitCompareBehaviorCount>
+</Catalog>

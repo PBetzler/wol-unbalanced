@@ -91,6 +91,10 @@ void libWoLU_GrantCampaignTech (int p) {
     // yet (e.g. everything during Liberation Day), so grant every armory tech's
     // rewards directly, bypassing the group gate. Mercs stay group-gated (rule 3).
     libWoLU_ForceGrantAllTechRewards(p);
+
+    // Unlock the WoLU clone abilities (autocast Super Stimpack etc.) — the flag
+    // upgrade is the requirement gate that only the human player ever satisfies.
+    TechTreeUpgradeAddLevel(p, "WoLUnbalancedFlag", 1);
 }
 
 void libWoLU_ForceGrantAllTechRewards (int p) {
@@ -180,44 +184,8 @@ void libWoLU_AddBehaviorToType (int p, string unitType, string behavior) {
     }
 }
 
-// Auto-stim (user spec): when a stim-capable unit attacks, stim — unless the buff is
-// already active or the ability is on cooldown; in those cases the unit is simply
-// re-checked on the next 1 s tick. Stim is transient, so the order never interrupts
-// the unit's current command. (Cooldown case: the issued order no-ops and retries.)
-void libWoLU_AutoStimType (int p, string unitType, string abil, string buff) {
-    unitgroup g;
-    unit u;
-    int i;
-    g = UnitGroup(unitType, p, RegionEntireMap(), UnitFilter(0, 0, 0, (1 << (c_targetFilterDead - 32))), 0);
-    i = UnitGroupCount(g, c_unitCountAll);
-    for ( ; i >= 1; i -= 1 ) {
-        u = UnitGroupUnitFromEnd(g, i);
-        if ((u != null) && (UnitOrderHasAbil(u, "attack") == true) && (UnitBehaviorCount(u, buff) == 0)) {
-            UnitIssueOrder(u, Order(AbilityCommand(abil, 0)), c_orderQueueAddToFront);
-        }
-    }
-}
-
-bool libWoLU_OnAutoStim (bool testConds, bool runActions) {
-    int p;
-    p = libWoLU_Player;
-    if (PlayerRace(p) != "Terr") {
-        return true;
-    }
-    libWoLU_AutoStimType(p, "Marine", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "Firebat", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "Marauder", "StimpackMarauder", "StimpackMarauder");
-    libWoLU_AutoStimType(p, "WarPig", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "DevilDog", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "HammerSecurity", "StimpackMarauder", "StimpackMarauder");
-    libWoLU_AutoStimType(p, "Raynor01", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "RaynorCommando", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "Raynor", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "TychusCommando", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "TychusChaingun", "Stimpack", "Stimpack");
-    libWoLU_AutoStimType(p, "Swann", "StimpackMarauder", "StimpackMarauder");
-    return true;
-}
+// (Scripted auto-stim removed: the StimpackWoLU clone abilities carry real engine
+// autocast — dashed circle included — defined in AbilData.xml.)
 
 bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
     if (PlayerRace(libWoLU_Player) == "Terr") {
@@ -237,5 +205,4 @@ void libWoLU_InitLib () {
     TriggerAddEventTimeElapsed(t, 1.0, c_timeGame);
     TriggerAddEventTimeElapsed(t, 10.0, c_timeGame);
     TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnPeriodic"), 2.0, c_timeGame);
-    TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnAutoStim"), 1.0, c_timeGame);
 }
