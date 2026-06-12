@@ -44,6 +44,25 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "BacklashRockets", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Banshee, was default 0.167
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Battlecruiser, was default 0.167
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Battlecruiser, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "TychusCommandoChaingun", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // TychusCommando, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "TychusChaingun", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // TychusChaingun, was 0.25
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SwannMelee", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Swann, was 0.2
+    CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Odin, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Odin, was 0.831
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DevilDogFlameThrower", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DevilDog, was 0.5
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyG", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // SpartanCompany, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // SpartanCompany, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyGUpgraded", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // SpartanCompany, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyAUpgraded", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // SpartanCompany, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SiegeBreaker", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // SiegeBreaker, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ArcliteShockCannon", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // SiegeBreakerSieged, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "WreckingCrewFighter", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // HelsAngelFighter, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "WreckingCrewAssault", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // HelsAngelAssault, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DuskWingBanshee", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DuskWing, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserG", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
 
     // --- Rule 5: build time cap 60 s (+ explicit overrides) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "FactoryTrain", "InfoArray[Train10].Time", p, "10.0", c_upgradeOperationSet);  // Predator, was 40.0
@@ -114,6 +133,44 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyDamage", "Amount", p, "0", c_upgradeOperationSet);  // tank sieged splash: no friendly fire
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyTargetDamage", "Amount", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Button.Requirements", p, "HaveAttachedTechLab", c_upgradeOperationSet);  // Hercules: no Fusion Core needed
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);  // Marine line: x65/45 (Raynor variants + War Pigs)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "LifeStart", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "LifeStart", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "LifeStart", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "WarPig", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "WarPig", "LifeStart", p, "1.4444", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat line: x2 (Tychus variants + Devil Dogs)
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "LifeStart", p, "2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "LifeMax", p, "2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "LifeStart", p, "2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeMax", p, "2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeStart", p, "2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeMax", p, "1.2", c_upgradeOperationMultiply);  // Goliath line: x150/125 (Shaped Hull +25)
+    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeStart", p, "1.2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "DukesRevenge", "LifeArmor", p, "2", c_upgradeOperationAdd);  // BC line: Behemoth Plating + Moirai drive
+    CatalogFieldValueModify(c_gameCatalogUnit, "DukesRevenge", "Speed", p, "1.25", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Banshee line: Hyperflight Rotors
+    CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "Range", p, "12", c_upgradeOperationSet);  // Odin mirrors Thor AA range
+    CatalogFieldValueModify(c_gameCatalogAbil, "Stimpack", "Cost[0].Vital[Life]", p, "-30", c_upgradeOperationSet);  // AP Super Stimpack: stim HEALS 30 (both path forms emitted)
+    CatalogFieldValueModify(c_gameCatalogAbil, "Stimpack", "Cost.Vital[Life]", p, "-30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "StimpackMarauder", "Cost[0].Vital[Life]", p, "-30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "StimpackMarauder", "Cost.Vital[Life]", p, "-30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "GaussRifle", "Range", p, "6", c_upgradeOperationSet);  // Marine Laser Targeting System: +1 range
+    CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeMax", p, "15", c_upgradeOperationAdd);  // AP Hostile Environment Adaptation
+    CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeStart", p, "15", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeMax", p, "10", c_upgradeOperationAdd);  // AP Ballistic Flightsuit
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeStart", p, "10", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Vulture", "Speed", p, "1.25", c_upgradeOperationMultiply);  // AP Ion Thrusters
+    CatalogFieldValueModify(c_gameCatalogUnit, "Vulture", "LifeRegenRate", p, "1", c_upgradeOperationSet);  // AP Jerry-Rigged Patchup
+    CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "LifeMax", p, "25", c_upgradeOperationAdd);  // AP Shaped Hull
+    CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Banshee", "Speed", p, "1.25", c_upgradeOperationMultiply);  // AP Hyperflight Rotors
+    CatalogFieldValueModify(c_gameCatalogUnit, "Battlecruiser", "LifeArmor", p, "2", c_upgradeOperationAdd);  // AP Behemoth Plating
+    CatalogFieldValueModify(c_gameCatalogUnit, "Battlecruiser", "Speed", p, "1.25", c_upgradeOperationMultiply);  // AP Moirai Impulse Drive
+    CatalogFieldValueModify(c_gameCatalogAbil, "MedivacTransport", "TotalCargoSpace", p, "12", c_upgradeOperationSet);  // AP Expanded Hull: 8 -> 12 cargo
+    CatalogFieldValueModify(c_gameCatalogAbil, "MedivacTransport", "MaxCargoCount", p, "12", c_upgradeOperationSet);
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);
@@ -122,4 +179,43 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research7].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research8].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research9].Time", p, "30", c_upgradeOperationSet);
+
+    // --- Heroes get the base units' abilities (rule 10): stim for the bio heroes ---
+    // EXPERIMENTAL: appends ability + command-card button via catalog; verify in game.
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "AbilArray[3].Link", p, "Stimpack", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "AbilArray[4].Link", p, "Stimpack", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "AbilArray[7].Link", p, "Stimpack", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "AbilArray[4].Link", p, "Stimpack", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "AbilArray[3].Link", p, "Stimpack", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "Stimpack,Execute", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "AbilArray[4].Link", p, "StimpackMarauder", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Face", p, "Stim", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Type", p, "AbilCmd", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].AbilCmd", p, "StimpackMarauder,Execute", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Row", p, "2", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "CardLayouts[0].LayoutButtons[13].Column", p, "1", c_upgradeOperationSet);
 }

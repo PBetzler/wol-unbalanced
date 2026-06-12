@@ -16,13 +16,21 @@ CATALOGS = ["mods/liberty.sc2mod", "campaigns/liberty.sc2campaign",
             "campaigns/libertystory.sc2campaign"]
 
 # Player-faction units whose weapons get the rule-7 damage-point cap.
-# Mercs/heroes get appended in a later batch once their ids are mapped.
+# Heroes and mercenaries inherit the cap (rules 4/10) — their weapons are
+# collected from the catalogs automatically.
+HERO_MERC_UNITS = [
+    "Raynor01", "RaynorCommando", "Raynor", "TychusCommando", "TychusChaingun",
+    "Swann", "Stetmann", "Nova", "Tosh", "Odin",
+    "WarPig", "DevilDog", "HammerSecurity", "SpartanCompany", "SiegeBreaker",
+    "SiegeBreakerSieged", "HelsAngelFighter", "HelsAngelAssault", "DuskWing",
+    "DukesRevenge",
+]
 PLAYER_UNITS = [
     "SCV", "Marine", "Medic", "Firebat", "Marauder", "Reaper", "Ghost", "Spectre",
     "Hellion", "Vulture", "Goliath", "Diamondback", "SiegeTank", "SiegeTankSieged",
     "Thor", "Predator", "Medivac", "Wraith", "VikingAssault", "VikingFighter",
     "Banshee", "Battlecruiser", "Raven", "ScienceVessel", "Hercules",
-]
+] + HERO_MERC_UNITS
 
 DAMAGE_POINT_CAP = 0.1
 BUILD_TIME_CAP = 60.0
@@ -183,6 +191,46 @@ def emit():
         ("Effect", "CrucioShockCannonFriendlyTargetDamage", "Amount", "0", "Set", ""),
         # Hercules trainable without Fusion Core
         ("Abil", "StarportTrain", "InfoArray[Train6].Button.Requirements", "HaveAttachedTechLab", "Set", "Hercules: no Fusion Core needed"),
+        # --- Hero/merc parity (rules 4/10): keep % advantage over changed base units ---
+        ("Unit", "Raynor01", "LifeMax", "1.4444", "Multiply", "Marine line: x65/45 (Raynor variants + War Pigs)"),
+        ("Unit", "Raynor01", "LifeStart", "1.4444", "Multiply", ""),
+        ("Unit", "RaynorCommando", "LifeMax", "1.4444", "Multiply", ""),
+        ("Unit", "RaynorCommando", "LifeStart", "1.4444", "Multiply", ""),
+        ("Unit", "Raynor", "LifeMax", "1.4444", "Multiply", ""),
+        ("Unit", "Raynor", "LifeStart", "1.4444", "Multiply", ""),
+        ("Unit", "WarPig", "LifeMax", "1.4444", "Multiply", ""),
+        ("Unit", "WarPig", "LifeStart", "1.4444", "Multiply", ""),
+        ("Unit", "TychusCommando", "LifeMax", "2", "Multiply", "Firebat line: x2 (Tychus variants + Devil Dogs)"),
+        ("Unit", "TychusCommando", "LifeStart", "2", "Multiply", ""),
+        ("Unit", "TychusChaingun", "LifeMax", "2", "Multiply", ""),
+        ("Unit", "TychusChaingun", "LifeStart", "2", "Multiply", ""),
+        ("Unit", "DevilDog", "LifeMax", "2", "Multiply", ""),
+        ("Unit", "DevilDog", "LifeStart", "2", "Multiply", ""),
+        ("Unit", "SpartanCompany", "LifeMax", "1.2", "Multiply", "Goliath line: x150/125 (Shaped Hull +25)"),
+        ("Unit", "SpartanCompany", "LifeStart", "1.2", "Multiply", ""),
+        ("Unit", "DukesRevenge", "LifeArmor", "2", "Add", "BC line: Behemoth Plating + Moirai drive"),
+        ("Unit", "DukesRevenge", "Speed", "1.25", "Multiply", ""),
+        ("Unit", "DuskWing", "Speed", "1.25", "Multiply", "Banshee line: Hyperflight Rotors"),
+        ("Weapon", "OdinAntiAir", "Range", "12", "Set", "Odin mirrors Thor AA range"),
+        # --- AP ports, direct-field batch ---
+        ("Abil", "Stimpack", "Cost[0].Vital[Life]", "-30", "Set", "AP Super Stimpack: stim HEALS 30 (both path forms emitted)"),
+        ("Abil", "Stimpack", "Cost.Vital[Life]", "-30", "Set", ""),
+        ("Abil", "StimpackMarauder", "Cost[0].Vital[Life]", "-30", "Set", ""),
+        ("Abil", "StimpackMarauder", "Cost.Vital[Life]", "-30", "Set", ""),
+        ("Weapon", "GaussRifle", "Range", "6", "Set", "Marine Laser Targeting System: +1 range"),
+        ("Unit", "SCV", "LifeMax", "15", "Add", "AP Hostile Environment Adaptation"),
+        ("Unit", "SCV", "LifeStart", "15", "Add", ""),
+        ("Unit", "Reaper", "LifeMax", "10", "Add", "AP Ballistic Flightsuit"),
+        ("Unit", "Reaper", "LifeStart", "10", "Add", ""),
+        ("Unit", "Vulture", "Speed", "1.25", "Multiply", "AP Ion Thrusters"),
+        ("Unit", "Vulture", "LifeRegenRate", "1", "Set", "AP Jerry-Rigged Patchup"),
+        ("Unit", "Goliath", "LifeMax", "25", "Add", "AP Shaped Hull"),
+        ("Unit", "Goliath", "LifeStart", "25", "Add", ""),
+        ("Unit", "Banshee", "Speed", "1.25", "Multiply", "AP Hyperflight Rotors"),
+        ("Unit", "Battlecruiser", "LifeArmor", "2", "Add", "AP Behemoth Plating"),
+        ("Unit", "Battlecruiser", "Speed", "1.25", "Multiply", "AP Moirai Impulse Drive"),
+        ("Abil", "MedivacTransport", "TotalCargoSpace", "12", "Set", "AP Expanded Hull: 8 -> 12 cargo"),
+        ("Abil", "MedivacTransport", "MaxCargoCount", "12", "Set", ""),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""
@@ -192,6 +240,24 @@ def emit():
     lines.append("    // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---")
     for idx in ("Research3", "Research4", "Research5", "Research7", "Research8", "Research9"):
         lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[{idx}].Time", p, "30", c_upgradeOperationSet);')
+
+    lines.append("")
+    lines.append("    // --- Heroes get the base units' abilities (rule 10): stim for the bio heroes ---")
+    lines.append("    // EXPERIMENTAL: appends ability + command-card button via catalog; verify in game.")
+    hero_abils = [
+        # (unit, free AbilArray index, ability, button face, abil cmd)
+        ("Raynor01", 3, "Stimpack", "Stim", "Stimpack,Execute"),
+        ("RaynorCommando", 4, "Stimpack", "Stim", "Stimpack,Execute"),
+        ("Raynor", 7, "Stimpack", "Stim", "Stimpack,Execute"),
+        ("TychusCommando", 4, "Stimpack", "Stim", "Stimpack,Execute"),
+        ("TychusChaingun", 3, "Stimpack", "Stim", "Stimpack,Execute"),
+        ("Swann", 4, "StimpackMarauder", "Stim", "StimpackMarauder,Execute"),
+    ]
+    BTN = 13  # well past any existing command-card button index
+    for unit, ai, abil, face, cmd in hero_abils:
+        lines.append(f'    CatalogFieldValueModify(c_gameCatalogUnit, "{unit}", "AbilArray[{ai}].Link", p, "{abil}", c_upgradeOperationSet);')
+        for field, val in (("Face", face), ("Type", "AbilCmd"), ("AbilCmd", cmd), ("Row", "2"), ("Column", "1")):
+            lines.append(f'    CatalogFieldValueModify(c_gameCatalogUnit, "{unit}", "CardLayouts[0].LayoutButtons[{BTN}].{field}", p, "{val}", c_upgradeOperationSet);')
 
     lines.append("}")
     lines.append("")

@@ -122,9 +122,27 @@ void libWoLU_DisableArmoryResearch (int p) {
     }
 }
 
+// Heroes inherit the base units' cloak (Nova=Ghost, Tosh=Spectre) — the campaign
+// already ships free-cloak behaviors, we just attach them to the heroes' units.
+void libWoLU_AddBehaviorToType (int p, string unitType, string behavior) {
+    unitgroup g;
+    unit u;
+    int i;
+    g = UnitGroup(unitType, p, RegionEntireMap(), UnitFilter(0, 0, 0, (1 << (c_targetFilterDead - 32))), 0);
+    i = UnitGroupCount(g, c_unitCountAll);
+    for ( ; i >= 1; i -= 1 ) {
+        u = UnitGroupUnitFromEnd(g, i);
+        if ((u != null) && (UnitBehaviorCount(u, behavior) == 0)) {
+            UnitBehaviorAdd(u, behavior, u, 1);
+        }
+    }
+}
+
 bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
     if (PlayerRace(libWoLU_Player) == "Terr") {
         libWoLU_SyncWeaponArmorLevels(libWoLU_Player);
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Nova", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Tosh", "SpectreCloakingFree");
     }
     return true;
 }
