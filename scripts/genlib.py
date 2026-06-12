@@ -103,10 +103,11 @@ def train_entries():
 # Vanilla->clone swaps: the player's units get the improved WoLU versions by editing
 # their EXISTING ability/weapon/button links (catalog modify can edit, not create).
 # Indices are derived from the reference XML so they can't drift.
-STIM_SWAPS = {"Marine": ("Stimpack", "StimpackWoLU"),
-              "Marauder": ("StimpackMarauder", "StimpackMarauderWoLU"),
-              "WarPig": ("Stimpack", "StimpackWoLU"),
-              "HammerSecurity": ("StimpackMarauder", "StimpackMarauderWoLU")}
+# Stim swaps moved to static XML index-overrides in UnitData.xml — runtime per-player
+# LINK edits proved to be silent no-ops (only scalar stat fields apply per player).
+# The Thor weapon swap below is kept as an experiment; the runtime diagnostic in
+# LibWoLUnbalanced.galaxy reports whether it actually applies.
+STIM_SWAPS = {}
 WEAPON_SWAPS = {"Thor": ("ThorsHammer", "ThorsHammerWoLU")}
 
 

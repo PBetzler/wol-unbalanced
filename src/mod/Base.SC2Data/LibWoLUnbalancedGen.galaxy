@@ -172,12 +172,5 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research9].Time", p, "30", c_upgradeOperationSet);
 
     // --- Clone swaps: player units use the improved WoLU versions (vanilla stays enemy-side) ---
-    CatalogFieldValueModify(c_gameCatalogUnit, "Marine", "AbilArray[3].Link", p, "StimpackWoLU", c_upgradeOperationSet);  // Marine: Stimpack -> StimpackWoLU
-    CatalogFieldValueModify(c_gameCatalogUnit, "Marine", "CardLayouts[0].LayoutButtons[5].AbilCmd", p, "StimpackWoLU,Execute", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", p, "ThorsHammerWoLU", c_upgradeOperationSet);  // Thor: ThorsHammer -> ThorsHammerWoLU
-    CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "AbilArray[3].Link", p, "StimpackMarauderWoLU", c_upgradeOperationSet);  // Marauder: StimpackMarauder -> StimpackMarauderWoLU
-    CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CardLayouts[0].LayoutButtons[6].AbilCmd", p, "StimpackMarauderWoLU,Execute", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "HammerSecurity", "AbilArray[3].Link", p, "StimpackMarauderWoLU", c_upgradeOperationSet);  // HammerSecurity: StimpackMarauder -> StimpackMarauderWoLU
-    CatalogFieldValueModify(c_gameCatalogUnit, "WarPig", "AbilArray[3].Link", p, "StimpackWoLU", c_upgradeOperationSet);  // WarPig: Stimpack -> StimpackWoLU
-    CatalogFieldValueModify(c_gameCatalogUnit, "WarPig", "CardLayouts[0].LayoutButtons[5].AbilCmd", p, "StimpackWoLU,Execute", c_upgradeOperationSet);
 }

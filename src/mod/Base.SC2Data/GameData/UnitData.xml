@@ -43,6 +43,33 @@
         </CardLayouts>
     </CUnit>
 
+    <!-- Vanilla stim users: REPLACE their stim ability/button slots with the WoLU clone by
+         index (global — but safe: vanilla stim was requirement-gated and no mission ever
+         grants the tech to AI players, and the clone is gated on our flag upgrade which
+         only the human player receives). Runtime per-player link swaps proved to be
+         silent no-ops, so this must live in XML. -->
+    <CUnit id="Marine">
+        <AbilArray index="3" Link="StimpackWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Marauder">
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="6" AbilCmd="StimpackMarauderWoLU,Execute"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="WarPig">
+        <AbilArray index="3" Link="StimpackWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="HammerSecurity">
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
+    </CUnit>
+
     <!-- AP port: Firebats get Stimpack (vanilla campaign firebats have none). The button is
          requirement-gated (UseStimpack), which enemy players never have granted. -->
     <CUnit id="Firebat">
