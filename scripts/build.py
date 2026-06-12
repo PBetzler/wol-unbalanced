@@ -131,6 +131,44 @@ def patch_document_header(map_path: str) -> None:
         os.unlink(tmp.name)
 
 
+def doc_version_counter() -> int:
+    """Monotonic document version derived from VERSION: major*10000+minor*100+patch.
+    Strictly increasing as long as releases bump semver."""
+    major, minor, patch = (int(x) for x in VERSION.split("."))
+    return major * 10000 + minor * 100 + patch
+
+
+def write_version_files(mod_dir: str) -> None:
+    """Emit the per-section .version files the editor maintains and our hand-rolled
+    component folder lacked. Saved games record the section versions of file:
+    dependencies; without them the engine has no "newer version of the same
+    document" path, so ANY mod content change invalidated existing saves, while
+    editor-saved mods (whose .version counters bump) update cleanly.
+
+    44-byte layout decoded from an editor-saved mod (Tactical Arsenal): 'cdes' +
+    reversed section tag, then 9 LE dwords [format=2, editor build, 5, 0, section
+    const, editor build, VERSION COUNTER, last-modified timestamp, 1]. The
+    timestamp is a fixed epoch + counter so identical sources keep producing
+    byte-identical builds (save-friendly: see plan.md)."""
+    import struct
+
+    counter = doc_version_counter()
+    ts = 1750000000 + counter
+    sections = {
+        # filename: (reversed tag, editor build dword, section const)
+        "DocumentInfo.version": (b"ofni", 0x159B4, 0x0A),
+        "GameData.version": (b"adag", 0x16018, 0x0B),
+        "GameText.version": (b"txet", 0x16018, 0x0B),
+    }
+    for fname, (tag, build_no, const) in sections.items():
+        blob = b"cdes" + tag + struct.pack(
+            "<9I", 2, build_no, 5, 0, const, build_no, counter, ts, 1
+        )
+        assert len(blob) == 44
+        with open(os.path.join(mod_dir, fname), "wb") as f:
+            f.write(blob)
+
+
 def build() -> None:
     maps_out = os.path.join(BUILD, "Campaign")
     mods_out = os.path.join(BUILD, "Mods")
@@ -150,6 +188,7 @@ def build() -> None:
         # the source campaign's own mod and metadata are reference-only, not shipped
 
     shutil.copytree(MOD_SRC, os.path.join(mods_out, MOD_NAME))
+    write_version_files(os.path.join(mods_out, MOD_NAME))
     with open(os.path.join(BUILD, "metadata.txt"), "w") as f:
         f.write(f"title={TITLE}\n"
                 "desc=Funnily overpowered Wings of Liberty: your units only, enemies stay vanilla. Not to be taken seriously.\n"
