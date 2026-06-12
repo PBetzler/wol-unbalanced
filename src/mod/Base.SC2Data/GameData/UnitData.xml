@@ -7,7 +7,10 @@
 
     <!-- Rule 10: bio heroes inherit Stimpack from their base units. Variant per base
          unit: Marine line heals 30 (StimpackWoLU), Firebat/Marauder lines heal 60
-         (StimpackMarauderWoLU) — unit-table spec, mirrors NCO's 30/60 split. -->
+         (StimpackMarauderWoLU) — unit-table spec, mirrors NCO's 30/60 split.
+         Button cells chosen against each unit's vanilla card (collisions found the
+         hard way: RaynorCommando 2,1 = radar, Raynor 2,0-2,3 all taken, Tychus
+         2,0/2,1 taken, Firebat 2,0/2,1 taken). -->
     <CUnit id="Raynor01">
         <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
@@ -17,19 +20,19 @@
     <CUnit id="RaynorCommando">
         <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Raynor">
         <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="4"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusCommando">
         <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusChaingun">
@@ -52,8 +55,10 @@
          silent no-ops, so this must live in XML. -->
     <CUnit id="Marine">
         <AbilArray index="3" Link="StimpackWoLU"/>
+        <AbilArray Link="MagrailWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
+            <LayoutButtons Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Marauder">
@@ -81,17 +86,63 @@
 
     <!-- AP port: Firebats get Stimpack (vanilla campaign firebats have none); the 60-heal
          marauder variant per the unit-table. The button is gated on WoLUHaveFlag, which
-         enemy players never receive. -->
+         enemy players never receive. Cell 2,2 — vanilla card has passive-display
+         buttons at 2,0 (Incinerator Nozzles) and 2,1 (Juggernaut Plating). -->
     <CUnit id="Firebat">
         <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="DevilDog">
         <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
+
+    <!-- Super Stimpack rollout per the unit-table Comments: Reaper (heal 30, "add super
+         stim and cloak"), Ghost/Spectre (heal 30, part of their autocast kit), Hellion
+         (heal 60 — NCO gives the Hellbat line the 60-heal marauder set). -->
+    <CUnit id="Reaper">
+        <AbilArray Link="StimpackWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Hellion">
+        <AbilArray Link="StimpackMarauderWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="0"/>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- Ghost/Spectre autocast kit. New ABILITIES are appended (never index-overridden:
+         enemy ghosts/spectres actively use vanilla Snipe/Obliterate — replacing their
+         ability slots would change enemy behavior, rule 9). The vanilla BUTTONS are
+         index-overridden to point at the clones instead: cards are pure UI, the AI
+         never reads them, so this is enemy-safe — and it costs no card space.
+         Ghost buttons (liberty.sc2mod order): [7]=Snipe, [11]=EMP.
+         Spectre buttons (liberty.sc2campaign order): [12]=Obliterate. -->
+    <CUnit id="Ghost">
+        <AbilArray Link="StimpackWoLU"/>
+        <AbilArray Link="SnipeWoLU"/>
+        <AbilArray Link="EMPWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="7" AbilCmd="SnipeWoLU,Execute"/>
+            <LayoutButtons index="11" AbilCmd="EMPWoLU,Execute"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Spectre">
+        <AbilArray Link="StimpackWoLU"/>
+        <AbilArray Link="ObliterateWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="12" AbilCmd="ObliterateWoLU,Execute"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="0"/>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- (Marine Magrail Munitions lives in the Marine block above — autocast bonus
+         shot, 20 dmg, 10 s cooldown, button at the free cell 2,1.) -->
 </Catalog>

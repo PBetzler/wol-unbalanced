@@ -66,7 +66,10 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammerWoLU", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Thor ground clone (XML-wired; vanilla id capped above is now unused)
 
     // --- Rule 5: build time cap 60 s (+ explicit overrides) ---
+    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksTrain", "InfoArray[Train1].Time", p, "19.0", c_upgradeOperationSet);  // Marine, was 25.0
     CatalogFieldValueModify(c_gameCatalogAbil, "FactoryTrain", "InfoArray[Train10].Time", p, "10.0", c_upgradeOperationSet);  // Predator, was 40.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "FactoryTrain", "InfoArray[Train6].Time", p, "22.0", c_upgradeOperationSet);  // Hellion, was 30.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "FactoryTrain", "InfoArray[Train7].Time", p, "30.0", c_upgradeOperationSet);  // Goliath, was 40.0
     CatalogFieldValueModify(c_gameCatalogAbil, "LarvaTrain", "InfoArray[Train7].Time", p, "60.0", c_upgradeOperationSet);  // Ultralisk, was 70.0
     CatalogFieldValueModify(c_gameCatalogAbil, "NexusTrainMothership", "InfoArray[Train1].Time", p, "60.0", c_upgradeOperationSet);  // Mothership, was 160.0
     CatalogFieldValueModify(c_gameCatalogAbil, "RoboticsFacilityTrain", "InfoArray[Train3].Time", p, "60.0", c_upgradeOperationSet);  // Colossus, was 75.0
@@ -149,7 +152,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "DukesRevenge", "Speed", p, "1.25", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Banshee line: Hyperflight Rotors
     CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "Range", p, "12", c_upgradeOperationSet);  // Odin mirrors Thor AA range
-    CatalogFieldValueModify(c_gameCatalogWeapon, "GaussRifle", "Range", p, "6", c_upgradeOperationSet);  // Marine Laser Targeting System: +1 range
+    CatalogFieldValueModify(c_gameCatalogWeapon, "GuassRifle", "Range", p, "6", c_upgradeOperationSet);  // Marine Laser Targeting System: +1 range (id is Blizzard's typo)
     CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeMax", p, "15", c_upgradeOperationAdd);  // AP Hostile Environment Adaptation
     CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeStart", p, "15", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeMax", p, "10", c_upgradeOperationAdd);  // AP Ballistic Flightsuit
@@ -163,6 +166,29 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Battlecruiser", "Speed", p, "1.25", c_upgradeOperationMultiply);  // AP Moirai Impulse Drive
     CatalogFieldValueModify(c_gameCatalogAbil, "MedivacTransport", "TotalCargoSpace", p, "12", c_upgradeOperationSet);  // AP Expanded Hull: 8 -> 12 cargo
     CatalogFieldValueModify(c_gameCatalogAbil, "MedivacTransport", "MaxCargoCount", p, "12", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Marine", "Sight", p, "2", c_upgradeOperationAdd);  // Laser Targeting System: +2 vision (range above)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Marauder Juggernaut Plating
+    CatalogFieldValueModify(c_gameCatalogWeapon, "PunisherGrenades", "Range", p, "7", c_upgradeOperationSet);  // Marauder LTS: +1 range (6->7)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogEffect, "FirebatUFull", "AttributeBonus[Light]", p, "4", c_upgradeOperationAdd);  // Firebat Infernal Pre-Igniter: +4 vs light (4->8)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "100", c_upgradeOperationAdd);  // Firebat Kinetic Foam: +100 life (after x2)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeStart", p, "100", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Firebat", "Range", p, "4", c_upgradeOperationSet);  // Firebat Nano Projectors: +2 range (2->4)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "C10CanisterRifle", "Range", p, "7", c_upgradeOperationSet);  // Ghost LTS: +1 range (6->7)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Specter", "Range", p, "7", c_upgradeOperationSet);  // Spectre mirrors Ghost LTS: +1 range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Hellion", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Hellion Infernal Plating
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "ShieldsMax", p, "100", c_upgradeOperationSet);  // Medivac Scatter Veil: +100 shields
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "ShieldsStart", p, "100", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "VikingAssault", "Speed", p, "1.55", c_upgradeOperationMultiply);  // Viking Aesir Turbines: +55% speed
+    CatalogFieldValueModify(c_gameCatalogUnit, "VikingFighter", "Speed", p, "1.55", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Diamondback", "Range", p, "3", c_upgradeOperationAdd);  // Diamondback Tri-Lithium Power Cell max: +3 range
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTankSieged", "LifeArmor", p, "3", c_upgradeOperationAdd);  // Tank Advanced Siege Tech: +3 armor sieged
+    CatalogFieldValueModify(c_gameCatalogWeapon, "BacklashRockets", "Range", p, "8", c_upgradeOperationSet);  // Banshee Advanced Targeting Optics: +2 range (folded flat — player banshees are perma-cloaked)
+    CatalogFieldValueModify(c_gameCatalogEffect, "BacklashRocketsU", "Amount", p, "1.25", c_upgradeOperationMultiply);  // Banshee Distortion Blasters: +25% dmg (folded flat)
+    CatalogFieldValueModify(c_gameCatalogAbil, "NanoRepair", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);  // Science Vessel Improved Nano-Repair: free heal
+    CatalogFieldValueModify(c_gameCatalogEffect, "OdinAADamage", "Amount", p, "35", c_upgradeOperationSet);  // Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);

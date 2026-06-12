@@ -46,4 +46,99 @@
             <Cooldown TimeUse="18"/>
         </Cost>
     </CAbilEffectInstant>
+
+    <!-- Ghost/Spectre autocast kit (unit-table: "The Snipe, EMP and super stim ability
+         should be auto cast", Spectre mirrors with Psionic Lash/Obliterate). Verbatim
+         copies of the vanilla abilities plus the autocast block proven on the stim
+         clones; AutoCastFilters exclude own/ally so they only fire at enemies. The
+         clones are APPENDED to the units (vanilla stays for enemy AI); only the card
+         buttons are re-pointed. NOTE: vanilla Obliterate has no <Effect> element —
+         the engine defaults the effect link to the ability id — so the clone must
+         set it explicitly or it would resolve to a nonexistent "ObliterateWoLU". -->
+    <CAbilEffectTarget id="SnipeWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="SnipeDamage"/>
+        <TargetFilters value="Biological,Visible;Self,Structure,Destructible,Stasis,Dead,Hidden,Invulnerable"/>
+        <Range value="10"/>
+        <CastIntroTime value="0.5"/>
+        <Cost>
+            <Vital index="Energy" value="25"/>
+        </Cost>
+        <Marker>
+            <MatchFlags index="Link" value="0"/>
+            <MatchFlags index="CasterUnit" value="1"/>
+        </Marker>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="10"/>
+        <AutoCastFilters value="Biological,Visible;Self,Player,Ally,Neutral,Structure,Destructible,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="Snipe" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+    <CAbilEffectTarget id="EMPWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="EMPLaunchMissile"/>
+        <Range value="10"/>
+        <PrepTime value="0.01"/>
+        <FinishTime value="2.5"/>
+        <CursorEffect value="EMPSearch"/>
+        <Cost>
+            <Vital index="Energy" value="75"/>
+        </Cost>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="10"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastValidatorArray value="WoLUTargetEnergyOrShields"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="EMP" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+        <AINotifyEffect value="EMPLaunchMissile"/>
+    </CAbilEffectTarget>
+    <CAbilEffectTarget id="ObliterateWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="Obliterate"/>
+        <Cost>
+            <Vital index="Energy" value="150"/>
+        </Cost>
+        <TargetFilters value="Visible;Self,Missile,Stasis,Dead,Invulnerable"/>
+        <Range value="8"/>
+        <RangeSlop value="8"/>
+        <PrepTime value="3"/>
+        <ShowProgressArray index="Prep" value="1"/>
+        <UninterruptibleArray index="Prep" value="1"/>
+        <UninterruptibleArray index="Cast" value="1"/>
+        <UninterruptibleArray index="Channel" value="1"/>
+        <UninterruptibleArray index="Finish" value="1"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="8"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Structure,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="Obliterate" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+        <ProgressButtonArray index="Prep" value="Obliterate"/>
+        <Alignment value="Negative"/>
+    </CAbilEffectTarget>
+
+    <!-- AP port: Marine Magrail Munitions — autocast 20-dmg bonus shot on a 10 s
+         cooldown. Modeled on Snipe (CAbilEffectTarget + spell damage) with the
+         proven autocast block; cooldown instead of energy. -->
+    <CAbilEffectTarget id="MagrailWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="MagrailDamageWoLU"/>
+        <TargetFilters value="Visible;Self,Player,Ally,Stasis,Dead,Hidden,Invulnerable"/>
+        <Range value="6"/>
+        <Cost>
+            <Cooldown TimeUse="10"/>
+        </Cost>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="6"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="MagrailWoLU" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
 </Catalog>

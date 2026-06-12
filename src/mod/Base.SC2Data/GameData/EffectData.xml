@@ -56,4 +56,13 @@
         <AreaArray Radius="0.8" Fraction="1"/>
         <AreaArray Radius="1.25" Fraction="0.5"/>
     </CEffectDamage>
+
+    <!-- Marine Magrail Munitions bonus shot (modeled on SnipeDamage). -->
+    <CEffectDamage id="MagrailDamageWoLU" parent="DU_WEAP">
+        <ImpactLocation Value="TargetUnit"/>
+        <EditorCategories value="Race:Terran"/>
+        <Kind value="Spell"/>
+        <Amount value="20"/>
+        <Death value="Normal"/>
+    </CEffectDamage>
 </Catalog>

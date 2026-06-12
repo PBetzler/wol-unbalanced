@@ -12,4 +12,24 @@
         <Find value="1"/>
         <Value value="WoLUNoFlagReq"/>
     </CValidatorPlayerRequirement>
+
+    <!-- EMP autocast gate: only fire at targets that actually have energy or shields
+         (schema verbatim from liberty's healCasterMinEnergy, WhichUnit=Target). -->
+    <CValidatorUnitCompareVital id="WoLUTargetHasEnergy">
+        <Compare value="GT"/>
+        <Value value="0"/>
+        <Vital value="Energy"/>
+        <WhichUnit Value="Target"/>
+    </CValidatorUnitCompareVital>
+    <CValidatorUnitCompareVital id="WoLUTargetHasShields">
+        <Compare value="GT"/>
+        <Value value="0"/>
+        <Vital value="Shields"/>
+        <WhichUnit Value="Target"/>
+    </CValidatorUnitCompareVital>
+    <CValidatorCombine id="WoLUTargetEnergyOrShields">
+        <Type value="Or"/>
+        <CombineArray value="WoLUTargetHasEnergy"/>
+        <CombineArray value="WoLUTargetHasShields"/>
+    </CValidatorCombine>
 </Catalog>

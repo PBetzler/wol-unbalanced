@@ -197,6 +197,12 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_SyncWeaponArmorLevels(libWoLU_Player);
         libWoLU_AddBehaviorToType(libWoLU_Player, "Nova", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Tosh", "SpectreCloakingFree");
+        // AP permanent-cloak ports (unit-table): Reaper "add ... cloak", Medivac/Wraith
+        // Advanced/Unregistered Cloaking — the 2 s period also catches units trained
+        // mid-mission. Player-scoped by construction (rule 9).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Reaper", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Medivac", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Wraith", "PersonalCloakingFree");
     }
     return true;
 }

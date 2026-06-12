@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Marine Magrail Munitions (AP port) — no Magrail asset exists in Liberty, so
+         reuse the U-238 Rounds icon. Name/tooltip in GameStrings.txt. -->
+    <CButton id="MagrailWoLU">
+        <Icon value="Assets\Textures\btn-techupgrade-terran-u238rounds.dds"/>
+    </CButton>
+</Catalog>

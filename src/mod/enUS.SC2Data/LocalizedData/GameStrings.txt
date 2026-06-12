@@ -1,2 +1,10 @@
 Button/Name/Stim=Super Stimpack
-Button/Tooltip/Stim=Increases movement and attack speed and <c val="00FF40">heals 30 life</c>.<n/>WoL Unbalanced: stims heal instead of hurting.
+Button/Tooltip/Stim=Increases movement and attack speed and <c val="00FF40">heals life</c> (30 for the Marine line, 60 for Firebats and Marauders).<n/>WoL Unbalanced: stims heal instead of hurting. Autocasts while fighting (18 s cooldown).
+Button/Name/MagrailWoLU=Magrail Shot
+Button/Tooltip/MagrailWoLU=Fires a magrail bonus shot for <c val="FFFF00">20 damage</c>. Autocasts every 10 seconds.<n/>WoL Unbalanced: Archipelago "Magrail Munitions" port.
+Abil/Name/StimpackWoLU=Super Stimpack
+Abil/Name/StimpackMarauderWoLU=Super Stimpack
+Abil/Name/SnipeWoLU=Snipe (Autocast)
+Abil/Name/EMPWoLU=EMP Round (Autocast)
+Abil/Name/ObliterateWoLU=Psionic Lash (Autocast)
+Abil/Name/MagrailWoLU=Magrail Shot

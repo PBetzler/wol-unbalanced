@@ -34,7 +34,15 @@ PLAYER_UNITS = [
 
 DAMAGE_POINT_CAP = 0.1
 BUILD_TIME_CAP = 60.0
-BUILD_TIME_OVERRIDES = {"Predator": 10.0, "Hercules": 20.0}
+BUILD_TIME_OVERRIDES = {
+    "Predator": 10.0,
+    "Hercules": 20.0,
+    # AP "Optimized Logistics" (faster training; AP gives no exact number — we use
+    # -25%, documented assumption) for the units whose table row includes it.
+    "Marine": 19.0,    # 25 * 0.75
+    "Hellion": 22.0,   # 30 * 0.75 (rounded)
+    "Goliath": 30.0,   # 40 * 0.75
+}
 
 # Rule 8: free cloak — ability ids with an energy activation cost, and buff
 # behaviors with an energy drain (negative regen). Extracted from the catalogs
@@ -228,7 +236,7 @@ def emit():
         # --- AP ports, direct-field batch ---
         # (Super Stimpack lives in the StimpackWoLU clone abilities now — see AbilData.xml
         #  and the clone link swaps emitted below.)
-        ("Weapon", "GaussRifle", "Range", "6", "Set", "Marine Laser Targeting System: +1 range"),
+        ("Weapon", "GuassRifle", "Range", "6", "Set", "Marine Laser Targeting System: +1 range (id is Blizzard's typo)"),
         ("Unit", "SCV", "LifeMax", "15", "Add", "AP Hostile Environment Adaptation"),
         ("Unit", "SCV", "LifeStart", "15", "Add", ""),
         ("Unit", "Reaper", "LifeMax", "10", "Add", "AP Ballistic Flightsuit"),
@@ -242,6 +250,31 @@ def emit():
         ("Unit", "Battlecruiser", "Speed", "1.25", "Multiply", "AP Moirai Impulse Drive"),
         ("Abil", "MedivacTransport", "TotalCargoSpace", "12", "Set", "AP Expanded Hull: 8 -> 12 cargo"),
         ("Abil", "MedivacTransport", "MaxCargoCount", "12", "Set", ""),
+        # --- AP ports, second direct-field batch (documented values from unit-table
+        #     Appendix A; assumptions are marked as such) ---
+        ("Unit", "Marine", "Sight", "2", "Add", "Laser Targeting System: +2 vision (range above)"),
+        ("Unit", "Marauder", "LifeArmor", "2", "Add", "Marauder Juggernaut Plating"),
+        ("Weapon", "PunisherGrenades", "Range", "7", "Set", "Marauder LTS: +1 range (6->7)"),
+        ("Unit", "Marauder", "Sight", "2", "Add", ""),
+        ("Effect", "FirebatUFull", "AttributeBonus[Light]", "4", "Add", "Firebat Infernal Pre-Igniter: +4 vs light (4->8)"),
+        ("Unit", "Firebat", "LifeMax", "100", "Add", "Firebat Kinetic Foam: +100 life (after x2)"),
+        ("Unit", "Firebat", "LifeStart", "100", "Add", ""),
+        ("Weapon", "Firebat", "Range", "4", "Set", "Firebat Nano Projectors: +2 range (2->4)"),
+        ("Weapon", "C10CanisterRifle", "Range", "7", "Set", "Ghost LTS: +1 range (6->7)"),
+        ("Unit", "Ghost", "Sight", "2", "Add", ""),
+        ("Weapon", "Specter", "Range", "7", "Set", "Spectre mirrors Ghost LTS: +1 range"),
+        ("Unit", "Spectre", "Sight", "2", "Add", ""),
+        ("Unit", "Hellion", "LifeArmor", "2", "Add", "Hellion Infernal Plating"),
+        ("Unit", "Medivac", "ShieldsMax", "100", "Set", "Medivac Scatter Veil: +100 shields"),
+        ("Unit", "Medivac", "ShieldsStart", "100", "Set", ""),
+        ("Unit", "VikingAssault", "Speed", "1.55", "Multiply", "Viking Aesir Turbines: +55% speed"),
+        ("Unit", "VikingFighter", "Speed", "1.55", "Multiply", ""),
+        ("Weapon", "Diamondback", "Range", "3", "Add", "Diamondback Tri-Lithium Power Cell max: +3 range"),
+        ("Unit", "SiegeTankSieged", "LifeArmor", "3", "Add", "Tank Advanced Siege Tech: +3 armor sieged"),
+        ("Weapon", "BacklashRockets", "Range", "8", "Set", "Banshee Advanced Targeting Optics: +2 range (folded flat — player banshees are perma-cloaked)"),
+        ("Effect", "BacklashRocketsU", "Amount", "1.25", "Multiply", "Banshee Distortion Blasters: +25% dmg (folded flat)"),
+        ("Abil", "NanoRepair", "Cost[0].Vital[Energy]", "0", "Set", "Science Vessel Improved Nano-Repair: free heal"),
+        ("Effect", "OdinAADamage", "Amount", "35", "Set", "Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)"),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""
