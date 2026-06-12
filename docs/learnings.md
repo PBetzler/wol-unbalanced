@@ -26,15 +26,32 @@ gotcha; authoritative details live in the code/plan, not here.
   for ONE player — the backbone of "buff us, not them". But it can only **edit
   existing fields**; creating array entries (`AbilArray`, `LayoutButtons`,
   `AreaArray`, `EffectArray`) is a **silent no-op**.
-- Behavior-class abilities (`CAbilBehavior` — vanilla stim, cloaks) **cannot autocast
-  at all**; no Blizzard data does it. Autocast needs effect-style abilities
-  (`CAbilEffectInstant`/`Target` with `AutoCastRange`/`AutoCastFilters`/validators).
+- Behavior-class abilities (`CAbilBehavior` — cloaks; **not** stim, which is
+  `CAbilEffectInstant` even in vanilla) **cannot autocast at all**; no Blizzard data
+  does it. Autocast needs effect-style abilities (`CAbilEffectInstant`/`Target`).
+- **Never hand-guess ability/effect schemas — copy a working Blizzard chain
+  verbatim** and adapt ids (cost: two sessions). The killers found by diffing against
+  NCO's Super Stimpack (`mods/novastoryassets.sc2mod` in the SC2GameData dump):
+  `<Effect value=.../>` without `index="0"` on `CAbilEffectInstant` silently leaves
+  the ability with **no effect** (manual cast does nothing); `AutoCast`/`AutoCastOn`
+  are **ability-level** `<Flags>`, not `CmdButtonArray` flags; effect chains use
+  `Value="Source"` (not Caster) and the attribute form
+  (`<VitalArray index="Life" Change="30"/>`).
 - Therefore: **clone architecture** — define `*WoLU` clones in static XML (arrays and
-  autocast baked in), gate them behind the `WoLUnbalancedFlag` upgrade (+
-  `WoLUHaveFlag` requirement) that only our library grants, and switch the player by
-  editing **existing** links per player (`AbilArray[i].Link`, `WeaponArray[i].Link`,
-  `LayoutButtons[j].AbilCmd`; indices derived from reference XML in
-  `scripts/genlib.py::clone_swaps`).
+  autocast baked in) and wire them in by **XML index-overrides** of the vanilla slots
+  (`<AbilArray index="3" Link="StimpackWoLU"/>`; indices verified against reference
+  XML). Per-player runtime LINK edits (`AbilArray[i].Link`, `WeaponArray[i].Link`,
+  `LayoutButtons[j].AbilCmd` via `CatalogFieldValueModify`) are **silent no-ops** —
+  only scalar stat-like fields apply per player.
+- XML index-overrides are GLOBAL, so the player gate lives inside the clone:
+  **abilities** gate their button on the `WoLUHaveFlag` requirement (flag upgrade
+  only our library grants); **weapons** fire without buttons, so the clone must stay
+  stat-identical to vanilla and the buff lives in a player-gated effect branch — the
+  campaign's Shaped Blast pattern: weapon → `CEffectSet` → sibling effects with
+  `CValidatorPlayerRequirement` gates (HasFlag = buffed, NoFlag via `CRequirementNot`
+  = vanilla). Per-player stat buffs (e.g. windup cap) go on the **clone id** at
+  runtime — neither runtime edits on the vanilla id nor parent inheritance propagate
+  to a clone after load.
 - **Never clone unit types** — mission scripts check unit types ("all your Marines
   are dead", drop pods spawning `Marine`, …).
 - Static XML is global. Safe there: pure definitions, and additions to
