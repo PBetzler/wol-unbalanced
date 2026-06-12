@@ -275,6 +275,10 @@ def emit():
         ("Effect", "BacklashRocketsU", "Amount", "1.25", "Multiply", "Banshee Distortion Blasters: +25% dmg (folded flat)"),
         ("Abil", "NanoRepair", "Cost[0].Vital[Energy]", "0", "Set", "Science Vessel Improved Nano-Repair: free heal"),
         ("Effect", "OdinAADamage", "Amount", "35", "Set", "Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)"),
+        ("Abil", "heal", "Range", "4", "Set", "Medic Nano Projector: +2 heal range (2->4)"),
+        ("Abil", "heal", "TargetFilters", "Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable", "Set", "Medic Adaptive Medpacks: heal mech + air (drops Ground,Biological requirement) — string-field edit, verify in game"),
+        ("Weapon", "Diamondback", "Period", "0.75", "Multiply", "Diamondback Hyperfluxor: faster attack (-25%, assumption)"),
+        ("Unit", "Diamondback", "Speed", "1.25", "Multiply", "Diamondback Maglev Propulsion (+25%, assumption)"),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""
