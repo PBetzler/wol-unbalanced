@@ -3,4 +3,7 @@
     <CRequirementCountUpgrade id="WoLUCountFlag">
         <Count Link="WoLUnbalancedFlag" State="CompleteOnly"/>
     </CRequirementCountUpgrade>
+    <CRequirementNot id="WoLUNotCountFlag">
+        <OperandArray index="0" value="WoLUCountFlag"/>
+    </CRequirementNot>
 </Catalog>

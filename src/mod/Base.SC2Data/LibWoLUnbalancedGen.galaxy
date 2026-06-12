@@ -63,6 +63,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammerWoLU", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Thor ground clone (XML-wired; vanilla id capped above is now unused)
 
     // --- Rule 5: build time cap 60 s (+ explicit overrides) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "FactoryTrain", "InfoArray[Train10].Time", p, "10.0", c_upgradeOperationSet);  // Predator, was 40.0
@@ -170,7 +171,4 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research7].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research8].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research9].Time", p, "30", c_upgradeOperationSet);
-
-    // --- Clone swaps: player units use the improved WoLU versions (vanilla stays enemy-side) ---
-    CatalogFieldValueModify(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", p, "ThorsHammerWoLU", c_upgradeOperationSet);  // Thor: ThorsHammer -> ThorsHammerWoLU
 }

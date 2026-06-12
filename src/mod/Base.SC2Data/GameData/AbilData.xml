@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Catalog>
     <!-- Clone approach: the player gets improved "WoLU" versions of abilities while
-         vanilla stays untouched for enemies. These are instant-EFFECT abilities (not
-         behavior abilities like vanilla stim) because only effect-style abilities
-         support engine autocast — which gives the real autocast button circle.
-         Autocast triggers when an enemy is in range and the stim buff is not active. -->
+         vanilla stays untouched for enemies. Verbatim clones of NCO's
+         SuperStimpackMarine / SuperStimpackMarauder (novastoryassets.sc2mod
+         AbilData.xml) — a WORKING Blizzard healing-stim with engine autocast.
+         Schema notes vs the failed first attempt: Effect needs index="0";
+         AutoCast/AutoCastOn are ABILITY-level flags, not CmdButtonArray flags.
+         Autocast fires while the unit is firing its weapon (CasterIsFiringWeapon,
+         defined in liberty.sc2mod) with an 18 s cooldown — i.e. perma-stim in
+         combat. Only adaptations: ids, button face "Stim", WoLUHaveFlag gate,
+         our effect-set ids. -->
     <CAbilEffectInstant id="StimpackWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <Effect value="WoLUStimSet"/>
+        <InfoTooltipPriority value="1"/>
+        <Effect index="0" value="WoLUStimSet"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <Flags index="RequireTargetVision" value="0"/>
         <Flags index="Transient" value="1"/>
-        <AutoCastRange value="8"/>
-        <AutoCastFilters value="Visible;Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
-        <AutoCastValidatorArray value="WoLUNoStimBuff"/>
+        <Flags index="PassengerAcquirePassengers" value="1"/>
+        <AutoCastRange value="5"/>
+        <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="Stim" Requirements="WoLUHaveFlag">
-            <Flags index="AutoCast" value="1"/>
-            <Flags index="AutoCastOn" value="1"/>
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
+        <Cost>
+            <Cooldown TimeUse="18"/>
+        </Cost>
     </CAbilEffectInstant>
     <CAbilEffectInstant id="StimpackMarauderWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <Effect value="WoLUStimMarauderSet"/>
+        <InfoTooltipPriority value="1"/>
+        <Effect index="0" value="WoLUStimMarauderSet"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <Flags index="RequireTargetVision" value="0"/>
         <Flags index="Transient" value="1"/>
-        <AutoCastRange value="8"/>
-        <AutoCastFilters value="Visible;Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
-        <AutoCastValidatorArray value="WoLUNoStimMarauderBuff"/>
+        <Flags index="PassengerAcquirePassengers" value="1"/>
+        <AutoCastRange value="5"/>
+        <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="Stim" Requirements="WoLUHaveFlag">
-            <Flags index="AutoCast" value="1"/>
-            <Flags index="AutoCastOn" value="1"/>
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
+        <Cost>
+            <Cooldown TimeUse="18"/>
+        </Cost>
     </CAbilEffectInstant>
 </Catalog>

@@ -127,10 +127,11 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
     // 10 s one is the canary you'll actually see after skipping the intro).
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced: data applied, upgrades & mercs granted."));
-    // Runtime diagnostic (read this back when testing): clone abil loaded from our
-    // XML? flag upgrade granted? what ability sits in Marine slot 3? what weapon in
-    // Thor slot 1 (per-player link-swap experiment)?
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag: clone=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "AutoCastRange", libWoLU_Player) + " flag=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "WoLUnbalancedFlag", c_techCountCompleteOnly)) + " m3=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[3].Link", libWoLU_Player) + " t1=" + CatalogFieldValueGet(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", libWoLU_Player)));
+    // Runtime diagnostic (read this back when testing). Expected when healthy:
+    // clone=5 (StimpackWoLU AutoCastRange from our XML), fx=WoLUStimSet (the effect
+    // actually wired — index-less Effect assignment was the old manual-cast killer),
+    // flag=1, m3=StimpackWoLU (Marine slot-3 index-override), t1=ThorsHammerWoLU.
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag: clone=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "AutoCastRange", libWoLU_Player) + " fx=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "Effect[0]", libWoLU_Player) + " flag=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "WoLUnbalancedFlag", c_techCountCompleteOnly)) + " m3=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[3].Link", libWoLU_Player) + " t1=" + CatalogFieldValueGet(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", libWoLU_Player)));
     return true;
 }
 

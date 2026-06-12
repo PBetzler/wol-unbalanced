@@ -100,44 +100,19 @@ def train_entries():
     return entries
 
 
-# Vanilla->clone swaps: the player's units get the improved WoLU versions by editing
-# their EXISTING ability/weapon/button links (catalog modify can edit, not create).
-# Indices are derived from the reference XML so they can't drift.
-# Stim swaps moved to static XML index-overrides in UnitData.xml — runtime per-player
-# LINK edits proved to be silent no-ops (only scalar stat fields apply per player).
-# The Thor weapon swap below is kept as an experiment; the runtime diagnostic in
-# LibWoLUnbalanced.galaxy reports whether it actually applies.
-STIM_SWAPS = {}
-WEAPON_SWAPS = {"Thor": ("ThorsHammer", "ThorsHammerWoLU")}
+# Vanilla->clone swaps live in static XML index-overrides (UnitData.xml): runtime
+# per-player LINK edits (AbilArray/WeaponArray/LayoutButtons) are silent no-ops —
+# only scalar stat-like fields apply per player (verified in game, see learnings).
+# Player gating happens inside the clones (requirement-gated buttons, validator-gated
+# effect branches), never via runtime link swaps.
 
-
-def clone_swaps():
-    out = []
-    seen = set()
-    for _, root in load("UnitData.xml"):
-        for unit in root.iter("CUnit"):
-            uid = unit.get("id")
-            if uid in STIM_SWAPS:
-                old, new = STIM_SWAPS[uid]
-                for i, a in enumerate(unit.findall("AbilArray")):
-                    key = (uid, "abil", i)
-                    if a.get("Link") == old and key not in seen:
-                        seen.add(key)
-                        out.append((uid, f"AbilArray[{i}].Link", new, f"{uid}: {old} -> {new}"))
-                for ci, card in enumerate(unit.findall("CardLayouts")):
-                    for bi, b in enumerate(card.findall("LayoutButtons")):
-                        key = (uid, "btn", ci, bi)
-                        if b.get("AbilCmd") == f"{old},Execute" and key not in seen:
-                            seen.add(key)
-                            out.append((uid, f"CardLayouts[{ci}].LayoutButtons[{bi}].AbilCmd", f"{new},Execute", ""))
-            if uid in WEAPON_SWAPS:
-                old, new = WEAPON_SWAPS[uid]
-                for i, w in enumerate(unit.findall("WeaponArray")):
-                    key = (uid, "weap", i)
-                    if w.get("Link") == old and key not in seen:
-                        seen.add(key)
-                        out.append((uid, f"WeaponArray[{i}].Link", new, f"{uid}: {old} -> {new}"))
-    return out
+# Weapon CLONES the player actually fires (wired via XML index-overrides). The windup
+# cap below targets vanilla weapon ids from the reference; it does NOT propagate to a
+# clone — parent inheritance resolves at catalog load, and per-player runtime edits on
+# the vanilla id don't touch the clone entry. Cap the clone ids explicitly.
+CLONE_WEAPONS = {
+    "ThorsHammerWoLU": "Thor ground clone (XML-wired; vanilla id capped above is now unused)",
+}
 
 
 def emit():
@@ -173,6 +148,8 @@ def emit():
             dp = points.get(wid)
             if dp is None or dp > DAMAGE_POINT_CAP:
                 lines.append(f'    CatalogFieldValueModify(c_gameCatalogWeapon, "{wid}", "DamagePoint", p, "{DAMAGE_POINT_CAP}", c_upgradeOperationSet);  // {uid}, was {dp if dp is not None else "default 0.167"}')
+    for wid, comment in CLONE_WEAPONS.items():
+        lines.append(f'    CatalogFieldValueModify(c_gameCatalogWeapon, "{wid}", "DamagePoint", p, "{DAMAGE_POINT_CAP}", c_upgradeOperationSet);  // {comment}')
 
     lines.append("")
     lines.append("    // --- Rule 5: build time cap 60 s (+ explicit overrides) ---")
@@ -279,12 +256,6 @@ def emit():
     # cannot CREATE array entries (AbilArray/LayoutButtons), only edit existing ones.
     # They live in src/mod/Base.SC2Data/GameData/UnitData.xml instead (hero units are
     # player-exclusive, so static XML is rule-9-safe for them).
-
-    lines.append("")
-    lines.append("    // --- Clone swaps: player units use the improved WoLU versions (vanilla stays enemy-side) ---")
-    for uid, field, val, comment in clone_swaps():
-        suffix = f"  // {comment}" if comment else ""
-        lines.append(f'    CatalogFieldValueModify(c_gameCatalogUnit, "{uid}", "{field}", p, "{val}", c_upgradeOperationSet);{suffix}')
 
     lines.append("}")
     lines.append("")

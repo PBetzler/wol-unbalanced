@@ -5,4 +5,9 @@
     <CRequirement id="WoLUHaveFlag">
         <NodeArray index="Use" Link="WoLUCountFlag"/>
     </CRequirement>
+    <!-- Negation, for the vanilla branch of player-gated effect pairs (the campaign's
+         NoShapedBlast pattern). -->
+    <CRequirement id="WoLUNoFlagReq">
+        <NodeArray index="Use" Link="WoLUNotCountFlag"/>
+    </CRequirement>
 </Catalog>

@@ -5,41 +5,43 @@
          Hero units are PLAYER-EXCLUSIVE, so giving them base-unit abilities here is safe —
          and necessary: CatalogFieldValueModify cannot create new array entries at runtime. -->
 
-    <!-- Rule 10: bio heroes inherit Stimpack from their base units -->
+    <!-- Rule 10: bio heroes inherit Stimpack from their base units. Variant per base
+         unit: Marine line heals 30 (StimpackWoLU), Firebat/Marauder lines heal 60
+         (StimpackMarauderWoLU) — unit-table spec, mirrors NCO's 30/60 split. -->
     <CUnit id="Raynor01">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="RaynorCommando">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Raynor">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusCommando">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusChaingun">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Swann">
-        <AbilArray Link="StimpackMarauder"/>
+        <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauder,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
 
@@ -48,23 +50,48 @@
          grants the tech to AI players, and the clone is gated on our flag upgrade which
          only the human player receives). Runtime per-player link swaps proved to be
          silent no-ops, so this must live in XML. -->
-    <!-- TEMPORARILY REVERTED to vanilla stim: the clone ability casts nothing (manual
-         press dead in game) — a schema bug in Stimpack's ability/effect chain.
-         Re-enable these index-overrides once the clone is rebuilt from a verbatim
-         Blizzard reference (Nova Covert Ops stim in campaigncommon/novastoryassets). -->
-
-    <!-- AP port: Firebats get Stimpack (vanilla campaign firebats have none). The button is
-         requirement-gated (UseStimpack), which enemy players never have granted. -->
-    <CUnit id="Firebat">
-        <AbilArray Link="Stimpack"/>
+    <CUnit id="Marine">
+        <AbilArray index="3" Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Marauder">
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="6" AbilCmd="StimpackMarauderWoLU,Execute"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="WarPig">
+        <AbilArray index="3" Link="StimpackWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="HammerSecurity">
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
+    </CUnit>
+
+    <!-- Thor ground splash: weapon slot 1 (0 = Javelin AA) -> the WoLU clone. Global,
+         but the clone is stat-identical to vanilla and its effect set is player-gated
+         (Shaped Blast pattern) — enemy Thors deal exact vanilla damage. -->
+    <CUnit id="Thor">
+        <WeaponArray index="1" Link="ThorsHammerWoLU"/>
+    </CUnit>
+
+    <!-- AP port: Firebats get Stimpack (vanilla campaign firebats have none); the 60-heal
+         marauder variant per the unit-table. The button is gated on WoLUHaveFlag, which
+         enemy players never receive. -->
+    <CUnit id="Firebat">
+        <AbilArray Link="StimpackMarauderWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="DevilDog">
-        <AbilArray Link="Stimpack"/>
+        <AbilArray Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="Stimpack,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
 </Catalog>

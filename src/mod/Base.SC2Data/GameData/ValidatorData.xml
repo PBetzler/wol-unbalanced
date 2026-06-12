@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Catalog>
-    <!-- Autocast gate: don't re-stim while the buff is active. -->
-    <CValidatorUnitCompareBehaviorCount id="WoLUNoStimBuff">
-        <Unit Value="Caster"/>
-        <Behavior value="Stimpack"/>
-        <Compare value="LT"/>
-        <Value value="1"/>
-    </CValidatorUnitCompareBehaviorCount>
-    <CValidatorUnitCompareBehaviorCount id="WoLUNoStimMarauderBuff">
-        <Unit Value="Caster"/>
-        <Behavior value="StimpackMarauder"/>
-        <Compare value="LT"/>
-        <Value value="1"/>
-    </CValidatorUnitCompareBehaviorCount>
+    <!-- Player gate for shared (non-requirement-gated) clone wiring, e.g. weapon
+         effects: same pattern as the campaign's HasShapedBlast/NoShapedBlast
+         (CValidatorPlayerRequirement on sibling effects). Only our library ever
+         grants WoLUnbalancedFlag, and only to the human player. -->
+    <CValidatorPlayerRequirement id="WoLUHasFlag">
+        <Find value="1"/>
+        <Value value="WoLUHaveFlag"/>
+    </CValidatorPlayerRequirement>
+    <CValidatorPlayerRequirement id="WoLUNoFlag">
+        <Find value="1"/>
+        <Value value="WoLUNoFlagReq"/>
+    </CValidatorPlayerRequirement>
 </Catalog>

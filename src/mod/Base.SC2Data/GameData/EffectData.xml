@@ -1,31 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Catalog>
-    <!-- Super Stimpack: apply the vanilla stim buff + heal 30 (instead of vanilla's
-         self-damage). Used by the StimpackWoLU clone abilities. -->
+    <!-- Super Stimpack effect chain — verbatim clone of NCO SuperStimpackMarine /
+         SuperStimpackMarauderHellbat chains (novastoryassets.sc2mod EffectData.xml),
+         ids renamed: CEffectSet -> apply WoLUSuperStim buff + CEffectModifyUnit heal.
+         Heal 30 for the Marine line, 60 for Marauder/Firebat lines (unit-table spec,
+         matches NCO's 30/60 split). Schema notes vs the failed first attempt: the
+         heal must be the ATTRIBUTE form (VitalArray ... Change="..."), and both
+         effects target Source, not Caster. -->
     <CEffectApplyBehavior id="WoLUStimApply">
-        <Behavior value="Stimpack"/>
+        <EditorCategories value="Race:Terran"/>
+        <Behavior value="WoLUSuperStim"/>
+        <WhichUnit Value="Source"/>
     </CEffectApplyBehavior>
-    <CEffectApplyBehavior id="WoLUStimMarauderApply">
-        <Behavior value="StimpackMarauder"/>
-    </CEffectApplyBehavior>
-    <CEffectModifyUnit id="WoLUStimHeal">
-        <ImpactUnit Value="Caster"/>
-        <VitalArray index="Life">
-            <Change value="30"/>
-        </VitalArray>
-    </CEffectModifyUnit>
     <CEffectSet id="WoLUStimSet">
+        <EditorCategories value="Race:Terran"/>
         <EffectArray value="WoLUStimApply"/>
-        <EffectArray value="WoLUStimHeal"/>
+        <EffectArray value="WoLUStimSetMU"/>
     </CEffectSet>
+    <CEffectModifyUnit id="WoLUStimSetMU">
+        <EditorCategories value="Race:Terran"/>
+        <VitalArray index="Life" Change="30"/>
+        <ImpactUnit Value="Source"/>
+    </CEffectModifyUnit>
     <CEffectSet id="WoLUStimMarauderSet">
-        <EffectArray value="WoLUStimMarauderApply"/>
-        <EffectArray value="WoLUStimHeal"/>
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="WoLUStimApply"/>
+        <EffectArray value="WoLUStimMarauderSetMU"/>
     </CEffectSet>
+    <CEffectModifyUnit id="WoLUStimMarauderSetMU">
+        <EditorCategories value="Race:Terran"/>
+        <ImpactUnit Value="Source"/>
+        <VitalArray index="Life" Change="60"/>
+    </CEffectModifyUnit>
 
-    <!-- Thor ground attack with sieged-tank-style splash (clone of ThorsHammerDamage;
-         the player's Thor weapon link is swapped to ThorsHammerWoLU at runtime). -->
+    <!-- Thor ground attack with sieged-tank-style splash. The ThorsHammerWoLU weapon
+         is wired into Thor's WeaponArray[1] by XML index-override, which is GLOBAL —
+         enemy Thors fire it too. Per-player isolation therefore happens HERE, at the
+         effect level (the campaign's Shaped Blast pattern): the weapon fires a set
+         whose branches are validator-gated on the flag upgrade only the human player
+         has — splash for us, exact vanilla damage for everyone else. -->
+    <CEffectSet id="ThorsHammerWoLUSet">
+        <EffectArray value="ThorsHammerDamageVanillaWoLU"/>
+        <EffectArray value="ThorsHammerDamageWoLU"/>
+    </CEffectSet>
+    <CEffectDamage id="ThorsHammerDamageVanillaWoLU" parent="ThorsHammerDamage">
+        <ValidatorArray value="WoLUNoFlag"/>
+    </CEffectDamage>
     <CEffectDamage id="ThorsHammerDamageWoLU" parent="ThorsHammerDamage">
+        <ValidatorArray value="WoLUHasFlag"/>
         <Kind value="Splash"/>
         <KindSplash value="Splash"/>
         <!-- Enemy-only splash (same filter pattern as the campaign's Crucio enemy

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Super Stimpack buff — verbatim clone of Nova Covert Ops "SuperStim"
+         (novastoryassets.sc2mod BehaviorData.xml): same 1.5x move/attack speed and
+         15 s duration as vanilla Stimpack. Adaptations: icon swapped to the WoL stim
+         icon (the NCO texture isn't in Liberty), and the NCO-only Hellion
+         remove-validator dropped (SourceIsNotHellion doesn't exist in Liberty). -->
+    <CBehaviorBuff id="WoLUSuperStim">
+        <Alignment value="Positive"/>
+        <InfoIcon value="Assets\Textures\btn-ability-terran-stimpack.dds"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Duration value="15"/>
+        <Modification MoveSpeedMultiplier="1.5" AttackSpeedMultiplier="1.5"/>
+    </CBehaviorBuff>
+</Catalog>
