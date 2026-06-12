@@ -25,8 +25,9 @@ void libWoLU_ApplyPlayer (int p) {
 
 bool libWoLU_OnMapInit (bool testConds, bool runActions) {
     libWoLU_ApplyPlayer(libWoLU_Player);
-    // Visible proof that the mod's library actually ran (not just the map patches).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced: player data applied."));
+    // No on-screen message here: map init usually falls inside the intro cinematic,
+    // where subtitle messages expire unseen. The visible canary fires with the tech
+    // grant below instead.
     return true;
 }
 
@@ -87,6 +88,9 @@ void libWoLU_GrantCampaignTech (int p) {
 
 bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     libWoLU_GrantCampaignTech(libWoLU_Player);
+    // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
+    // 10 s one is the canary you'll actually see after skipping the intro).
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced: data applied, upgrades & mercs granted."));
     return true;
 }
 
