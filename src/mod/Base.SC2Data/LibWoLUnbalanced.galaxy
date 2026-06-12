@@ -69,6 +69,8 @@ void libWoLU_GrantCampaignTech (int p) {
     libCamp_gf_ApplyCampaignTech(p);
     libCamp_gf_TS_ApplyMercenaryTech(p);
     libCamp_gf_TS_ApplyMercUpgrades(p);
+    libWoLU_SyncWeaponArmorLevels(p);
+    libWoLU_DisableArmoryResearch(p);
 
     // Branch units last — the apply pass above may have re-restricted them.
     if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled)) {
@@ -82,6 +84,51 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     return true;
 }
 
+// Engineering Bay rework: its infantry weapon/armor researches (30 s, see generated
+// lib) act as COMBINED upgrades — completing level N also grants the vehicle and ship
+// equivalents. The Armory building's own researches are disabled as redundant.
+void libWoLU_SyncWeaponArmorLevels (int p) {
+    int n;
+    string lvl;
+    n = 1;
+    while (n <= 3) {
+        lvl = IntToString(n);
+        if (TechTreeUpgradeCount(p, "TerranInfantryWeaponsLevel" + lvl, c_techCountCompleteOnly) > 0) {
+            if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsLevel" + lvl, c_techCountCompleteOnly) == 0) {
+                TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsLevel" + lvl, 1);
+            }
+            if (TechTreeUpgradeCount(p, "TerranShipWeaponsLevel" + lvl, c_techCountCompleteOnly) == 0) {
+                TechTreeUpgradeAddLevel(p, "TerranShipWeaponsLevel" + lvl, 1);
+            }
+        }
+        if (TechTreeUpgradeCount(p, "TerranInfantryArmorsLevel" + lvl, c_techCountCompleteOnly) > 0) {
+            if (TechTreeUpgradeCount(p, "TerranVehicleArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
+                TechTreeUpgradeAddLevel(p, "TerranVehicleArmorsLevel" + lvl, 1);
+            }
+            if (TechTreeUpgradeCount(p, "TerranShipArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
+                TechTreeUpgradeAddLevel(p, "TerranShipArmorsLevel" + lvl, 1);
+            }
+        }
+        n = n + 1;
+    }
+}
+
+void libWoLU_DisableArmoryResearch (int p) {
+    int i;
+    i = 2;  // command indices of ArmoryResearch Research3..Research14
+    while (i <= 13) {
+        TechTreeAbilityAllow(p, AbilityCommand("ArmoryResearch", i), false);
+        i = i + 1;
+    }
+}
+
+bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
+    if (PlayerRace(libWoLU_Player) == "Terr") {
+        libWoLU_SyncWeaponArmorLevels(libWoLU_Player);
+    }
+    return true;
+}
+
 void libWoLU_InitLib () {
     trigger t;
     TriggerAddEventMapInit(TriggerCreate("libWoLU_OnMapInit"));
@@ -90,4 +137,5 @@ void libWoLU_InitLib () {
     t = TriggerCreate("libWoLU_OnGrantTech");
     TriggerAddEventTimeElapsed(t, 1.0, c_timeGame);
     TriggerAddEventTimeElapsed(t, 10.0, c_timeGame);
+    TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnPeriodic"), 2.0, c_timeGame);
 }

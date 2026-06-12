@@ -135,6 +135,64 @@ def emit():
         if target is not None and time != target:
             lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "{aid}", "InfoArray[{idx}].Time", p, "{target}", c_upgradeOperationSet);  // {unit}, was {time}')
 
+    lines.append("")
+    lines.append("    // --- Rule 6: merc calldowns — unlimited charges, ready at mission start ---")
+    for n in range(1, 9):
+        for field, val in (("Charge.CountMax", "0"), ("Charge.CountStart", "0"), ("Cooldown.TimeStart", "0")):
+            lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train{n}].{field}", p, "{val}", c_upgradeOperationSet);')
+
+    lines.append("")
+    lines.append("    // --- Per-unit stats (unit-table comments) ---")
+    stat_edits = [
+        # (catalog, entry, field, value, op, comment)
+        ("Unit", "Firebat", "LifeMax", "2", "Multiply", "Firebat: double HP (100 -> 200)"),
+        ("Unit", "Firebat", "LifeStart", "2", "Multiply", ""),
+        ("Unit", "Predator", "CostResource[Vespene]", "0", "Set", "Predator: no gas"),
+        ("Unit", "Predator", "Food", "-1", "Set", "Predator: 1 supply"),
+        ("Unit", "Hercules", "LifeArmor", "2", "Add", "Hercules: +2 armor"),
+        ("Unit", "Medic", "CostResource[Minerals]", "25", "Subtract", "Medic: AP Resource Efficiency (-25/-25/-1)"),
+        ("Unit", "Medic", "CostResource[Vespene]", "25", "Subtract", ""),
+        ("Unit", "Medic", "Food", "-1", "Set", ""),
+        ("Unit", "Ghost", "CostResource[Minerals]", "100", "Subtract", "Ghost: AP Bargain Bin Prices (-100/-50/-1)"),
+        ("Unit", "Ghost", "CostResource[Vespene]", "50", "Subtract", ""),
+        ("Unit", "Ghost", "Food", "-1", "Set", ""),
+        ("Unit", "Spectre", "CostResource[Minerals]", "100", "Subtract", "Spectre mirrors Ghost"),
+        ("Unit", "Spectre", "CostResource[Vespene]", "50", "Subtract", ""),
+        ("Unit", "Spectre", "Food", "-1", "Set", ""),
+        ("Unit", "Firebat", "CargoSize", "1", "Set", "rule: all infantry take 1 bunker slot"),
+        ("Unit", "Marauder", "CargoSize", "1", "Set", ""),
+        ("Unit", "Ghost", "CargoSize", "1", "Set", ""),
+        ("Unit", "Spectre", "CargoSize", "1", "Set", ""),
+        # damage flattening: base damage = old total vs bonus attribute
+        ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: 10(+10 light) -> 20 flat"),
+        ("Effect", "C10CanisterRifle", "AttributeBonus[Light]", "0", "Set", ""),
+        ("Effect", "SpecterU", "Amount", "20", "Set", "Spectre rifle: 15(+5 armored) -> 20 flat"),
+        ("Effect", "SpecterU", "AttributeBonus[Armored]", "0", "Set", ""),
+        # Thor AA: flatten 8(+4 light)=12 < HIP 35 -> 35 per rocket; range = HIP 11 + 1
+        ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA: HIP floor 35/rocket (LotV Punisher)"),
+        ("Effect", "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", "0", "Set", ""),
+        ("Weapon", "JavelinMissileLaunchers", "Range", "12", "Set", "Thor AA range = HIP range 11 + 1"),
+        # Thor ground attack: sieged-tank-like splash
+        ("Effect", "ThorsHammerDamage", "Kind", "Splash", "Set", "Thor ground: splash like sieged tank"),
+        ("Effect", "ThorsHammerDamage", "AreaArray[0].Radius", "0.8", "Set", ""),
+        ("Effect", "ThorsHammerDamage", "AreaArray[0].Fraction", "1", "Set", ""),
+        ("Effect", "ThorsHammerDamage", "AreaArray[1].Radius", "1.25", "Set", ""),
+        ("Effect", "ThorsHammerDamage", "AreaArray[1].Fraction", "0.5", "Set", ""),
+        # Siege tank: no friendly fire (campaign implements FF via separate friendly effects)
+        ("Effect", "CrucioShockCannonFriendlyDamage", "Amount", "0", "Set", "tank sieged splash: no friendly fire"),
+        ("Effect", "CrucioShockCannonFriendlyTargetDamage", "Amount", "0", "Set", ""),
+        # Hercules trainable without Fusion Core
+        ("Abil", "StarportTrain", "InfoArray[Train6].Button.Requirements", "HaveAttachedTechLab", "Set", "Hercules: no Fusion Core needed"),
+    ]
+    for cat, entry, field, val, op, comment in stat_edits:
+        suffix = f"  // {comment}" if comment else ""
+        lines.append(f'    CatalogFieldValueModify(c_gameCatalog{cat}, "{entry}", "{field}", p, "{val}", c_upgradeOperation{op});{suffix}')
+
+    lines.append("")
+    lines.append("    // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---")
+    for idx in ("Research3", "Research4", "Research5", "Research7", "Research8", "Research9"):
+        lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[{idx}].Time", p, "30", c_upgradeOperationSet);')
+
     lines.append("}")
     lines.append("")
     with open(OUT, "w") as f:

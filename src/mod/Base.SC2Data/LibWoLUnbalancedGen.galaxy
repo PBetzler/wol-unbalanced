@@ -53,4 +53,73 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "StargateTrain", "InfoArray[Train3].Time", p, "60.0", c_upgradeOperationSet);  // Carrier, was 120.0
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train4].Time", p, "60.0", c_upgradeOperationSet);  // Battlecruiser, was 110.0
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Time", p, "20.0", c_upgradeOperationSet);  // Hercules, was 70.0
+
+    // --- Rule 6: merc calldowns — unlimited charges, ready at mission start ---
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountMax", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+
+    // --- Per-unit stats (unit-table comments) ---
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeStart", p, "2", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Predator", "CostResource[Vespene]", p, "0", c_upgradeOperationSet);  // Predator: no gas
+    CatalogFieldValueModify(c_gameCatalogUnit, "Predator", "Food", p, "-1", c_upgradeOperationSet);  // Predator: 1 supply
+    CatalogFieldValueModify(c_gameCatalogUnit, "Hercules", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Hercules: +2 armor
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medic", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // Medic: AP Resource Efficiency (-25/-25/-1)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medic", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medic", "Food", p, "-1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CostResource[Minerals]", p, "100", c_upgradeOperationSubtract);  // Ghost: AP Bargain Bin Prices (-100/-50/-1)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CostResource[Vespene]", p, "50", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "Food", p, "-1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CostResource[Minerals]", p, "100", c_upgradeOperationSubtract);  // Spectre mirrors Ghost
+    CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CostResource[Vespene]", p, "50", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "Food", p, "-1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "CargoSize", p, "1", c_upgradeOperationSet);  // rule: all infantry take 1 bunker slot
+    CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CargoSize", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CargoSize", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: 10(+10 light) -> 20 flat
+    CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: 15(+5 armored) -> 20 flat
+    CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "AttributeBonus[Armored]", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "Amount", p, "35", c_upgradeOperationSet);  // Thor AA: HIP floor 35/rocket (LotV Punisher)
+    CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "JavelinMissileLaunchers", "Range", p, "12", c_upgradeOperationSet);  // Thor AA range = HIP range 11 + 1
+    CatalogFieldValueModify(c_gameCatalogEffect, "ThorsHammerDamage", "Kind", p, "Splash", c_upgradeOperationSet);  // Thor ground: splash like sieged tank
+    CatalogFieldValueModify(c_gameCatalogEffect, "ThorsHammerDamage", "AreaArray[0].Radius", p, "0.8", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "ThorsHammerDamage", "AreaArray[0].Fraction", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "ThorsHammerDamage", "AreaArray[1].Radius", p, "1.25", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "ThorsHammerDamage", "AreaArray[1].Fraction", p, "0.5", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyDamage", "Amount", p, "0", c_upgradeOperationSet);  // tank sieged splash: no friendly fire
+    CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyTargetDamage", "Amount", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Button.Requirements", p, "HaveAttachedTechLab", c_upgradeOperationSet);  // Hercules: no Fusion Core needed
+
+    // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research4].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research5].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research7].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research8].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research9].Time", p, "30", c_upgradeOperationSet);
 }
