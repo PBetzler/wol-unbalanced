@@ -28,6 +28,9 @@
     <CEffectDamage id="ThorsHammerDamageWoLU" parent="ThorsHammerDamage">
         <Kind value="Splash"/>
         <KindSplash value="Splash"/>
+        <!-- Enemy-only splash (same filter pattern as the campaign's Crucio enemy
+             damage): never hits own/allied/neutral units. -->
+        <SearchFilters value="Ground;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
         <AreaArray Radius="0.8" Fraction="1"/>
         <AreaArray Radius="1.25" Fraction="0.5"/>
     </CEffectDamage>
