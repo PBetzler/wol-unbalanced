@@ -11,6 +11,10 @@
          combat. Only adaptations: ids, button face "Stim", WoLUHaveFlag gate,
          our effect-set ids. -->
     <CAbilEffectInstant id="StimpackWoLU">
+        <!-- AbilSetId = the engine's cross-subgroup button mechanism (vanilla stim
+             variants share it): one button press stims every selected unit whose
+             ability belongs to the set, across unit types. -->
+        <AbilSetId value="Stimpack"/>
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <InfoTooltipPriority value="1"/>
         <Effect index="0" value="WoLUStimSet"/>
@@ -29,6 +33,7 @@
         </Cost>
     </CAbilEffectInstant>
     <CAbilEffectInstant id="StimpackMarauderWoLU">
+        <AbilSetId value="Stimpack"/>
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <InfoTooltipPriority value="1"/>
         <Effect index="0" value="WoLUStimMarauderSet"/>

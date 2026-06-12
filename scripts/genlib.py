@@ -279,6 +279,10 @@ def emit():
         ("Abil", "heal", "TargetFilters", "Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable", "Set", "Medic Adaptive Medpacks: heal mech + air (drops Ground,Biological requirement) — string-field edit, verify in game"),
         ("Weapon", "Diamondback", "Period", "0.75", "Multiply", "Diamondback Hyperfluxor: faster attack (-25%, assumption)"),
         ("Unit", "Diamondback", "Speed", "1.25", "Multiply", "Diamondback Maglev Propulsion (+25%, assumption)"),
+        # Raven (unit-table): "all spawned abilities have unlimited duration" —
+        # 3600 s outlasts any mission while avoiding 0/-1 sentinel semantics.
+        ("Behavior", "AutoTurretTimedLife", "Duration", "3600", "Set", "Raven: permanent Auto-Turrets (AP Durable Materials, maxed)"),
+        ("Behavior", "PointDefenseDroneTimedLife", "Duration", "3600", "Set", "Raven: permanent Point Defense Drones"),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""

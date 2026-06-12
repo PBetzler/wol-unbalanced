@@ -193,6 +193,8 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "heal", "TargetFilters", p, "Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable", c_upgradeOperationSet);  // Medic Adaptive Medpacks: heal mech + air (drops Ground,Biological requirement) — string-field edit, verify in game
     CatalogFieldValueModify(c_gameCatalogWeapon, "Diamondback", "Period", p, "0.75", c_upgradeOperationMultiply);  // Diamondback Hyperfluxor: faster attack (-25%, assumption)
     CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Diamondback Maglev Propulsion (+25%, assumption)
+    CatalogFieldValueModify(c_gameCatalogBehavior, "AutoTurretTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Auto-Turrets (AP Durable Materials, maxed)
+    CatalogFieldValueModify(c_gameCatalogBehavior, "PointDefenseDroneTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Point Defense Drones
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);
