@@ -18,13 +18,5 @@ jobs:
           if git ls-files | grep -E '\.(SC2Map|zip|exe|dll)$'; then
             echo "forbidden file types committed"; exit 1
           fi
-      - name: Galaxy library sanity (balanced braces/parens)
-        run: |
-          python - <<'EOF'
-          import glob
-          for p in glob.glob("src/mod/Base.SC2Data/*.galaxy"):
-              s = open(p).read()
-              assert s.count("{") == s.count("}"), f"unbalanced braces in {p}"
-              assert s.count("(") == s.count(")"), f"unbalanced parens in {p}"
-              print("ok", p)
-          EOF
+      - name: Galaxy library sanity (braces, parens, declaration order)
+        run: python scripts/galaxy_lint.py

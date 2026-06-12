@@ -13,6 +13,12 @@ include "LibWoLUnbalancedGen"
 
 const int libWoLU_Player = 1;
 
+// Forward declarations — Galaxy is single-pass; anything called before its
+// definition in this file must be prototyped here.
+void libWoLU_SyncWeaponArmorLevels (int p);
+void libWoLU_DisableArmoryResearch (int p);
+void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
+
 void libWoLU_ApplyPlayer (int p) {
     libWoLUGen_Apply(p);
 }
