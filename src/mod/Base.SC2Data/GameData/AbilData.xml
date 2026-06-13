@@ -77,6 +77,21 @@
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="10"/>
         <AutoCastFilters value="Biological,Visible;Self,Player,Ally,Neutral,Structure,Destructible,Stasis,Dead,Hidden,Invulnerable"/>
+        <!-- Smart-snipe targeting — PARTIAL. The full unit-table priority (1 healers,
+             2 clean-kill within 15 HP, 3 tanky, 4 by remaining HP) is NOT expressible
+             with the engine's 6 built-in TargetSorts (TSAlliancePassive/TSDistance/
+             TSLifeFraction/TSLifeLargestFirst/TSMarker/TSRandom) — there is no
+             "is-healer" sort nor a clean-kill bucket. Best declarative approximation:
+             require a minimum target life so Snipe is never wasted on chaff
+             (WoLUSnipeWorthwhile), then prefer the largest-life valid target
+             (TSLifeLargestFirst) ~ the table's "tanky targets" tier. FLAGGED: exact
+             healer-first / clean-kill priority needs a periodic galaxy targeting
+             trigger or a TargetFind data structure — deferred, not guessed. -->
+        <AutoCastValidatorArray value="WoLUSnipeWorthwhile"/>
+        <TargetSorts RequestCount="1">
+            <SortArray value="TSLifeLargestFirst"/>
+            <SortArray value="TSDistance"/>
+        </TargetSorts>
         <CmdButtonArray index="Execute" DefaultButtonFace="Snipe" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>

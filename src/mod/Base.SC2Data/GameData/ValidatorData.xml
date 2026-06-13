@@ -43,4 +43,14 @@
         <Field value="LifeMax"/>
         <Value value="300"/>
     </CValidatorUnitCompareField>
+
+    <!-- Snipe autocast floor: don't waste a 45-dmg Snipe on a target with < 30
+         current life (the table's "max 15 HP wasted" intent, as a floor). Current
+         life, not max — a wounded heavy can still be a clean kill. -->
+    <CValidatorUnitCompareVital id="WoLUSnipeWorthwhile">
+        <Compare value="GE"/>
+        <Value value="30"/>
+        <Vital value="Life"/>
+        <WhichUnit Value="Target"/>
+    </CValidatorUnitCompareVital>
 </Catalog>
