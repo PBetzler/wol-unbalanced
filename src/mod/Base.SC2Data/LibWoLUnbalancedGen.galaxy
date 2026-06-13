@@ -192,6 +192,11 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "RaynorGaussRifle", "Range", p, "1", c_upgradeOperationAdd);  // Raynor01: Marine LTS +1 range parity
     CatalogFieldValueModify(c_gameCatalogWeapon, "CommandoRifle", "Range", p, "1", c_upgradeOperationAdd);  // RaynorCommando: +1 range parity
     CatalogFieldValueModify(c_gameCatalogWeapon, "RaynorWeapon", "Range", p, "1", c_upgradeOperationAdd);  // Raynor (Tychus-side hero): +1 range parity
+    CatalogFieldValueModify(c_gameCatalogWeapon, "KelmorianMinerGaussRifle", "Range", p, "1", c_upgradeOperationAdd);  // War Pigs (Marine merc): LTS +1 range parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "WarPig", "Sight", p, "2", c_upgradeOperationAdd);  // War Pigs: LTS +2 sight parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "Sight", p, "2", c_upgradeOperationAdd);  // Raynor line: LTS +2 sight parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raynor", "Sight", p, "2", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeMax", p, "15", c_upgradeOperationAdd);  // AP Hostile Environment Adaptation
     CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeStart", p, "15", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeMax", p, "10", c_upgradeOperationAdd);  // AP Ballistic Flightsuit

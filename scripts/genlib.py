@@ -277,6 +277,12 @@ def emit():
         ("Weapon", "RaynorGaussRifle", "Range", "1", "Add", "Raynor01: Marine LTS +1 range parity"),
         ("Weapon", "CommandoRifle", "Range", "1", "Add", "RaynorCommando: +1 range parity"),
         ("Weapon", "RaynorWeapon", "Range", "1", "Add", "Raynor (Tychus-side hero): +1 range parity"),
+        ("Weapon", "KelmorianMinerGaussRifle", "Range", "1", "Add", "War Pigs (Marine merc): LTS +1 range parity"),
+        # Laser Targeting also grants +2 sight; mirror it on the Marine line's heroes/merc.
+        ("Unit", "WarPig", "Sight", "2", "Add", "War Pigs: LTS +2 sight parity"),
+        ("Unit", "Raynor01", "Sight", "2", "Add", "Raynor line: LTS +2 sight parity"),
+        ("Unit", "RaynorCommando", "Sight", "2", "Add", ""),
+        ("Unit", "Raynor", "Sight", "2", "Add", ""),
         ("Unit", "SCV", "LifeMax", "15", "Add", "AP Hostile Environment Adaptation"),
         ("Unit", "SCV", "LifeStart", "15", "Add", ""),
         ("Unit", "Reaper", "LifeMax", "10", "Add", "AP Ballistic Flightsuit"),

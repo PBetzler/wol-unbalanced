@@ -14,22 +14,31 @@
     <!-- Explicit indices (= each unit's vanilla array count = next free slot). Index-
          LESS appends do not take effect in our dependency mod; explicit-index appends
          do (proven on Marine). Counts derived from the reference catalogs. -->
+    <!-- Rule 10: Raynor (=Marine) inherits Marine abilities — Super Stim AND Magrail
+         Munitions. Magrail appended at each variant's next free abil/button index
+         (after the stim we added). Button cells picked against each vanilla card. -->
     <CUnit id="Raynor01">
         <AbilArray index="3" Link="StimpackWoLU"/>
+        <AbilArray index="4" Link="MagrailWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="5" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="6" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="RaynorCommando">
         <AbilArray index="4" Link="StimpackWoLU"/>
+        <AbilArray index="5" Link="MagrailWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="8" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="3"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Raynor">
         <AbilArray index="7" Link="StimpackWoLU"/>
+        <AbilArray index="8" Link="MagrailWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="4"/>
+            <LayoutButtons index="10" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="1" Column="0"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusCommando">
@@ -103,10 +112,15 @@
             <LayoutButtons index="6" AbilCmd="StimpackMarauderWoLU,Execute"/>
         </CardLayouts>
     </CUnit>
+    <!-- Rule 4: War Pigs (Marine merc) inherit Marine upgrades — stim (index-override
+         of vanilla slot) + Magrail Munitions (appended at next free abil 4 / button 7,
+         free cell 2,2). +1 range / +2 sight (Laser Targeting) applied in genlib. -->
     <CUnit id="WarPig">
         <AbilArray index="3" Link="StimpackWoLU"/>
+        <AbilArray index="4" Link="MagrailWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
+            <LayoutButtons index="7" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="HammerSecurity">
