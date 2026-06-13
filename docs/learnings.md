@@ -135,12 +135,18 @@ gotcha; authoritative details live in the code/plan, not here.
   `parent="Yamato"` inheriting Effect=`Yamato`), the effect-bound visuals (projectiles,
   beams, impacts — the ones that matter) fire. Only **ability/weapon-bound caster
   animations** (cast poses, charge glows, the stim puff) are lost, which is cosmetic.
-- **Projectiles need a launch effect + a missile unit with an actor.** A raw
-  `CEffectDamage` has no projectile. Cheapest fix: `CEffectLaunchMissile` with
-  `AmmoUnit="<existing missile unit>"` (e.g. `PunisherGrenadesLMWeapon`, `EMP2Weapon`)
-  — the existing `CActorMissile unitName="..."` renders it, no new actor/model needed
-  (Magrail does this). Assets outside our Liberty deps (e.g. the NCO magrail model)
-  aren't reachable — reuse a Liberty missile as a stand-in.
+- **Projectiles need a launch effect + a missile unit with an actor**, or a beam
+  actor. A raw `CEffectDamage` has no visual.
+- **Raw assets (`.m3`/textures/sounds) under `Assets\...` are base-game CASC files,
+  referenceable BY PATH from any mod — independent of DATA (catalog) dependencies.**
+  So to use another campaign's visual you do NOT need to bundle the `.m3` or depend on
+  that mod's data: define a `CModel` pointing at the `Assets\...\.m3` path and clone
+  the original's actor. Bundling is only for assets not in the base install. The
+  Magrail uses the real WarHound railgun model this way
+  (`Assets\Effects\Terran\WarHoundRailGunMissile\WarHoundRailGunMissile.m3`) + a
+  `CActorBeamSimple` cloned from NCO's `RailGunTurretAttackBeamPoint`, bound to
+  `Effect.MagrailDamageWoLU.Start`. **General rule for ability visuals: reference the
+  original's `Assets\` `.m3` by path and clone the original's actor.**
 - **Don't clone a WEAPON if you can avoid it** — weapon-bound animations
   (`WeaponStart.<id>`) break. Prefer overriding the **vanilla weapon's `Effect`** to a
   player-gated effect set (Thor does this): the weapon id stays, so the attack
