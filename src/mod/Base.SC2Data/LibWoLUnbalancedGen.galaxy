@@ -118,6 +118,27 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CostResource[Minerals]", p, "100", c_upgradeOperationSubtract);  // Spectre mirrors Ghost
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CostResource[Vespene]", p, "50", c_upgradeOperationSubtract);
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "Food", p, "-1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption: -25/-25/-1)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raven", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raven", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Raven", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "Food", p, "1", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "CargoSize", p, "1", c_upgradeOperationSet);  // rule: all infantry take 1 bunker slot
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
