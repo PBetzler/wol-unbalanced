@@ -85,6 +85,11 @@ gotcha; authoritative details live in the code/plan, not here.
   can extend. Nuanced autocast priority ("healers first", "clean-kill within N HP")
   is **not** expressible declaratively; it needs a periodic galaxy targeting trigger
   or a TargetFind data structure. Don't pretend a sort list does more than it can.
+- **Damage reduction** is a `CBehaviorBuff` with a `<DamageResponse ModifyFraction="0.5"
+  ModifyMinimumDamage="1">` block (schema confirmed against the Moebius pack's
+  `AdvancedShielding`; 0.5 = take half damage). `<Kind index="Ranged" value="1"/>`
+  entries are meant to filter by damage kind, but the reference sets them all to 0 with
+  no obvious effect — treat Kind-filtering as unverified and prefer halving all damage.
 - `CValidatorUnitCompareField` reads any unit field (e.g. `LifeMax`); default WhichUnit
   is the validated/target unit. `CValidatorUnitCompareVital` reads current Life/Energy/
   Shields with an explicit `<WhichUnit Value="Target"/>`. Both compose under
