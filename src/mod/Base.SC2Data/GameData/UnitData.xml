@@ -161,4 +161,14 @@
             <LayoutButtons Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
         </CardLayouts>
     </CUnit>
+
+    <!-- Science Vessel: AP list includes Defensive Matrix — reuse the BC clone
+         (same append + WoLUHaveFlag gate). Free card cell 2,2 (vanilla SV uses
+         2,0 NanoRepair / 2,1 Irradiate / 2,3 Detector). -->
+    <CUnit id="ScienceVessel">
+        <AbilArray Link="DefensiveMatrixWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
+        </CardLayouts>
+    </CUnit>
 </Catalog>
