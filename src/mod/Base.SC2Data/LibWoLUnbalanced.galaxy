@@ -203,6 +203,8 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_AddBehaviorToType(libWoLU_Player, "Reaper", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Medivac", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Wraith", "PersonalCloakingFree");
+        // Predator Adaptive Defenses: permanent damage-halving buff (player-only).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUAdaptiveDefenses");
     }
     return true;
 }

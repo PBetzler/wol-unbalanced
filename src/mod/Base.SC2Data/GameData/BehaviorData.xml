@@ -12,4 +12,22 @@
         <Duration value="15"/>
         <Modification MoveSpeedMultiplier="1.5" AttackSpeedMultiplier="1.5"/>
     </CBehaviorBuff>
+
+    <!-- Predator Adaptive Defenses (AP). DamageResponse ModifyFraction halves incoming
+         damage — schema verified verbatim against the Moebius mod's AdvancedShielding
+         (mods/_reference/moebius BehaviorData.xml). SIMPLIFICATION: the table says
+         "halves ranged/splash dmg"; the DamageResponse Kind-filter semantics are
+         ambiguous in the reference (all Kinds set to 0), so this halves ALL incoming
+         damage — slightly stronger, fits an overpowered mod, and avoids guessing the
+         filter. Permanent + player-only: attached to player Predators via the periodic
+         UnitBehaviorAdd in LibWoLUnbalanced.galaxy (rule 9 safe). -->
+    <CBehaviorBuff id="WoLUAdaptiveDefenses">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoIcon value="Assets\Textures\btn-ability-zeratul-sentry-reflectionshield.dds"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <DamageResponse ModifyFraction="0.5" ModifyMinimumDamage="1">
+            <Chance value="1"/>
+        </DamageResponse>
+    </CBehaviorBuff>
 </Catalog>

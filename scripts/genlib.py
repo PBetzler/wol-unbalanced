@@ -268,6 +268,7 @@ def emit():
         ("Unit", "Reaper", "LifeStart", "10", "Add", ""),
         ("Unit", "Vulture", "Speed", "1.25", "Multiply", "AP Ion Thrusters"),
         ("Unit", "Vulture", "LifeRegenRate", "1", "Set", "AP Jerry-Rigged Patchup"),
+        ("Unit", "Reaper", "LifeRegenRate", "2", "Set", "AP Combat Drugs: out-of-combat regen (approx via flat regen)"),
         ("Unit", "Goliath", "LifeMax", "25", "Add", "AP Shaped Hull"),
         ("Unit", "Goliath", "LifeStart", "25", "Add", ""),
         ("Unit", "Banshee", "Speed", "1.25", "Multiply", "AP Hyperflight Rotors"),

@@ -180,6 +180,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeStart", p, "10", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "Vulture", "Speed", p, "1.25", c_upgradeOperationMultiply);  // AP Ion Thrusters
     CatalogFieldValueModify(c_gameCatalogUnit, "Vulture", "LifeRegenRate", p, "1", c_upgradeOperationSet);  // AP Jerry-Rigged Patchup
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeRegenRate", p, "2", c_upgradeOperationSet);  // AP Combat Drugs: out-of-combat regen (approx via flat regen)
     CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "LifeMax", p, "25", c_upgradeOperationAdd);  // AP Shaped Hull
     CatalogFieldValueModify(c_gameCatalogUnit, "Goliath", "LifeStart", p, "25", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "Banshee", "Speed", p, "1.25", c_upgradeOperationMultiply);  // AP Hyperflight Rotors
