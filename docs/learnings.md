@@ -147,6 +147,17 @@ gotcha; authoritative details live in the code/plan, not here.
   `CActorBeamSimple` cloned from NCO's `RailGunTurretAttackBeamPoint`, bound to
   `Effect.MagrailDamageWoLU.Start`. **General rule for ability visuals: reference the
   original's `Assets\` `.m3` by path and clone the original's actor.**
+- **Faction-swap mods (Tychus Edition, War of Mengsk — examples in `mods/`) confirm the
+  technique tiers:** (1) for whole cross-campaign UNITS they add the source mods as
+  *dependencies* (`DocumentInfo`: Tychus adds `Void` + `file:Mods\alliedcommanders.sc2mod`);
+  (2) they *bundle* only the binary assets NOT in the base CASC — premium/co-op SKIN
+  textures (`Warhound_Sirius_*.dds`) — into an `Assets/Textures/` folder in the mod;
+  (3) they do NOT bundle base-game EFFECT models (the railgun `.m3` is absent from both),
+  proving effect models are base-CASC and path-referenceable. So: path-reference for a
+  single base-game effect (what we do); bundle only truly-absent binaries; add a
+  dependency when importing whole units. If a path-referenced effect ever fails to
+  render in-game, the proven fallback is adding `file:Mods\alliedcommanders.sc2mod` (co-op
+  has the magrail) as a dependency and referencing the real ability/actor directly.
 - **Don't clone a WEAPON if you can avoid it** — weapon-bound animations
   (`WeaponStart.<id>`) break. Prefer overriding the **vanilla weapon's `Effect`** to a
   player-gated effect set (Thor does this): the weapon id stays, so the attack
