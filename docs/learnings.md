@@ -49,6 +49,14 @@ gotcha; authoritative details live in the code/plan, not here.
   only the card BUTTON's `AbilCmd` — cards are pure UI, the AI never reads them.
   (Override-in-place is fine only when the vanilla ability was requirement-gated and
   never granted to AI — the stim case.)
+- **Appends MUST carry an explicit index** — `<AbilArray Link="X"/>` and
+  `<LayoutButtons Face="X" .../>` WITHOUT an index are silently dropped in our
+  dependency mod (confirmed in game: Magrail invisible until given `index="4"`; works
+  after). Use the next free slot = the unit's vanilla element count (e.g. Marine has
+  AbilArray 0-3 → Magrail at `index="4"`, LayoutButtons 0-5 → button at `index="6"`).
+  Vanilla cards are contiguous, so count = next free index. (TA-style index-less
+  appends may work in a fully editor-saved mod, but NOT in our hand-rolled component
+  folder — don't trust them.)
 - A `CAbilEffectTarget`/`CWeaponLegacy` with **no `Effect` element defaults the link
   to its own id** (vanilla `Obliterate` ability → `Obliterate` damage effect). Clones
   must set `Effect` explicitly or they point at a nonexistent `<clone-id>` effect.
