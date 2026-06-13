@@ -8,6 +8,10 @@ Abil/Name/SnipeWoLU=Snipe (Autocast)
 Abil/Name/EMPWoLU=EMP Round (Autocast)
 Abil/Name/ObliterateWoLU=Psionic Lash (Autocast)
 Abil/Name/MagrailWoLU=Magrail Shot
+Button/Name/WoLUUpgLaserTargeting=Laser Targeting System
+Button/Tooltip/WoLUUpgLaserTargeting=<c val="00FF40">+1 weapon range, +2 sight</c>.<n/>WoL Unbalanced (Archipelago) — active.
+Button/Name/WoLUUpgOptLogistics=Optimized Logistics
+Button/Tooltip/WoLUUpgOptLogistics=<c val="00FF40">Faster training</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Abil/Name/YamatoWoLU=Yamato Cannon (Autocast)
 Abil/Name/MissilePodsWoLU=Missile Pods (Autocast)
 Abil/Name/DefensiveMatrixWoLU=Defensive Matrix (Autocast)

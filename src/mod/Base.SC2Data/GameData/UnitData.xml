@@ -67,6 +67,34 @@
         <CardLayouts index="0">
             <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
             <LayoutButtons index="6" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="1"/>
+            <!-- Passive upgrade display (row 1): the WoL Unbalanced stat buffs this unit
+                 carries. Type=Passive (no action), gated on WoLUHaveFlag so only the
+                 player's units show them. Super Stim + Magrail already show as the
+                 action buttons in row 2. Indices continue from the existing buttons. -->
+            <LayoutButtons index="7">
+                <Face value="CombatShield"/>
+                <Type value="Passive"/>
+                <AbilCmd value="255"/>
+                <Requirements value="WoLUHaveFlag"/>
+                <Row value="1"/>
+                <Column value="0"/>
+            </LayoutButtons>
+            <LayoutButtons index="8">
+                <Face value="WoLUUpgLaserTargeting"/>
+                <Type value="Passive"/>
+                <AbilCmd value="255"/>
+                <Requirements value="WoLUHaveFlag"/>
+                <Row value="1"/>
+                <Column value="1"/>
+            </LayoutButtons>
+            <LayoutButtons index="9">
+                <Face value="WoLUUpgOptLogistics"/>
+                <Type value="Passive"/>
+                <AbilCmd value="255"/>
+                <Requirements value="WoLUHaveFlag"/>
+                <Row value="1"/>
+                <Column value="2"/>
+            </LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="Marauder">

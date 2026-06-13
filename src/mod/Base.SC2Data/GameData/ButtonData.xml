@@ -7,4 +7,16 @@
     <CButton id="MagrailWoLU">
         <Icon value="Assets\Textures\btn-upgrade-terran-magrailmunitions.dds"/>
     </CButton>
+
+    <!-- Passive upgrade-display buttons: shown on a unit's command card (Type=Passive)
+         so the player can see the WoL Unbalanced buffs each unit carries — matching the
+         campaign's own pattern (Firebat shows Incinerator Nozzles / Juggernaut Plating).
+         Icons referenced by base-CASC path (AP/co-op upgrade icons, present in every
+         install). Names/tooltips in GameStrings.txt. -->
+    <CButton id="WoLUUpgLaserTargeting">
+        <Icon value="Assets\Textures\btn-upgrade-terran-lazertargetingsystem.dds"/>
+    </CButton>
+    <CButton id="WoLUUpgOptLogistics">
+        <Icon value="Assets\Textures\btn-upgrade-terran-optimizedlogistics.dds"/>
+    </CButton>
 </Catalog>
