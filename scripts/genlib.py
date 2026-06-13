@@ -261,8 +261,9 @@ def emit():
         ("Unit", "TychusChaingun", "LifeStart", "2", "Multiply", ""),
         ("Unit", "DevilDog", "LifeMax", "2", "Multiply", ""),
         ("Unit", "DevilDog", "LifeStart", "2", "Multiply", ""),
-        ("Unit", "SpartanCompany", "LifeMax", "1.2", "Multiply", "Goliath line: x150/125 (Shaped Hull +25)"),
-        ("Unit", "SpartanCompany", "LifeStart", "1.2", "Multiply", ""),
+        # (SpartanCompany Shaped Hull +25 is applied as a flat LifeMax/LifeStart +25
+        #  in the parity sweep below — mirrors the base Goliath exactly. The earlier
+        #  x1.2 multiply here was a duplicate of that and double-counted Shaped Hull.)
         ("Unit", "DukesRevenge", "LifeArmor", "2", "Add", "BC line: Behemoth Plating + Moirai drive"),
         ("Unit", "DukesRevenge", "Speed", "1.25", "Multiply", ""),
         ("Unit", "DuskWing", "Speed", "1.25", "Multiply", "Banshee line: Hyperflight Rotors"),
@@ -408,6 +409,12 @@ def emit():
         ("Weapon", "DRBattlecruiserA", "AllowedMovement", "Moving", "Set", "Jackson's Revenge: fire while moving (air)"),
         ("Weapon", "DRCannonsG", "AllowedMovement", "Moving", "Set", ""),
         ("Weapon", "DRCannonsA", "AllowedMovement", "Moving", "Set", ""),
+
+        # -- SCV: Hostile Environment Adaptation — slightly faster attack (AP) --
+        ("Weapon", "FusionCutter", "Period", "0.7", "Set", "SCV: faster attack (Hostile Env Adaptation)"),
+        # -- Vulture: Auto-Launchers — attack while moving (AP). Ion Thrusters speed
+        #    + Jerry-Rigged + Cerberus mine count handled earlier. --
+        ("Weapon", "Vulture", "AllowedMovement", "Moving", "Set", "Vulture Auto-Launchers: fire while moving"),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""

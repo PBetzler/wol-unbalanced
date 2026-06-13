@@ -182,8 +182,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "LifeStart", p, "2", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeMax", p, "2", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeStart", p, "2", c_upgradeOperationMultiply);
-    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeMax", p, "1.2", c_upgradeOperationMultiply);  // Goliath line: x150/125 (Shaped Hull +25)
-    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeStart", p, "1.2", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "DukesRevenge", "LifeArmor", p, "2", c_upgradeOperationAdd);  // BC line: Behemoth Plating + Moirai drive
     CatalogFieldValueModify(c_gameCatalogUnit, "DukesRevenge", "Speed", p, "1.25", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Banshee line: Hyperflight Rotors
@@ -293,6 +291,8 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Jackson's Revenge: fire while moving (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "FusionCutter", "Period", p, "0.7", c_upgradeOperationSet);  // SCV: faster attack (Hostile Env Adaptation)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Vulture", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Vulture Auto-Launchers: fire while moving
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);
