@@ -110,6 +110,9 @@
         <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="6" AbilCmd="StimpackMarauderWoLU,Execute"/>
+            <LayoutButtons index="7"><Face value="JuggernautPlating"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="9"><Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <!-- Rule 4: War Pigs (Marine merc) inherit Marine upgrades — stim (index-override
@@ -156,12 +159,15 @@
         <AbilArray index="3" Link="StimpackWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="Hellion">
         <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="5" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="0"/>
+            <LayoutButtons index="6"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="7"><Face value="WoLUUpgSmartServos"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
 
@@ -180,6 +186,7 @@
             <LayoutButtons index="7" AbilCmd="SnipeWoLU,Execute"/>
             <LayoutButtons index="11" AbilCmd="EMPWoLU,Execute"/>
             <LayoutButtons index="13" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
+            <LayoutButtons index="14"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="Spectre">
@@ -188,6 +195,7 @@
         <CardLayouts index="0">
             <LayoutButtons index="12" AbilCmd="ObliterateWoLU,Execute"/>
             <LayoutButtons index="14" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="0"/>
+            <LayoutButtons index="15"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
 
@@ -207,6 +215,10 @@
             <LayoutButtons index="6" Face="MissilePods" Type="AbilCmd" AbilCmd="MissilePodsWoLU,Execute" Row="2" Column="1"/>
             <LayoutButtons index="7" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="8" Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
+            <LayoutButtons index="9">
+                <Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/>
+                <Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/>
+            </LayoutButtons>
         </CardLayouts>
     </CUnit>
 
@@ -217,6 +229,46 @@
         <AbilArray index="4" Link="DefensiveMatrixWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- Passive upgrade-display rows for units we hadn't given a card block yet.
+         Type=Passive icons in the free row 1, gated on WoLUHaveFlag, explicit indices
+         = each unit's vanilla button count (append rule). Shows the WoL buffs whose
+         upgrade has a reusable icon (campaign buttons by id + our AP icon set); buffs
+         that are abilities already show as their action buttons. -->
+    <CUnit id="Goliath">
+        <CardLayouts index="0">
+            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="SiegeTank">
+        <CardLayouts index="0">
+            <LayoutButtons index="6"><Face value="MaelstromRounds"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Thor">
+        <CardLayouts index="0">
+            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="VikingFighter">
+        <CardLayouts index="0">
+            <LayoutButtons index="6"><Face value="WoLUUpgSmartServos"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Banshee">
+        <CardLayouts index="0">
+            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Medivac">
+        <CardLayouts index="0">
+            <LayoutButtons index="9"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
 </Catalog>

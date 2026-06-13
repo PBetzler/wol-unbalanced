@@ -12,6 +12,10 @@ Button/Name/WoLUUpgLaserTargeting=Laser Targeting System
 Button/Tooltip/WoLUUpgLaserTargeting=<c val="00FF40">+1 weapon range, +2 sight</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Button/Name/WoLUUpgOptLogistics=Optimized Logistics
 Button/Tooltip/WoLUUpgOptLogistics=<c val="00FF40">Faster training</c>.<n/>WoL Unbalanced (Archipelago) — active.
+Button/Name/WoLUUpgInternalTech=Internal Tech Module
+Button/Tooltip/WoLUUpgInternalTech=<c val="00FF40">No Tech Lab / prerequisite needed</c>.<n/>WoL Unbalanced (Archipelago) — active.
+Button/Name/WoLUUpgSmartServos=Smart Servos
+Button/Tooltip/WoLUUpgSmartServos=<c val="00FF40">Faster transform, attack while moving</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Abil/Name/YamatoWoLU=Yamato Cannon (Autocast)
 Abil/Name/MissilePodsWoLU=Missile Pods (Autocast)
 Abil/Name/DefensiveMatrixWoLU=Defensive Matrix (Autocast)

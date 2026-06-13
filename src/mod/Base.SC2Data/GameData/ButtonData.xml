@@ -19,4 +19,10 @@
     <CButton id="WoLUUpgOptLogistics">
         <Icon value="Assets\Textures\btn-upgrade-terran-optimizedlogistics.dds"/>
     </CButton>
+    <CButton id="WoLUUpgInternalTech">
+        <Icon value="Assets\Textures\btn-upgrade-terran-internalizedtechmodule.dds"/>
+    </CButton>
+    <CButton id="WoLUUpgSmartServos">
+        <Icon value="Assets\Textures\btn-upgrade-terran-transformationservos.dds"/>
+    </CButton>
 </Catalog>
