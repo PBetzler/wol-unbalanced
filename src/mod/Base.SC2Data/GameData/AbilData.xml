@@ -77,18 +77,22 @@
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="10"/>
         <AutoCastFilters value="Biological,Visible;Self,Player,Ally,Neutral,Structure,Destructible,Stasis,Dead,Hidden,Invulnerable"/>
-        <!-- Smart-snipe targeting — PARTIAL. The full unit-table priority (1 healers,
-             2 clean-kill within 15 HP, 3 tanky, 4 by remaining HP) is NOT expressible
-             with the engine's 6 built-in TargetSorts (TSAlliancePassive/TSDistance/
-             TSLifeFraction/TSLifeLargestFirst/TSMarker/TSRandom) — there is no
-             "is-healer" sort nor a clean-kill bucket. Best declarative approximation:
-             require a minimum target life so Snipe is never wasted on chaff
-             (WoLUSnipeWorthwhile), then prefer the largest-life valid target
-             (TSLifeLargestFirst) ~ the table's "tanky targets" tier. FLAGGED: exact
-             healer-first / clean-kill priority needs a periodic galaxy targeting
-             trigger or a TargetFind data structure — deferred, not guessed. -->
+        <!-- Smart-snipe targeting — FULL priority via custom CTargetSort entries
+             (TargetSortData.xml), unblocked by the RaynorRogue kit which proved
+             CTargetSort* are catalog-definable (my earlier "fixed 6-value enum"
+             claim was wrong). Priority order matches the unit-table:
+               1) healers      → TSWoLUSnipeHealer  (Medic/Medivac first)
+               2) clean kills   → TSWoLUSnipeLethal  (target Life <= 45 = Snipe dmg)
+               3) tanky targets → TSLifeLargestFirst (largest life among non-lethal)
+               4) the rest      → TSDistance         (nearest)
+             The worthwhile floor (Life >= 30) still vetoes wasting Snipe on chaff.
+             JUDGMENT CALL flagged: "healer" = Medic/Medivac unit types (no engine
+             healer flag). The "max 15 HP wasted" bound is approximated by the 30..45
+             window (worthwhile floor + lethal cutoff). -->
         <AutoCastValidatorArray value="WoLUSnipeWorthwhile"/>
         <TargetSorts RequestCount="1">
+            <SortArray value="TSWoLUSnipeHealer"/>
+            <SortArray value="TSWoLUSnipeLethal"/>
             <SortArray value="TSLifeLargestFirst"/>
             <SortArray value="TSDistance"/>
         </TargetSorts>

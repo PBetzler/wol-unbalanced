@@ -53,4 +53,31 @@
         <Vital value="Life"/>
         <WhichUnit Value="Target"/>
     </CValidatorUnitCompareVital>
+
+    <!-- Smart-Snipe priority validators (used by custom CTargetSort entries — see
+         TargetSortData.xml). Sort-direction convention confirmed from the RaynorRogue
+         kit's BattlecruiserWeaponSwitch: a plain CTargetSortValidator sorts passers
+         LAST, so Descending=1 puts passers FIRST. -->
+    <!-- Tier 2: Snipe (45) is lethal now — clean kill, no overkill waste beyond 15. -->
+    <CValidatorUnitCompareVital id="WoLUSnipeLethal">
+        <Compare value="LE"/>
+        <Value value="45"/>
+        <Vital value="Life"/>
+        <WhichUnit Value="Target"/>
+    </CValidatorUnitCompareVital>
+    <!-- Tier 1: healers first. JUDGMENT CALL: WoL enemy healers are Medic + Medivac;
+         this set is a reasonable choice, not an engine-defined "healer" flag. -->
+    <CValidatorUnitType id="WoLUTargetIsMedic">
+        <WhichUnit Value="Target"/>
+        <Value value="Medic"/>
+    </CValidatorUnitType>
+    <CValidatorUnitType id="WoLUTargetIsMedivac">
+        <WhichUnit Value="Target"/>
+        <Value value="Medivac"/>
+    </CValidatorUnitType>
+    <CValidatorCombine id="WoLUTargetIsHealer">
+        <Type value="Or"/>
+        <CombineArray value="WoLUTargetIsMedic"/>
+        <CombineArray value="WoLUTargetIsMedivac"/>
+    </CValidatorCombine>
 </Catalog>

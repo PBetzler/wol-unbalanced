@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Custom target sorts for smart-Snipe. Confirmed against the RaynorRogue kit
+         (kit_liberty_story.SC2Mod TargetSortData.xml) that CTargetSort* entries are
+         catalog-definable (NOT a fixed engine enum) and that a plain
+         CTargetSortValidator sorts passers last → Descending=1 puts passers first.
+         Listed in SnipeWoLU.TargetSorts in priority order: healers, then lethal
+         (clean-kill) targets, then largest-life, then nearest. -->
+    <CTargetSortValidator id="TSWoLUSnipeHealer">
+        <Validator value="WoLUTargetIsHealer"/>
+        <Descending value="1"/>
+    </CTargetSortValidator>
+    <CTargetSortValidator id="TSWoLUSnipeLethal">
+        <Validator value="WoLUSnipeLethal"/>
+        <Descending value="1"/>
+    </CTargetSortValidator>
+</Catalog>
