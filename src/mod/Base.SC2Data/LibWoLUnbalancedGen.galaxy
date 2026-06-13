@@ -174,6 +174,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Banshee line: Hyperflight Rotors
     CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "Range", p, "12", c_upgradeOperationSet);  // Odin mirrors Thor AA range
     CatalogFieldValueModify(c_gameCatalogWeapon, "GuassRifle", "Range", p, "6", c_upgradeOperationSet);  // Marine Laser Targeting System: +1 range (id is Blizzard's typo)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "RaynorGaussRifle", "Range", p, "1", c_upgradeOperationAdd);  // Raynor01: Marine LTS +1 range parity
+    CatalogFieldValueModify(c_gameCatalogWeapon, "CommandoRifle", "Range", p, "1", c_upgradeOperationAdd);  // RaynorCommando: +1 range parity
+    CatalogFieldValueModify(c_gameCatalogWeapon, "RaynorWeapon", "Range", p, "1", c_upgradeOperationAdd);  // Raynor (Tychus-side hero): +1 range parity
     CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeMax", p, "15", c_upgradeOperationAdd);  // AP Hostile Environment Adaptation
     CatalogFieldValueModify(c_gameCatalogUnit, "SCV", "LifeStart", p, "15", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "LifeMax", p, "10", c_upgradeOperationAdd);  // AP Ballistic Flightsuit

@@ -133,6 +133,11 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // actually wired — index-less Effect assignment was the old manual-cast killer),
     // flag=1, m3=StimpackWoLU (Marine slot-3 index-override), t1=ThorsHammerWoLU.
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag: clone=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "AutoCastRange", libWoLU_Player) + " fx=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "Effect[0]", libWoLU_Player) + " flag=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "WoLUnbalancedFlag", c_techCountCompleteOnly)) + " m3=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[3].Link", libWoLU_Player) + " t1=" + CatalogFieldValueGet(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", libWoLU_Player)));
+    // Append diagnostic: does a STATIC-XML indexless AbilArray append actually apply?
+    // Vanilla Marine has 4 abils (stop/attack/move/Stimpack); we append MagrailWoLU.
+    // Healthy => acount=5, m4=MagrailWoLU. If acount=4 / m4 empty, appends are dropped
+    // (then new abilities must use explicit indices, not indexless appends).
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag2: acount=" + IntToString(CatalogFieldValueCount(c_gameCatalogUnit, "Marine", "AbilArray", libWoLU_Player)) + " m4=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[4].Link", libWoLU_Player) + " bcount=" + IntToString(CatalogFieldValueCount(c_gameCatalogUnit, "Marine", "CardLayouts[0].LayoutButtons", libWoLU_Player))));
     return true;
 }
 

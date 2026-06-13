@@ -262,6 +262,12 @@ def emit():
         # (Super Stimpack lives in the StimpackWoLU clone abilities now — see AbilData.xml
         #  and the clone link swaps emitted below.)
         ("Weapon", "GuassRifle", "Range", "6", "Set", "Marine Laser Targeting System: +1 range (id is Blizzard's typo)"),
+        # Rule 10 parity: Raynor (=Marine) variants use their OWN weapons, so the
+        # GuassRifle edit above never reached them. +1 range via Add (robust to each
+        # weapon's base; keeps the hero ahead of the buffed Marine).
+        ("Weapon", "RaynorGaussRifle", "Range", "1", "Add", "Raynor01: Marine LTS +1 range parity"),
+        ("Weapon", "CommandoRifle", "Range", "1", "Add", "RaynorCommando: +1 range parity"),
+        ("Weapon", "RaynorWeapon", "Range", "1", "Add", "Raynor (Tychus-side hero): +1 range parity"),
         ("Unit", "SCV", "LifeMax", "15", "Add", "AP Hostile Environment Adaptation"),
         ("Unit", "SCV", "LifeStart", "15", "Add", ""),
         ("Unit", "Reaper", "LifeMax", "10", "Add", "AP Ballistic Flightsuit"),

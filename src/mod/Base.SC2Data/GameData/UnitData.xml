@@ -53,12 +53,17 @@
          grants the tech to AI players, and the clone is gated on our flag upgrade which
          only the human player receives). Runtime per-player link swaps proved to be
          silent no-ops, so this must live in XML. -->
+    <!-- EXPLICIT-INDEX append test: vanilla Marine has AbilArray 0-3 (stop/attack/
+         move/Stimpack) and LayoutButtons 0-5, so Magrail = abil index 4, button
+         index 6. If this makes Magrail appear (and diag2 shows acount=5
+         m4=MagrailWoLU), index-less appends were the bug and every other unit's
+         appends get the same treatment. -->
     <CUnit id="Marine">
         <AbilArray index="3" Link="StimpackWoLU"/>
-        <AbilArray Link="MagrailWoLU"/>
+        <AbilArray index="4" Link="MagrailWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
-            <LayoutButtons Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="6" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Marauder">
