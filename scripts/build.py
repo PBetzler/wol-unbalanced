@@ -132,24 +132,31 @@ def patch_document_header(map_path: str) -> None:
 
 
 def doc_version_counter() -> int:
-    """Monotonic document version derived from VERSION: major*10000+minor*100+patch.
-    Strictly increasing as long as releases bump semver."""
-    major, minor, patch = (int(x) for x in VERSION.split("."))
-    return major * 10000 + minor * 100 + patch
+    """STRICTLY-INCREASING per-build document version.
+
+    Earlier this was derived from VERSION (constant 0.1.0 -> 100 across every dev
+    build). That was the bug: SC2 reloads a save when the installed dependency
+    version is >= the saved one (forward-compat — this is why other mods update
+    cleanly), but a *constant* version means each rebuild is "same version number,
+    different content", which the engine rejects with the version-mismatch error.
+
+    A wall-clock-derived counter guarantees every build is a higher version than any
+    prior one, so saves made on an earlier build load on a later one. Sized to stay a
+    sane, slowly-growing u32 (seconds since 2026-06-01)."""
+    import time
+    floor = 100  # keep >= the old VERSION-derived value
+    return max(floor, int(time.time()) - 1_780_000_000)
 
 
 def write_version_files(mod_dir: str) -> None:
     """Emit the per-section .version files the editor maintains and our hand-rolled
-    component folder lacked. Saved games record the section versions of file:
-    dependencies; without them the engine has no "newer version of the same
-    document" path, so ANY mod content change invalidated existing saves, while
-    editor-saved mods (whose .version counters bump) update cleanly.
+    component folder lacked. SC2 reloads a save against a dependency whose version is
+    >= the saved version; these files carry that version. The counter must INCREASE
+    every build (see doc_version_counter) or changed content reads as a mismatch.
 
     44-byte layout decoded from an editor-saved mod (Tactical Arsenal): 'cdes' +
     reversed section tag, then 9 LE dwords [format=2, editor build, 5, 0, section
-    const, editor build, VERSION COUNTER, last-modified timestamp, 1]. The
-    timestamp is a fixed epoch + counter so identical sources keep producing
-    byte-identical builds (save-friendly: see plan.md)."""
+    const, editor build, VERSION COUNTER, last-modified timestamp, 1]."""
     import struct
 
     counter = doc_version_counter()
