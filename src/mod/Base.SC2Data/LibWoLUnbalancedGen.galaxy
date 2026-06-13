@@ -77,30 +77,46 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Time", p, "20.0", c_upgradeOperationSet);  // Hercules, was 70.0
 
     // --- Rule 6: merc calldowns — unlimited charges, ready at mission start ---
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train1].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train4].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train5].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train6].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountMax", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train7].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
 
     // --- Per-unit stats (unit-table comments) ---
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)

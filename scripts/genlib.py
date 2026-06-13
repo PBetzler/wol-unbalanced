@@ -167,8 +167,18 @@ def emit():
 
     lines.append("")
     lines.append("    // --- Rule 6: merc calldowns — unlimited charges, ready at mission start ---")
+    # CountMax/CountStart=0 means ZERO charges ("Not enough charges" in game), NOT
+    # unlimited. For effectively-unlimited-from-start: start full (CountStart high),
+    # big cap (CountMax high), uses cost nothing (CountUse=0), and no cooldown wait
+    # (TimeStart/TimeUse=0) so it never runs dry.
     for n in range(1, 9):
-        for field, val in (("Charge.CountMax", "0"), ("Charge.CountStart", "0"), ("Cooldown.TimeStart", "0")):
+        for field, val in (
+            ("Charge.CountMax", "99"),
+            ("Charge.CountStart", "99"),
+            ("Charge.CountUse", "0"),
+            ("Cooldown.TimeStart", "0"),
+            ("Cooldown.TimeUse", "0"),
+        ):
             lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train{n}].{field}", p, "{val}", c_upgradeOperationSet);')
 
     lines.append("")

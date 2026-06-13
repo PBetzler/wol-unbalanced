@@ -20,6 +20,7 @@ void libWoLU_DisableArmoryResearch (int p);
 void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
 void libWoLU_GraduateSiegeRange (int p, string unitType);
 void libWoLU_ForceGrantAllTechRewards (int p);
+void libWoLU_EnableCurrentMissionUnits (int p);
 
 void libWoLU_ApplyPlayer (int p) {
     libWoLUGen_Apply(p);
@@ -81,6 +82,14 @@ void libWoLU_GrantCampaignTech (int p) {
     libWoLU_SyncWeaponArmorLevels(p);
     libWoLU_DisableArmoryResearch(p);
 
+    // Units available DURING their unlock mission (not only after completing it).
+    // The campaign only enables a mission's unit tech groups once that mission is
+    // COMPLETED (see CampaignLib: the state rebuild gates mission-unlocked subgroups
+    // on MissionStatusCheck Completed), so e.g. the Medic — unlocked by mission 2 —
+    // isn't buildable while you PLAY mission 2. Enable the CURRENT map's unlocked
+    // tech groups too (EnableCampaignTechUnit also allows the unit's train command).
+    libWoLU_EnableCurrentMissionUnits(p);
+
     // Branch units last — the apply pass above may have re-restricted them.
     if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled)) {
         TechTreeUnitAllow(p, "Ghost", true);
@@ -120,6 +129,23 @@ void libWoLU_ForceGrantAllTechRewards (int p) {
             j = j + 1;
         }
         i = i + 1;
+    }
+}
+
+// Enable the CURRENT mission's unlocked unit tech groups (so units are buildable
+// during their unlock mission, not only after completing it). Each mission registers
+// up to 3 unlocked tech subgroups (CampaignLib map data); EnableCampaignTechUnit sets
+// the group enabled AND allows the unit's train command.
+void libWoLU_EnableCurrentMissionUnits (int p) {
+    int j;
+    int grp;
+    j = 1;
+    while (j <= 3) {
+        grp = libCamp_gf_MissionUnlockedTechSubgorup(libCamp_gv_tS_CurrentMap, j);
+        if ((grp != libCamp_ge_StoryTechGroup_StoryTechGroupNone)) {
+            libCamp_gf_EnableCampaignTechUnit(true, grp, p);
+        }
+        j = j + 1;
     }
 }
 
