@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Magrail railgun beam. Cloned from NCO's RailGunTurretAttackBeamPoint (a
+         complete working railgun beam): a one-shot beam created when the Magrail
+         damage effect fires, drawn from the marine's weapon to the target, using the
+         base-game WarHound railgun model (WoLUMagrailBeamModel = the real .m3, by CASC
+         path — no bundling/NCO-data dependency). This is the authentic magrail visual.
+         FLAG: authored without in-game iteration — verify it renders; the parents
+         (BeamSimpleAnimationStyleOneShot) and the Effect.<id>.Start binding are taken
+         verbatim from the working NCO actor, so this is a faithful clone, not a guess. -->
+    <CActorBeamSimple id="WoLUMagrailBeam" parent="BeamSimpleAnimationStyleOneShot">
+        <On Terms="Effect.MagrailDamageWoLU.Start; At Caster" Send="Create"/>
+        <Model value="WoLUMagrailBeamModel"/>
+        <HostLaunch Subject="_Unit"/>
+        <HostLaunchSiteOps Ops="SOpAttachWeapon" HoldPosition="1"/>
+        <HostImpactSiteOps Ops="SOpTargetPoint"/>
+    </CActorBeamSimple>
+    <!-- Railgun impact flash at the target. -->
+    <CActorModel id="WoLUMagrailImpactActor" parent="ModelAnimationStyleOneShot">
+        <On Terms="Effect.MagrailDamageWoLU.Start" Send="Create"/>
+        <Model value="WoLUMagrailImpact"/>
+        <HostSiteOps Ops="SOpTargetPoint"/>
+    </CActorModel>
+</Catalog>

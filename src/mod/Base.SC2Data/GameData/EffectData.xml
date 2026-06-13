@@ -58,16 +58,9 @@
         <AreaArray Radius="1.25" Fraction="0.5"/>
     </CEffectDamage>
 
-    <!-- Marine Magrail Munitions bonus shot. The ability launches MagrailLaunchWoLU
-         (a missile, for the visible projectile), which deals MagrailDamageWoLU on
-         impact. AmmoUnit reuses the Marauder grenade missile so an existing
-         CActorMissile renders the projectile (no new actor/model needed). -->
-    <CEffectLaunchMissile id="MagrailLaunchWoLU">
-        <EditorCategories value="Race:Terran"/>
-        <ImpactEffect value="MagrailDamageWoLU"/>
-        <ImpactLocation Value="TargetUnit"/>
-        <AmmoUnit value="PunisherGrenadesLMWeapon"/>
-    </CEffectLaunchMissile>
+    <!-- Marine Magrail Munitions bonus shot. Instant damage; the railgun BEAM visual
+         is a one-shot beam actor bound to this effect's Start (WoLUMagrailBeam in
+         ActorData.xml), using the base-game WarHound railgun model. -->
     <CEffectDamage id="MagrailDamageWoLU" parent="DU_WEAP">
         <ImpactLocation Value="TargetUnit"/>
         <EditorCategories value="Race:Terran"/>

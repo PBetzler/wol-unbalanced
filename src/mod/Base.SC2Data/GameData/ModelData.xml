@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Catalog>
+    <!-- Magrail railgun visual models. Reference the base-game WarHound railgun .m3
+         files by CASC path (present in every SC2 install — no bundling or NCO data
+         dependency needed). These are the same models NCO's railgun abilities use
+         (NovaSnipeStone etc.), so this is the authentic magrail look. The CModel ids
+         match the CActorBeamSimple ids in ActorData.xml so the engine auto-links them
+         (NCO's NovaSnipeStoneAttackBeam pattern). -->
+    <CModel id="WoLUMagrailBeam" parent="PersistentSpellFX">
+        <Model value="Assets\Effects\Terran\WarHoundRailGunMissile\WarHoundRailGunMissile.m3"/>
+        <EditorCategories value="Race:Terran"/>
+    </CModel>
+    <CModel id="WoLUMagrailImpact" parent="ImpactFX">
+        <Model value="Assets\Effects\Terran\WarHoundRailGunMissileImpact\WarHoundRailGunMissileImpact.m3"/>
+        <EditorCategories value="Race:Terran"/>
+    </CModel>
+</Catalog>

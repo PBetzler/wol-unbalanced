@@ -195,13 +195,11 @@
          proven autocast block; cooldown instead of energy. -->
     <CAbilEffectTarget id="MagrailWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <!-- Fire a real projectile: launch a missile (reuses the Marauder grenade
-             missile unit PunisherGrenadesLMWeapon, whose CActorMissile gives a visible
-             infantry-scale shot), then deal MagrailDamageWoLU on impact. A raw damage
-             effect has no actor → no projectile; an AmmoUnit reuse borrows an existing
-             missile's visual without authoring a new actor/model. (The exact NCO
-             magrail rail model isn't in our Liberty-only deps; this is a stand-in.) -->
-        <Effect index="0" value="MagrailLaunchWoLU"/>
+        <!-- Real railgun visual: MagrailDamageWoLU fires a one-shot beam actor that
+             uses the base-game WarHound railgun model (WoLUMagrailBeam in ActorData/
+             ModelData). The .m3 is referenced by CASC path — present in every install,
+             no bundling or NCO dependency needed. This is the authentic magrail look. -->
+        <Effect index="0" value="MagrailDamageWoLU"/>
         <TargetFilters value="Visible;Self,Player,Ally,Stasis,Dead,Hidden,Invulnerable"/>
         <Range value="6"/>
         <Cost>
