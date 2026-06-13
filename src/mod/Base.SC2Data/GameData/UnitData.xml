@@ -11,40 +11,43 @@
          Button cells chosen against each unit's vanilla card (collisions found the
          hard way: RaynorCommando 2,1 = radar, Raynor 2,0-2,3 all taken, Tychus
          2,0/2,1 taken, Firebat 2,0/2,1 taken). -->
+    <!-- Explicit indices (= each unit's vanilla array count = next free slot). Index-
+         LESS appends do not take effect in our dependency mod; explicit-index appends
+         do (proven on Marine). Counts derived from the reference catalogs. -->
     <CUnit id="Raynor01">
-        <AbilArray Link="StimpackWoLU"/>
+        <AbilArray index="3" Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="5" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="RaynorCommando">
-        <AbilArray Link="StimpackWoLU"/>
+        <AbilArray index="4" Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Raynor">
-        <AbilArray Link="StimpackWoLU"/>
+        <AbilArray index="7" Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="4"/>
+            <LayoutButtons index="9" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="4"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusCommando">
-        <AbilArray Link="StimpackMarauderWoLU"/>
+        <AbilArray index="4" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusChaingun">
-        <AbilArray Link="StimpackMarauderWoLU"/>
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="5" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Swann">
-        <AbilArray Link="StimpackMarauderWoLU"/>
+        <AbilArray index="4" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
 
@@ -94,15 +97,15 @@
          enemy players never receive. Cell 2,2 — vanilla card has passive-display
          buttons at 2,0 (Incinerator Nozzles) and 2,1 (Juggernaut Plating). -->
     <CUnit id="Firebat">
-        <AbilArray Link="StimpackMarauderWoLU"/>
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="DevilDog">
-        <AbilArray Link="StimpackMarauderWoLU"/>
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
 
@@ -110,15 +113,15 @@
          stim and cloak"), Ghost/Spectre (heal 30, part of their autocast kit), Hellion
          (heal 60 — NCO gives the Hellbat line the 60-heal marauder set). -->
     <CUnit id="Reaper">
-        <AbilArray Link="StimpackWoLU"/>
+        <AbilArray index="3" Link="StimpackWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Hellion">
-        <AbilArray Link="StimpackMarauderWoLU"/>
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="0"/>
+            <LayoutButtons index="5" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="0"/>
         </CardLayouts>
     </CUnit>
 
@@ -130,21 +133,21 @@
          Ghost buttons (liberty.sc2mod order): [7]=Snipe, [11]=EMP.
          Spectre buttons (liberty.sc2campaign order): [12]=Obliterate. -->
     <CUnit id="Ghost">
-        <AbilArray Link="StimpackWoLU"/>
-        <AbilArray Link="SnipeWoLU"/>
-        <AbilArray Link="EMPWoLU"/>
+        <AbilArray index="9" Link="StimpackWoLU"/>
+        <AbilArray index="10" Link="SnipeWoLU"/>
+        <AbilArray index="11" Link="EMPWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="7" AbilCmd="SnipeWoLU,Execute"/>
             <LayoutButtons index="11" AbilCmd="EMPWoLU,Execute"/>
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
+            <LayoutButtons index="13" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Spectre">
-        <AbilArray Link="StimpackWoLU"/>
-        <AbilArray Link="ObliterateWoLU"/>
+        <AbilArray index="9" Link="StimpackWoLU"/>
+        <AbilArray index="10" Link="ObliterateWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="12" AbilCmd="ObliterateWoLU,Execute"/>
-            <LayoutButtons Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="0"/>
+            <LayoutButtons index="14" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="0"/>
         </CardLayouts>
     </CUnit>
 
@@ -157,13 +160,13 @@
          vanilla manual Yamato at 2,0 stays. attack-while-moving + ignore-armor are
          applied per player on the laser weapons/effects in genlib. -->
     <CUnit id="Battlecruiser">
-        <AbilArray Link="MissilePodsWoLU"/>
-        <AbilArray Link="DefensiveMatrixWoLU"/>
-        <AbilArray Link="YamatoWoLU"/>
+        <AbilArray index="5" Link="MissilePodsWoLU"/>
+        <AbilArray index="6" Link="DefensiveMatrixWoLU"/>
+        <AbilArray index="7" Link="YamatoWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="MissilePods" Type="AbilCmd" AbilCmd="MissilePodsWoLU,Execute" Row="2" Column="1"/>
-            <LayoutButtons Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
-            <LayoutButtons Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
+            <LayoutButtons index="6" Face="MissilePods" Type="AbilCmd" AbilCmd="MissilePodsWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="7" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="8" Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
         </CardLayouts>
     </CUnit>
 
@@ -171,9 +174,9 @@
          (same append + WoLUHaveFlag gate). Free card cell 2,2 (vanilla SV uses
          2,0 NanoRepair / 2,1 Irradiate / 2,3 Detector). -->
     <CUnit id="ScienceVessel">
-        <AbilArray Link="DefensiveMatrixWoLU"/>
+        <AbilArray index="4" Link="DefensiveMatrixWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="9" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
 </Catalog>
