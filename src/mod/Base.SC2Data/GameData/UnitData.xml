@@ -271,4 +271,28 @@
             <LayoutButtons index="9"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
+
+    <!-- Rule 10: Nova (=Ghost) inherits the Ghost autocast kit — Super Stim + Snipe +
+         EMP. Appended at next free abil index (7+); buttons in Nova's free row-1 cells
+         (1,2 / 1,3 / 1,4). Nova's own NovaSnipe etc. stay. -->
+    <CUnit id="Nova">
+        <AbilArray index="7" Link="StimpackWoLU"/>
+        <AbilArray index="8" Link="SnipeWoLU"/>
+        <AbilArray index="9" Link="EMPWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="12" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="2"/>
+            <LayoutButtons index="13" Face="Snipe" Type="AbilCmd" AbilCmd="SnipeWoLU,Execute" Row="1" Column="3"/>
+            <LayoutButtons index="14" Face="EMP" Type="AbilCmd" AbilCmd="EMPWoLU,Execute" Row="1" Column="4"/>
+        </CardLayouts>
+    </CUnit>
+    <!-- Rule 10: Tosh (=Spectre) inherits Super Stim + Psionic Lash (Obliterate).
+         Appended at abil 7/8; buttons in Tosh's free row-1 cells (1,1 / 1,2). -->
+    <CUnit id="Tosh">
+        <AbilArray index="7" Link="StimpackWoLU"/>
+        <AbilArray index="8" Link="ObliterateWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="10" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
+            <LayoutButtons index="11" Face="Obliterate" Type="AbilCmd" AbilCmd="ObliterateWoLU,Execute" Row="1" Column="2"/>
+        </CardLayouts>
+    </CUnit>
 </Catalog>
