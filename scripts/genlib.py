@@ -339,6 +339,75 @@ def emit():
         # 500 swamps any armor value => effectively ignored. Confirm in game.
         ("Effect", "ATSLaserBatteryU", "ArmorReduction", "500", "Set", "BC attacks ignore armor (ground) — VERIFY ArmorReduction semantics"),
         ("Effect", "ATALaserBatteryU", "ArmorReduction", "500", "Set", "BC attacks ignore armor (air)"),
+
+        # ========================================================================
+        # PARITY + COMPLETENESS SWEEP (rules 4/10). Mercs & heroes use DISTINCT
+        # weapon ids, so base-unit weapon edits never reach them — mirror them here.
+        # Also fills base-unit Laser-Targeting gaps. Range/Sight via Add (robust to
+        # each weapon's base value). All per-player (rule 9 safe).
+        # ========================================================================
+        # -- Base-unit LTS gaps (AP list has Laser Targeting: +1 range, +2 sight) --
+        ("Weapon", "P38ScytheGuassPistol", "Range", "1", "Add", "Reaper LTS: +1 range"),
+        ("Unit", "Reaper", "Sight", "2", "Add", "Reaper LTS: +2 sight"),
+        ("Weapon", "CrucioShockCannon", "Range", "1", "Add", "Siege Tank LTS: +1 sieged range"),
+        ("Weapon", "90mmCannons", "Range", "1", "Add", "Siege Tank LTS: +1 mobile range"),
+        ("Unit", "SiegeTank", "Sight", "2", "Add", "Siege Tank LTS: +2 sight"),
+        ("Unit", "SiegeTankSieged", "Sight", "2", "Add", ""),
+        ("Weapon", "ThorsHammer", "Range", "1", "Add", "Thor LTS: +1 ground range"),
+        ("Unit", "Thor", "Sight", "2", "Add", "Thor LTS: +2 sight"),
+        ("Unit", "Banshee", "Sight", "2", "Add", "Banshee LTS: +2 sight"),
+        # -- Marauder line: Hammer Securities (merc) + Swann (hero): range, sight, +2 armor --
+        ("Weapon", "HammerSecurity", "Range", "1", "Add", "Hammer Securities: Marauder LTS range"),
+        ("Unit", "HammerSecurity", "Sight", "2", "Add", ""),
+        ("Unit", "HammerSecurity", "LifeArmor", "2", "Add", "Hammer Securities: Juggernaut Plating"),
+        ("Weapon", "DutchConcussiveGrenade", "Range", "1", "Add", "Swann: Marauder LTS range"),
+        ("Unit", "Swann", "Sight", "2", "Add", ""),
+        ("Unit", "Swann", "LifeArmor", "2", "Add", "Swann: Juggernaut Plating"),
+        # -- Firebat line: Kinetic Foam +100 HP to Devil Dogs + Tychus (on top of x2);
+        #    Nano Projectors +2 range to the Devil Dog flamethrower only (Tychus = chaingun) --
+        ("Unit", "DevilDog", "LifeMax", "100", "Add", "Devil Dogs: Kinetic Foam +100"),
+        ("Unit", "DevilDog", "LifeStart", "100", "Add", ""),
+        ("Weapon", "DevilDogFlameThrower", "Range", "2", "Add", "Devil Dogs: Nano Projectors +2 range"),
+        ("Unit", "TychusCommando", "LifeMax", "100", "Add", "Tychus: Kinetic Foam +100"),
+        ("Unit", "TychusCommando", "LifeStart", "100", "Add", ""),
+        ("Unit", "TychusChaingun", "LifeMax", "100", "Add", ""),
+        ("Unit", "TychusChaingun", "LifeStart", "100", "Add", ""),
+        # -- Ghost line: Nova (=Ghost) range + sight --
+        ("Weapon", "Nova", "Range", "1", "Add", "Nova (=Ghost): LTS range"),
+        ("Unit", "Nova", "Sight", "2", "Add", ""),
+        # -- Spectre line: Tosh (=Spectre) range + sight --
+        ("Weapon", "Tosh", "Range", "1", "Add", "Tosh (=Spectre): LTS range"),
+        ("Unit", "Tosh", "Sight", "2", "Add", ""),
+        # -- Goliath line: Ares-Class (+3 AA / +1 cannon range) + Shaped Hull (+25).
+        #    Goliath has NO Laser Targeting (its AP list omits it). --
+        ("Weapon", "GoliathA", "Range", "3", "Add", "Goliath Ares-Class: +3 AA range"),
+        ("Weapon", "GoliathG", "Range", "1", "Add", "Goliath Ares-Class: +1 cannon range"),
+        ("Weapon", "GoliathAUpgraded", "Range", "3", "Add", ""),
+        ("Weapon", "GoliathGUpgraded", "Range", "1", "Add", ""),
+        ("Weapon", "SpartanCompanyA", "Range", "3", "Add", "Spartan Company: Ares-Class parity"),
+        ("Weapon", "SpartanCompanyG", "Range", "1", "Add", ""),
+        ("Weapon", "SpartanCompanyAUpgraded", "Range", "3", "Add", ""),
+        ("Weapon", "SpartanCompanyGUpgraded", "Range", "1", "Add", ""),
+        ("Unit", "SpartanCompany", "LifeMax", "25", "Add", "Spartan Company: Shaped Hull +25"),
+        ("Unit", "SpartanCompany", "LifeStart", "25", "Add", ""),
+        # -- Siege Tank line: Siege Breakers (range, sight, +3 armor sieged) --
+        ("Weapon", "SiegeBreaker", "Range", "1", "Add", "Siege Breakers: LTS mobile range"),
+        ("Weapon", "ArcliteShockCannon", "Range", "1", "Add", "Siege Breakers: LTS sieged range"),
+        ("Unit", "SiegeBreaker", "Sight", "2", "Add", ""),
+        ("Unit", "SiegeBreakerSieged", "Sight", "2", "Add", ""),
+        ("Unit", "SiegeBreakerSieged", "LifeArmor", "3", "Add", "Siege Breakers: Advanced Siege Tech +3"),
+        # -- Banshee line: Dusk Wings (range, sight) --
+        ("Weapon", "DuskWingBanshee", "Range", "2", "Add", "Dusk Wings: Banshee range parity"),
+        ("Unit", "DuskWing", "Sight", "2", "Add", ""),
+        # -- Thor line: Odin (ground range, sight; AA range/dmg done; ground splash in XML) --
+        ("Weapon", "Odin", "Range", "1", "Add", "Odin (=Thor): LTS ground range"),
+        ("Unit", "Odin", "Sight", "2", "Add", ""),
+        # -- BC line: Jackson's Revenge — fire-while-moving parity (armor/speed done;
+        #    ignore-armor on DR damage effects deferred — see uncertainty list) --
+        ("Weapon", "DRBattlecruiserG", "AllowedMovement", "Moving", "Set", "Jackson's Revenge: fire while moving (ground)"),
+        ("Weapon", "DRBattlecruiserA", "AllowedMovement", "Moving", "Set", "Jackson's Revenge: fire while moving (air)"),
+        ("Weapon", "DRCannonsG", "AllowedMovement", "Moving", "Set", ""),
+        ("Weapon", "DRCannonsA", "AllowedMovement", "Moving", "Set", ""),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""

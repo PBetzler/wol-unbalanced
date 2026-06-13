@@ -244,6 +244,55 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC fire while moving (air->air)
     CatalogFieldValueModify(c_gameCatalogEffect, "ATSLaserBatteryU", "ArmorReduction", p, "500", c_upgradeOperationSet);  // BC attacks ignore armor (ground) — VERIFY ArmorReduction semantics
     CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "500", c_upgradeOperationSet);  // BC attacks ignore armor (air)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "Range", p, "1", c_upgradeOperationAdd);  // Reaper LTS: +1 range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "Sight", p, "2", c_upgradeOperationAdd);  // Reaper LTS: +2 sight
+    CatalogFieldValueModify(c_gameCatalogWeapon, "CrucioShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 sieged range
+    CatalogFieldValueModify(c_gameCatalogWeapon, "90mmCannons", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 mobile range
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "Sight", p, "2", c_upgradeOperationAdd);  // Siege Tank LTS: +2 sight
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTankSieged", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Range", p, "1", c_upgradeOperationAdd);  // Thor LTS: +1 ground range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Thor", "Sight", p, "2", c_upgradeOperationAdd);  // Thor LTS: +2 sight
+    CatalogFieldValueModify(c_gameCatalogUnit, "Banshee", "Sight", p, "2", c_upgradeOperationAdd);  // Banshee LTS: +2 sight
+    CatalogFieldValueModify(c_gameCatalogWeapon, "HammerSecurity", "Range", p, "1", c_upgradeOperationAdd);  // Hammer Securities: Marauder LTS range
+    CatalogFieldValueModify(c_gameCatalogUnit, "HammerSecurity", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "HammerSecurity", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Hammer Securities: Juggernaut Plating
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DutchConcussiveGrenade", "Range", p, "1", c_upgradeOperationAdd);  // Swann: Marauder LTS range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Swann", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Swann: Juggernaut Plating
+    CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeMax", p, "100", c_upgradeOperationAdd);  // Devil Dogs: Kinetic Foam +100
+    CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeStart", p, "100", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DevilDogFlameThrower", "Range", p, "2", c_upgradeOperationAdd);  // Devil Dogs: Nano Projectors +2 range
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "LifeMax", p, "100", c_upgradeOperationAdd);  // Tychus: Kinetic Foam +100
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "LifeStart", p, "100", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "LifeMax", p, "100", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "LifeStart", p, "100", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Nova", "Range", p, "1", c_upgradeOperationAdd);  // Nova (=Ghost): LTS range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Nova", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Tosh", "Range", p, "1", c_upgradeOperationAdd);  // Tosh (=Spectre): LTS range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Tosh", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "GoliathA", "Range", p, "3", c_upgradeOperationAdd);  // Goliath Ares-Class: +3 AA range
+    CatalogFieldValueModify(c_gameCatalogWeapon, "GoliathG", "Range", p, "1", c_upgradeOperationAdd);  // Goliath Ares-Class: +1 cannon range
+    CatalogFieldValueModify(c_gameCatalogWeapon, "GoliathAUpgraded", "Range", p, "3", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "GoliathGUpgraded", "Range", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyA", "Range", p, "3", c_upgradeOperationAdd);  // Spartan Company: Ares-Class parity
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyG", "Range", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyAUpgraded", "Range", p, "3", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyGUpgraded", "Range", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeMax", p, "25", c_upgradeOperationAdd);  // Spartan Company: Shaped Hull +25
+    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "SiegeBreaker", "Range", p, "1", c_upgradeOperationAdd);  // Siege Breakers: LTS mobile range
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ArcliteShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Breakers: LTS sieged range
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreaker", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreakerSieged", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreakerSieged", "LifeArmor", p, "3", c_upgradeOperationAdd);  // Siege Breakers: Advanced Siege Tech +3
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DuskWingBanshee", "Range", p, "2", c_upgradeOperationAdd);  // Dusk Wings: Banshee range parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "Range", p, "1", c_upgradeOperationAdd);  // Odin (=Thor): LTS ground range
+    CatalogFieldValueModify(c_gameCatalogUnit, "Odin", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserG", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Jackson's Revenge: fire while moving (ground)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Jackson's Revenge: fire while moving (air)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);
