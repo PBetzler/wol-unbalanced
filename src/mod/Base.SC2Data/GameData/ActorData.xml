@@ -10,7 +10,7 @@
          verbatim from the working NCO actor, so this is a faithful clone, not a guess. -->
     <CActorBeamSimple id="WoLUMagrailBeam" parent="BeamSimpleAnimationStyleOneShot">
         <On Terms="Effect.MagrailDamageWoLU.Start; At Caster" Send="Create"/>
-        <Model value="WoLUMagrailBeamModel"/>
+        <Model value="WoLUMagrailBeam"/>
         <HostLaunch Subject="_Unit"/>
         <HostLaunchSiteOps Ops="SOpAttachWeapon" HoldPosition="1"/>
         <HostImpactSiteOps Ops="SOpTargetPoint"/>
