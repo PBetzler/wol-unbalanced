@@ -124,6 +124,28 @@ gotcha; authoritative details live in the code/plan, not here.
   missions) are coarse and survive updates — that's the "other mods update fine" case.
   The `.version` files we still emit are harmless release hygiene, not a dev-save fix.
 
+## Visual actors bind to IDs — clones with new IDs lose visuals
+
+- Visuals live in `ActorData`, keyed to specific **ability / weapon / effect IDs** via
+  event terms (`Abil.Snipe.SourceCastStart`, `WeaponStart.ThorsHammer.AttackStart`,
+  `Effect.Yamato.*`, and `CActorMissile unitName="EMP2Weapon"`). A clone with a NEW id
+  inherits NONE of these — the actor never matches → no visual.
+- **Rule of thumb that mostly saves you:** if a clone **reuses the vanilla EFFECT id**
+  (`SnipeWoLU` Effect=`SnipeDamage`, `EMPWoLU` Effect=`EMPLaunchMissile`, `YamatoWoLU`
+  `parent="Yamato"` inheriting Effect=`Yamato`), the effect-bound visuals (projectiles,
+  beams, impacts — the ones that matter) fire. Only **ability/weapon-bound caster
+  animations** (cast poses, charge glows, the stim puff) are lost, which is cosmetic.
+- **Projectiles need a launch effect + a missile unit with an actor.** A raw
+  `CEffectDamage` has no projectile. Cheapest fix: `CEffectLaunchMissile` with
+  `AmmoUnit="<existing missile unit>"` (e.g. `PunisherGrenadesLMWeapon`, `EMP2Weapon`)
+  — the existing `CActorMissile unitName="..."` renders it, no new actor/model needed
+  (Magrail does this). Assets outside our Liberty deps (e.g. the NCO magrail model)
+  aren't reachable — reuse a Liberty missile as a stand-in.
+- **Don't clone a WEAPON if you can avoid it** — weapon-bound animations
+  (`WeaponStart.<id>`) break. Prefer overriding the **vanilla weapon's `Effect`** to a
+  player-gated effect set (Thor does this): the weapon id stays, so the attack
+  animation fires, and per-player isolation lives in the validator-gated effect set.
+
 ## Galaxy script
 
 - Galaxy is **single-pass** like C: use-before-definition is a compile error, and a
