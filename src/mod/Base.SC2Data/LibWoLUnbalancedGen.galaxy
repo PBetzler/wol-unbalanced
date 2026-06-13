@@ -63,7 +63,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // DukesRevenge, was default 0.167
-    CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammerWoLU", "DamagePoint", p, "0.1", c_upgradeOperationSet);  // Thor ground clone (XML-wired; vanilla id capped above is now unused)
 
     // --- Rule 5: build time cap 60 s (+ explicit overrides) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "BarracksTrain", "InfoArray[Train1].Time", p, "19.0", c_upgradeOperationSet);  // Marine, was 25.0

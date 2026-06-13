@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Catalog>
-    <!-- Thor ground weapon clone, wired into WeaponArray[1] by XML index-override in
-         UnitData.xml. That override is GLOBAL (enemy Thors get this weapon too), so
-         the clone must stay stat-identical to vanilla: the only change is the effect
-         set, whose branches are player-gated (see EffectData.xml). Player-only stat
-         buffs (DamagePoint windup cap) are applied per player at runtime on THIS id
-         — never baked in here, where they would leak to enemies. -->
-    <CWeaponLegacy id="ThorsHammerWoLU" parent="ThorsHammer">
+    <!-- Thor ground splash WITHOUT a weapon clone. Cloning the weapon (ThorsHammerWoLU)
+         broke the attack visual, because the Thor's animation actors bind to
+         WeaponStart.ThorsHammer (the weapon ID). So instead we keep the vanilla
+         weapon ID and only override its Effect to our player-gated set — the weapon
+         animation fires for everyone, and the splash-vs-vanilla split happens at the
+         effect level (Shaped Blast pattern, see EffectData.xml). Global edit, but the
+         effect set's branches are validator-gated so enemy Thors deal vanilla damage.
+         Per-player windup cap stays on the vanilla ThorsHammer id in genlib. -->
+    <CWeaponLegacy id="ThorsHammer">
         <Effect value="ThorsHammerWoLUSet"/>
     </CWeaponLegacy>
 </Catalog>

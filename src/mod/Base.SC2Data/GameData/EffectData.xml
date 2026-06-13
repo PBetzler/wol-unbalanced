@@ -33,12 +33,13 @@
         <VitalArray index="Life" Change="60"/>
     </CEffectModifyUnit>
 
-    <!-- Thor ground attack with sieged-tank-style splash. The ThorsHammerWoLU weapon
-         is wired into Thor's WeaponArray[1] by XML index-override, which is GLOBAL —
-         enemy Thors fire it too. Per-player isolation therefore happens HERE, at the
-         effect level (the campaign's Shaped Blast pattern): the weapon fires a set
-         whose branches are validator-gated on the flag upgrade only the human player
-         has — splash for us, exact vanilla damage for everyone else. -->
+    <!-- Thor ground attack with sieged-tank-style splash. The vanilla ThorsHammer
+         weapon's Effect is overridden to this set (WeaponData.xml) — keeping the
+         weapon id so attack animations still fire. The set is GLOBAL (enemy Thors
+         fire it too), so per-player isolation happens HERE at the effect level (the
+         campaign's Shaped Blast pattern): both branches are validator-gated on the
+         flag upgrade only the human player has — splash for us, exact vanilla damage
+         for everyone else. -->
     <CEffectSet id="ThorsHammerWoLUSet">
         <EffectArray value="ThorsHammerDamageVanillaWoLU"/>
         <EffectArray value="ThorsHammerDamageWoLU"/>
@@ -57,7 +58,16 @@
         <AreaArray Radius="1.25" Fraction="0.5"/>
     </CEffectDamage>
 
-    <!-- Marine Magrail Munitions bonus shot (modeled on SnipeDamage). -->
+    <!-- Marine Magrail Munitions bonus shot. The ability launches MagrailLaunchWoLU
+         (a missile, for the visible projectile), which deals MagrailDamageWoLU on
+         impact. AmmoUnit reuses the Marauder grenade missile so an existing
+         CActorMissile renders the projectile (no new actor/model needed). -->
+    <CEffectLaunchMissile id="MagrailLaunchWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <ImpactEffect value="MagrailDamageWoLU"/>
+        <ImpactLocation Value="TargetUnit"/>
+        <AmmoUnit value="PunisherGrenadesLMWeapon"/>
+    </CEffectLaunchMissile>
     <CEffectDamage id="MagrailDamageWoLU" parent="DU_WEAP">
         <ImpactLocation Value="TargetUnit"/>
         <EditorCategories value="Race:Terran"/>

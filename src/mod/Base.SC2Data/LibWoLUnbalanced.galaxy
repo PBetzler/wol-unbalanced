@@ -131,7 +131,8 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // Runtime diagnostic (read this back when testing). Expected when healthy:
     // clone=5 (StimpackWoLU AutoCastRange from our XML), fx=WoLUStimSet (the effect
     // actually wired — index-less Effect assignment was the old manual-cast killer),
-    // flag=1, m3=StimpackWoLU (Marine slot-3 index-override), t1=ThorsHammerWoLU.
+    // flag=1, m3=StimpackWoLU (Marine slot-3 index-override), t1=ThorsHammer
+    // (vanilla weapon kept — splash now via its overridden Effect, not a clone swap).
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag: clone=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "AutoCastRange", libWoLU_Player) + " fx=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "Effect[0]", libWoLU_Player) + " flag=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "WoLUnbalancedFlag", c_techCountCompleteOnly)) + " m3=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[3].Link", libWoLU_Player) + " t1=" + CatalogFieldValueGet(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", libWoLU_Player)));
     // Append diagnostic: does a STATIC-XML indexless AbilArray append actually apply?
     // Vanilla Marine has 4 abils (stop/attack/move/Stimpack); we append MagrailWoLU.

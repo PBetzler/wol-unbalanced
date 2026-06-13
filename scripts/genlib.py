@@ -114,13 +114,10 @@ def train_entries():
 # Player gating happens inside the clones (requirement-gated buttons, validator-gated
 # effect branches), never via runtime link swaps.
 
-# Weapon CLONES the player actually fires (wired via XML index-overrides). The windup
-# cap below targets vanilla weapon ids from the reference; it does NOT propagate to a
-# clone — parent inheritance resolves at catalog load, and per-player runtime edits on
-# the vanilla id don't touch the clone entry. Cap the clone ids explicitly.
-CLONE_WEAPONS = {
-    "ThorsHammerWoLU": "Thor ground clone (XML-wired; vanilla id capped above is now unused)",
-}
+# No weapon clones any more: Thor's splash is wired by overriding the vanilla
+# ThorsHammer weapon's Effect (keeps the weapon id so attack visuals fire). The
+# vanilla ThorsHammer windup is already capped by the rule-7 pass below.
+CLONE_WEAPONS = {}
 
 
 def emit():
@@ -230,7 +227,9 @@ def emit():
         ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA: HIP floor 35/rocket (LotV Punisher)"),
         ("Effect", "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", "0", "Set", ""),
         ("Weapon", "JavelinMissileLaunchers", "Range", "12", "Set", "Thor AA range = HIP range 11 + 1"),
-        # (Thor ground splash lives in the ThorsHammerWoLU weapon clone — runtime catalog
+        # (Thor ground splash is wired by overriding vanilla ThorsHammer's Effect in
+        #  WeaponData.xml; the windup cap on ThorsHammer is applied per player above.)
+        # (legacy note — runtime catalog
         #  modify cannot CREATE AreaArray entries; the weapon link swap is emitted below.)
         # Siege tank: no friendly fire (campaign implements FF via separate friendly effects)
         ("Effect", "CrucioShockCannonFriendlyDamage", "Amount", "0", "Set", "tank sieged splash: no friendly fire"),

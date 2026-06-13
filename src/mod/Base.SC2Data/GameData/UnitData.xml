@@ -85,12 +85,10 @@
         <AbilArray index="3" Link="StimpackMarauderWoLU"/>
     </CUnit>
 
-    <!-- Thor ground splash: weapon slot 1 (0 = Javelin AA) -> the WoLU clone. Global,
-         but the clone is stat-identical to vanilla and its effect set is player-gated
-         (Shaped Blast pattern) — enemy Thors deal exact vanilla damage. -->
-    <CUnit id="Thor">
-        <WeaponArray index="1" Link="ThorsHammerWoLU"/>
-    </CUnit>
+    <!-- Thor ground splash is now wired by overriding the vanilla ThorsHammer weapon's
+         Effect (WeaponData.xml) — NOT by a weapon clone/swap, which broke the attack
+         animation (actors bind to WeaponStart.ThorsHammer). No Thor WeaponArray edit
+         needed here anymore. -->
 
     <!-- AP port: Firebats get Stimpack (vanilla campaign firebats have none); the 60-heal
          marauder variant per the unit-table. The button is gated on WoLUHaveFlag, which
