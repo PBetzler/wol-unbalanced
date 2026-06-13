@@ -80,11 +80,16 @@ gotcha; authoritative details live in the code/plan, not here.
   range); override only the autocast block + the gated button. Cheapest way to add an
   autocast variant without re-specifying the effect chain (used by the BC kit:
   `YamatoWoLU parent="Yamato"`, etc.). Works for weapons too (`ThorsHammerWoLU`).
-- **TargetSorts are a fixed 6-value engine enum** (`TSAlliancePassive`, `TSDistance`,
-  `TSLifeFraction`, `TSLifeLargestFirst`, `TSMarker`, `TSRandom`) — not a catalog you
-  can extend. Nuanced autocast priority ("healers first", "clean-kill within N HP")
-  is **not** expressible declaratively; it needs a periodic galaxy targeting trigger
-  or a TargetFind data structure. Don't pretend a sort list does more than it can.
+- **TargetSorts are catalog-definable** via `CTargetSortValidator` / `CTargetSortField`
+  / `CTargetSortMarker` / `CTargetSortPriority` entries in `TargetSortData.xml` — NOT a
+  fixed enum (the built-in `TS*` names are just the stock ones). So nuanced autocast
+  priority IS expressible: `CTargetSortValidator` orders targets by a validator,
+  `CTargetSortField` by any unit field. **Direction**: a plain `CTargetSortValidator`
+  sorts passers LAST; add `<Descending value="1"/>` to put passers FIRST (confirmed
+  from the RaynorRogue kit's `TSTrackedByBattlecruiser`, used un-descended to push
+  already-attacked targets to the back for overkill avoidance). The `gada` component
+  auto-discovers `TargetSortData.xml` — no ComponentList entry needed.
+  (Smart-Snipe uses this: healer → lethal → tanky → nearest.)
 - **Damage reduction** is a `CBehaviorBuff` with a `<DamageResponse ModifyFraction="0.5"
   ModifyMinimumDamage="1">` block (schema confirmed against the Moebius pack's
   `AdvancedShielding`; 0.5 = take half damage). `<Kind index="Ranged" value="1"/>`
