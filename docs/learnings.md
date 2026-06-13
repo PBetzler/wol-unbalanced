@@ -109,12 +109,20 @@ gotcha; authoritative details live in the code/plan, not here.
   `CValidatorCombine` (Or/And) — the toolkit for autocast gates.
 - **Attack-while-moving** is the weapon's `AllowedMovement` enum (`Slowing` default,
   `Moving` = fire on the move) — a vanilla field, no custom work.
-- **Save compatibility**: a mod must ship per-section `.version` files
-  (`DocumentInfo/GameData/GameText.version`, 44-byte format) with a monotonically
-  increasing counter, or every content change invalidates existing saves. The editor
-  maintains these automatically; a hand-rolled component folder must emit them
-  (`scripts/build.py::write_version_files`). Old saves made before versioning was
-  added stay broken — only forward compatibility is fixed.
+- **Mid-mission saves do NOT survive mod changes — and `.version` files do NOT fix
+  this** (two attempts proved it: constant counter, then monotonic counter; the error
+  recurred both times). A `.SC2Save` serializes live game state *against the mod's
+  exact catalog structure* — `save.ioSync` stores upgrade names (`WoLUnbalancedFlag`),
+  ability IDs, and array indices. Any data change (a new ability, a shifted
+  `AbilArray` index, a new behavior) makes those references no longer line up →
+  "the game does not match the version of the saved game." Confirmed empirically: our
+  `DocumentHeader` is byte-identical across builds, yet saves still break, so the
+  binding is to content/structure, not a version number. **Dev workflow: after each
+  reinstall, START THE MISSION FRESH** — don't reload a mid-mission save made on a
+  previous build. Within a single unchanged build, saves work fine (make all changes →
+  build+install once → then save/reload freely). Campaign-progress saves (between
+  missions) are coarse and survive updates — that's the "other mods update fine" case.
+  The `.version` files we still emit are harmless release hygiene, not a dev-save fix.
 
 ## Galaxy script
 

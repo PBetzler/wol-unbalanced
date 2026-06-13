@@ -150,9 +150,12 @@ def doc_version_counter() -> int:
 
 def write_version_files(mod_dir: str) -> None:
     """Emit the per-section .version files the editor maintains and our hand-rolled
-    component folder lacked. SC2 reloads a save against a dependency whose version is
-    >= the saved version; these files carry that version. The counter must INCREASE
-    every build (see doc_version_counter) or changed content reads as a mismatch.
+    component folder lacked. NOTE: these do NOT make mid-mission saves survive mod
+    changes — a .SC2Save serializes live game state against the catalog's exact
+    structure (upgrade names, ability IDs, array indices in save.ioSync), so any data
+    change invalidates it regardless of version numbers (verified: see learnings.md).
+    These files are release hygiene (a monotonic version for end-user update parity);
+    the dev workflow for changed mods is to start the mission fresh, not reload a save.
 
     44-byte layout decoded from an editor-saved mod (Tactical Arsenal): 'cdes' +
     reversed section tag, then 9 LE dwords [format=2, editor build, 5, 0, section
