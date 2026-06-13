@@ -127,6 +127,50 @@
         <Alignment value="Negative"/>
     </CAbilEffectTarget>
 
+    <!-- Battlecruiser kit (unit-table: autocast Missile Pods + Defensive Matrix +
+         Yamato on beefy targets). parent= inherits the full vanilla ability (cost,
+         effect, range) so only autocast + the WoLUHaveFlag gate are added; this is
+         the same append-don't-override approach as the Ghost kit (vanilla abilities
+         untouched for enemy BCs; clones gated so only the flagged player uses them).
+         Yamato autocast only fires at big targets (LifeMax >= 300) and never at
+         structures — see WoLUYamatoBigTarget validator + the structure-excluding
+         AutoCastFilters. NOTE/ASSUMPTION: defensive-structure discrimination (the
+         table wants Yamato on Spine/turrets but not supply depots) is NOT solved —
+         autocast skips ALL structures; manual Yamato still hits anything. -->
+    <CAbilEffectTarget id="YamatoWoLU" parent="Yamato">
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="10"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Structure,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastValidatorArray value="WoLUYamatoBigTarget"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="YamatoGun" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+    <CAbilEffectTarget id="MissilePodsWoLU" parent="MissilePods">
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="7"/>
+        <AutoCastFilters value="Air,Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="MissilePods" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+    <!-- ASSUMPTION/UNVERIFIED: Defensive Matrix is an INSTANT self-buff; autocast on
+         a self-cast instant ability has no clean Blizzard blueprint (heal/snipe
+         autocast are target abilities). These flags + an "enemy in range" gate are a
+         best effort; the manual button always works. Flag for in-game check — if it
+         never auto-fires, fall back to manual-only. -->
+    <CAbilEffectInstant id="DefensiveMatrixWoLU" parent="DefensiveMatrix">
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="9"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectInstant>
+
     <!-- AP port: Marine Magrail Munitions — autocast 20-dmg bonus shot on a 10 s
          cooldown. Modeled on Snipe (CAbilEffectTarget + spell damage) with the
          proven autocast block; cooldown instead of energy. -->

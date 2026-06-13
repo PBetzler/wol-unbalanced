@@ -283,6 +283,15 @@ def emit():
         # 3600 s outlasts any mission while avoiding 0/-1 sentinel semantics.
         ("Behavior", "AutoTurretTimedLife", "Duration", "3600", "Set", "Raven: permanent Auto-Turrets (AP Durable Materials, maxed)"),
         ("Behavior", "PointDefenseDroneTimedLife", "Duration", "3600", "Set", "Raven: permanent Point Defense Drones"),
+        # Battlecruiser (unit-table): fire while moving (AllowedMovement enum is a
+        # vanilla field; weapons ship Slowing/Moving — Moving = no slow-to-fire).
+        ("Weapon", "ATSLaserBattery", "AllowedMovement", "Moving", "Set", "BC ATX-style: fire while moving (air->surface)"),
+        ("Weapon", "ATALaserBattery", "AllowedMovement", "Moving", "Set", "BC fire while moving (air->air)"),
+        # BC attacks ignore armor (unit-table). ASSUMPTION/VERIFY: ArmorReduction
+        # subtracts from the target's armor for this effect (SnipeDamage sets it 0);
+        # 500 swamps any armor value => effectively ignored. Confirm in game.
+        ("Effect", "ATSLaserBatteryU", "ArmorReduction", "500", "Set", "BC attacks ignore armor (ground) — VERIFY ArmorReduction semantics"),
+        ("Effect", "ATALaserBatteryU", "ArmorReduction", "500", "Set", "BC attacks ignore armor (air)"),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""

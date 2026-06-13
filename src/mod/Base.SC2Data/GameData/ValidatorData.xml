@@ -32,4 +32,15 @@
         <CombineArray value="WoLUTargetHasEnergy"/>
         <CombineArray value="WoLUTargetHasShields"/>
     </CValidatorCombine>
+
+    <!-- Yamato autocast gate: only worth it on a beefy target. Compares the target's
+         MAX life (CValidatorUnitCompareField reads any unit field; default WhichUnit
+         is the validated/target unit, as TargetRadiusLarge does). ASSUMPTION: the
+         table says "max HP + max shields >= 300"; WoL campaign enemies are Terran/
+         Zerg (no shields), so LifeMax >= 300 is equivalent here. -->
+    <CValidatorUnitCompareField id="WoLUYamatoBigTarget">
+        <Compare value="GE"/>
+        <Field value="LifeMax"/>
+        <Value value="300"/>
+    </CValidatorUnitCompareField>
 </Catalog>

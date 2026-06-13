@@ -195,6 +195,10 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Diamondback Maglev Propulsion (+25%, assumption)
     CatalogFieldValueModify(c_gameCatalogBehavior, "AutoTurretTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Auto-Turrets (AP Durable Materials, maxed)
     CatalogFieldValueModify(c_gameCatalogBehavior, "PointDefenseDroneTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Point Defense Drones
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC ATX-style: fire while moving (air->surface)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC fire while moving (air->air)
+    CatalogFieldValueModify(c_gameCatalogEffect, "ATSLaserBatteryU", "ArmorReduction", p, "500", c_upgradeOperationSet);  // BC attacks ignore armor (ground) — VERIFY ArmorReduction semantics
+    CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "500", c_upgradeOperationSet);  // BC attacks ignore armor (air)
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);

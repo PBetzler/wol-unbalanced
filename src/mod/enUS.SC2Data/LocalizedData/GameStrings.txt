@@ -8,3 +8,6 @@ Abil/Name/SnipeWoLU=Snipe (Autocast)
 Abil/Name/EMPWoLU=EMP Round (Autocast)
 Abil/Name/ObliterateWoLU=Psionic Lash (Autocast)
 Abil/Name/MagrailWoLU=Magrail Shot
+Abil/Name/YamatoWoLU=Yamato Cannon (Autocast)
+Abil/Name/MissilePodsWoLU=Missile Pods (Autocast)
+Abil/Name/DefensiveMatrixWoLU=Defensive Matrix (Autocast)

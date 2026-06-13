@@ -145,4 +145,20 @@
 
     <!-- (Marine Magrail Munitions lives in the Marine block above — autocast bonus
          shot, 20 dmg, 10 s cooldown, button at the free cell 2,1.) -->
+
+    <!-- Battlecruiser autocast kit appended (append-don't-override; clones gated on
+         WoLUHaveFlag so enemy BCs can't use them). Base BC card has only Yamato at
+         2,0, so 2,1/2,2/2,3 are free. The clone buttons carry the autocast circle;
+         vanilla manual Yamato at 2,0 stays. attack-while-moving + ignore-armor are
+         applied per player on the laser weapons/effects in genlib. -->
+    <CUnit id="Battlecruiser">
+        <AbilArray Link="MissilePodsWoLU"/>
+        <AbilArray Link="DefensiveMatrixWoLU"/>
+        <AbilArray Link="YamatoWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons Face="MissilePods" Type="AbilCmd" AbilCmd="MissilePodsWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
+        </CardLayouts>
+    </CUnit>
 </Catalog>
