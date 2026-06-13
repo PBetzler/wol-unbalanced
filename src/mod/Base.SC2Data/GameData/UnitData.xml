@@ -23,6 +23,8 @@
         <CardLayouts index="0">
             <LayoutButtons index="5" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
             <LayoutButtons index="6" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="7"><Face value="CombatShield"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="RaynorCommando">
@@ -31,6 +33,8 @@
         <CardLayouts index="0">
             <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="8" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="3"/>
+            <LayoutButtons index="9"><Face value="CombatShield"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="10"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="Raynor">
@@ -39,6 +43,8 @@
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="4"/>
             <LayoutButtons index="10" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="1" Column="0"/>
+            <LayoutButtons index="11"><Face value="CombatShield"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="12"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="TychusCommando">
@@ -124,6 +130,8 @@
         <CardLayouts index="0">
             <LayoutButtons index="5" AbilCmd="StimpackWoLU,Execute"/>
             <LayoutButtons index="7" Face="MagrailWoLU" Type="AbilCmd" AbilCmd="MagrailWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="8"><Face value="CombatShield"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="9"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="HammerSecurity">
@@ -215,9 +223,15 @@
             <LayoutButtons index="6" Face="MissilePods" Type="AbilCmd" AbilCmd="MissilePodsWoLU,Execute" Row="2" Column="1"/>
             <LayoutButtons index="7" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="8" Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
+            <!-- BC has Internal Tech Module + Optimized Logistics (NOT Laser Targeting —
+                 its targeting upgrade is Field-Assist, a range aura). -->
             <LayoutButtons index="9">
-                <Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/>
+                <Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/>
                 <Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/>
+            </LayoutButtons>
+            <LayoutButtons index="10">
+                <Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/>
+                <Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/>
             </LayoutButtons>
         </CardLayouts>
     </CUnit>
@@ -237,10 +251,12 @@
          = each unit's vanilla button count (append rule). Shows the WoL buffs whose
          upgrade has a reusable icon (campaign buttons by id + our AP icon set); buffs
          that are abilities already show as their action buttons. -->
+    <!-- Goliath has NO Laser Targeting (its AP list omits it): show Shaped Hull +
+         Optimized Logistics (its real upgrades). -->
     <CUnit id="Goliath">
         <CardLayouts index="0">
-            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
-            <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="7"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="SiegeTank">
