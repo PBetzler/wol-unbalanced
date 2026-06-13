@@ -74,6 +74,30 @@ gotcha; authoritative details live in the code/plan, not here.
   `SearchFilters` (campaign's Crucio pattern:
   `Ground;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable`).
 
+## Abilities, autocast, and targeting
+
+- **`parent=` on a `CAbil*` clone** inherits the whole vanilla ability (cost, effect,
+  range); override only the autocast block + the gated button. Cheapest way to add an
+  autocast variant without re-specifying the effect chain (used by the BC kit:
+  `YamatoWoLU parent="Yamato"`, etc.). Works for weapons too (`ThorsHammerWoLU`).
+- **TargetSorts are a fixed 6-value engine enum** (`TSAlliancePassive`, `TSDistance`,
+  `TSLifeFraction`, `TSLifeLargestFirst`, `TSMarker`, `TSRandom`) — not a catalog you
+  can extend. Nuanced autocast priority ("healers first", "clean-kill within N HP")
+  is **not** expressible declaratively; it needs a periodic galaxy targeting trigger
+  or a TargetFind data structure. Don't pretend a sort list does more than it can.
+- `CValidatorUnitCompareField` reads any unit field (e.g. `LifeMax`); default WhichUnit
+  is the validated/target unit. `CValidatorUnitCompareVital` reads current Life/Energy/
+  Shields with an explicit `<WhichUnit Value="Target"/>`. Both compose under
+  `CValidatorCombine` (Or/And) — the toolkit for autocast gates.
+- **Attack-while-moving** is the weapon's `AllowedMovement` enum (`Slowing` default,
+  `Moving` = fire on the move) — a vanilla field, no custom work.
+- **Save compatibility**: a mod must ship per-section `.version` files
+  (`DocumentInfo/GameData/GameText.version`, 44-byte format) with a monotonically
+  increasing counter, or every content change invalidates existing saves. The editor
+  maintains these automatically; a hand-rolled component folder must emit them
+  (`scripts/build.py::write_version_files`). Old saves made before versioning was
+  added stay broken — only forward compatibility is fixed.
+
 ## Galaxy script
 
 - Galaxy is **single-pass** like C: use-before-definition is a compile error, and a
