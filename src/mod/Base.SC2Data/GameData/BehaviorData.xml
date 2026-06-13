@@ -30,4 +30,23 @@
             <Chance value="1"/>
         </DamageResponse>
     </CBehaviorBuff>
+
+    <!-- Siege Tank Graduating Range (unit-table: sieged range grows +1 every 3 s, up
+         to +5). One stack = +1 WeaponRange (Modification field confirmed from liberty
+         BunkerWeaponRangeBonus); MaxStackCount caps at +5. The stacking is DRIVEN from
+         the galaxy lib (libWoLU_GraduateSiegeRange, every 3 s adds one stack to player
+         SiegeTankSieged/SiegeBreakerSieged up to 5) — a self-stacking PeriodicEffect
+         buff has no verbatim reference, so the reliable UnitBehaviorAdd-with-count
+         primitive is used instead. Lives on the sieged form only, so stacks reset to 0
+         on unsiege and re-grow on re-siege. FLAG: confirm in game that 5 stacks =
+         +5 range (standard per-stack additive Modification, but unverified here). -->
+    <CBehaviorBuff id="WoLUGraduatingRange">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <InfoIcon value="Assets\Textures\btn-upgrade-terran-siegetech.dds"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <MaxStackCount value="5"/>
+        <Modification WeaponRange="1"/>
+    </CBehaviorBuff>
 </Catalog>
