@@ -37,8 +37,8 @@ Infantry only, no production, enemy Dominion present → perfect for the foundat
 ### M2 · The Outlaws — Medic (flagged string-field edits)
 - [ ] Medic cost **−25 / −25** and **−1** supply vs vanilla (75/50→50/25, 2→1)
 - [ ] Medic heal **range 4** (was 2)
-- [ ] [RISK] **Adaptive Medpacks** (string-field edit on `heal.TargetFilters`): Medic can heal **mechanical and air** units (try healing an SCV / a Viking). If it can't, the filter-string edit is wrong — report.
-- [ ] Tychus (hero = Firebat) present here too — see Firebat values under M4
+- [ ] [RISK] **Adaptive Medpacks** (string-field edit on `heal.TargetFilters`): Medic can heal **mechanical and air** units (try healing an SCV / a Viking). **KNOWN BROKEN (v0.2.0 test):** can't heal mech — the Biological gate is likely at the heal *effect* level (core CASC), not the ability's `TargetFilters`. Needs a deeper fix.
+  <!-- (Removed an incorrect note that Tychus appears in The Outlaws — he does not.) -->
 
 ### M3 · Zero Hour — mercs-from-start + bunker
 - [ ] [RISK] **ALL 8 mercs available from the start** (rule-3 override): in *any* mission where you have a Merc Compound, every merc calldown — War Pigs, Devil Dogs, Hammer Securities, Spartan Company, Siege Breakers, Hel's Angels, Dusk Wings, Jackson's Revenge — is present and usable immediately, **regardless of which unit counterparts have unlocked**. Each has effectively unlimited charges and is ready at mission start; never "Not enough charges" (Merc Compound still required to exist).
