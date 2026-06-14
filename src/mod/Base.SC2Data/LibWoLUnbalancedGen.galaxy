@@ -281,8 +281,8 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogBehavior, "PointDefenseDroneTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Point Defense Drones
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC ATX-style: fire while moving (air->surface)
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC fire while moving (air->air)
-    CatalogFieldValueModify(c_gameCatalogEffect, "ATSLaserBatteryU", "ArmorReduction", p, "500", c_upgradeOperationSet);  // BC attacks ignore armor (ground) — VERIFY ArmorReduction semantics
-    CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "500", c_upgradeOperationSet);  // BC attacks ignore armor (air)
+    CatalogFieldValueModify(c_gameCatalogEffect, "ATSLaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (ground): ArmorReduction multiplier 1->0
+    CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "Range", p, "1", c_upgradeOperationAdd);  // Reaper LTS: +1 range
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "Sight", p, "2", c_upgradeOperationAdd);  // Reaper LTS: +2 sight
     CatalogFieldValueModify(c_gameCatalogWeapon, "CrucioShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 sieged range

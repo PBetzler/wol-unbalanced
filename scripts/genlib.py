@@ -360,11 +360,13 @@ def emit():
         # vanilla field; weapons ship Slowing/Moving — Moving = no slow-to-fire).
         ("Weapon", "ATSLaserBattery", "AllowedMovement", "Moving", "Set", "BC ATX-style: fire while moving (air->surface)"),
         ("Weapon", "ATALaserBattery", "AllowedMovement", "Moving", "Set", "BC fire while moving (air->air)"),
-        # BC attacks ignore armor (unit-table). ASSUMPTION/VERIFY: ArmorReduction
-        # subtracts from the target's armor for this effect (SnipeDamage sets it 0);
-        # 500 swamps any armor value => effectively ignored. Confirm in game.
-        ("Effect", "ATSLaserBatteryU", "ArmorReduction", "500", "Set", "BC attacks ignore armor (ground) — VERIFY ArmorReduction semantics"),
-        ("Effect", "ATALaserBatteryU", "ArmorReduction", "500", "Set", "BC attacks ignore armor (air)"),
+        # BC attacks ignore armor (unit-table). CONFIRMED semantics: ArmorReduction is a
+        # MULTIPLIER on how much the target's armor applies (reference values are only 0 /
+        # 0.334 / 1; SnipeDamage="ignores armor" sets it to 0). So 0 = ignore armor, 1 =
+        # normal. The earlier 500 was BACKWARDS — it would make armor reduce BC damage 500x
+        # (≈0 damage to any armored target). Corrected to 0.
+        ("Effect", "ATSLaserBatteryU", "ArmorReduction", "0", "Set", "BC attacks ignore armor (ground): ArmorReduction multiplier 1->0"),
+        ("Effect", "ATALaserBatteryU", "ArmorReduction", "0", "Set", "BC attacks ignore armor (air)"),
 
         # ========================================================================
         # PARITY + COMPLETENESS SWEEP (rules 4/10). Mercs & heroes use DISTINCT

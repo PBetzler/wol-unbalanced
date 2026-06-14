@@ -180,11 +180,16 @@
          autocast are target abilities). These flags + an "enemy in range" gate are a
          best effort; the manual button always works. Flag for in-game check — if it
          never auto-fires, fall back to manual-only. -->
+    <!-- Defensive Matrix is a SELF-buff instant (parent applies DefensiveMatrixSet to the
+         caster). The old AutoCastFilters EXCLUDED Self/Ally (offensive-target form) so the
+         autocast had no valid target and never fired. A self-buff autocasts like Stimpack:
+         drive it off the caster's combat state, not a target filter. Mirror the verified
+         StimpackWoLU pattern (CasterIsFiringWeapon) so the BC/SV auto-shields when fighting. -->
     <CAbilEffectInstant id="DefensiveMatrixWoLU" parent="DefensiveMatrix">
         <Flags index="AutoCast" value="1"/>
         <Flags index="AutoCastOn" value="1"/>
-        <AutoCastRange value="9"/>
-        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastRange value="5"/>
+        <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
