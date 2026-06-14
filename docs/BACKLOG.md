@@ -27,7 +27,7 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 
 ## WP-D — custom features (highest risk, build last)
 
-- Raven kit: permanent summons (Durable Materials → 3600 s, shipped) + Point-Defense-Drone as a Raven self-autocast (PDD-as-unit).
+- Raven kit: permanent summons (Durable Materials → 3600 s, shipped). **Point-Defense-Drone as a Raven self-autocast** — INVESTIGATED, rule-9 blocked: `PointDefenseLaser` (the PDD's missile-intercept weapon) can't be added to the Raven per-player (runtime `WeaponArray` append is a no-op; a static global add gives ENEMY Ravens the weapon too; and the effect set `PointDefenseLaserInitialSet` is gated by a `PointDefenseDroneUnitFilter` validator that filters to PDD units). The only route is a cloned, WoLUHasFlag-effect-gated `PointDefenseLaser` added globally to the Raven (no-op for enemies, hidden weapon) — that's a structural change to enemy Ravens (hidden weapon they fire but with a no-op effect). **Owner decision needed:** is that acceptable rule-9 tolerance? (see open-issues "Blocked — needs owner").
 - BC smart-batteries: the fully-blueprinted rogue-kit multi-target-no-overkill system (needs in-game iteration; pre-approved single-target fallback already works).
 - Smart-Snipe TargetSort priorities (full 4-tier shipped declaratively; verify the ordering in game).
 
