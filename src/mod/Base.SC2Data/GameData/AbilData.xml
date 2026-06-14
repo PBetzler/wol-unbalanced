@@ -326,4 +326,50 @@
             <Unit value="MercSeniorGhost"/>
         </InfoArray>
     </CAbilTrain>
+
+    <!-- Liberator merc transform: clones of the Viking AssaultMode/FighterMode morphs with
+         the result Unit redirected to the Liberator-skinned merc forms. Durations/sections
+         copied verbatim from the vanilla Viking morphs; FighterMode's UseFighterMode
+         requirement dropped (the merc form is always allowed to revert). -->
+    <CAbilMorph id="MercLiberatorDeploy">
+        <AbilSetId value="MercLiberatorDeploy"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="AssaultMode">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+        <Flags index="IgnoreFacing" value="1"/>
+        <Flags index="IgnorePlacement" value="0"/>
+        <InfoArray Unit="MercLiberatorAG" CollideRange="3.75" RandomDelayMax="0.5">
+            <SectionArray index="Actor">
+                <DurationArray index="Duration" value="2.34"/>
+            </SectionArray>
+            <SectionArray index="Mover">
+                <DurationArray index="Delay" value="0.533"/>
+                <DurationArray index="Duration" value="1.2"/>
+            </SectionArray>
+            <SectionArray index="Stats">
+                <DurationArray index="Duration" value="2.34"/>
+            </SectionArray>
+        </InfoArray>
+    </CAbilMorph>
+    <CAbilMorph id="MercLiberatorUndeploy">
+        <AbilSetId value="MercLiberatorUndeploy"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="FighterMode">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+        <Flags index="IgnoreFacing" value="1"/>
+        <InfoArray Unit="MercLiberator" RandomDelayMax="0.5">
+            <SectionArray index="Actor">
+                <DurationArray index="Duration" value="2.333"/>
+            </SectionArray>
+            <SectionArray index="Mover">
+                <DurationArray index="Delay" value="0.6"/>
+                <DurationArray index="Duration" value="0.85"/>
+            </SectionArray>
+            <SectionArray index="Stats">
+                <DurationArray index="Duration" value="2.333"/>
+            </SectionArray>
+        </InfoArray>
+    </CAbilMorph>
 </Catalog>

@@ -377,12 +377,18 @@
         <ShieldRegenDelay value="10"/>
     </CUnit>
 
-    <!-- Midnight Riders = AP "Mercenary Liberators". We have no default Liberator unit in
-         WoL deps, so (per user) this is a Wraith clone wearing the Liberator MODEL (CModel
-         "Liberator" exists) — a cloaked dual-target air gunship. AP Liberator upgrades:
-         +4 weapon range (WoLULiberatorUpgrades behavior), +2 vision (genlib), cloak (Wraith
-         innate). FLAG: reskin — no real Defender-Mode transform; model token unverified. -->
-    <CUnit id="MercLiberator" parent="Wraith">
+    <!-- Midnight Riders = AP "Mercenary Liberators". No complete Liberator unit is reachable
+         in WoL deps (unit defs are in Moebius and weaponless; the LiberatorAGTarget deploy
+         is in NCO; the weapons are in core CASC). SOLUTION for the Defender-mode transform:
+         reskin the Viking — the one WoL unit with a real working morph. Fighter form is a
+         VikingFighter clone wearing the Liberator model; it morphs (via MercLiberatorDeploy,
+         a clone of the Viking AssaultMode redirected to MercLiberatorAG) into the Defender
+         form, a VikingAssault clone wearing the LiberatorAG model. AbilArray[3] is the
+         Viking's morph slot (stop/attack/move/AssaultMode); we override it to the redirected
+         morph and add a card button (the inherited AssaultMode button auto-hides since its
+         ability is no longer on the unit). FLAG: reskin (Viking weapons, not real Liberator
+         AA/siege); confirm the morph fires and both models render. -->
+    <CUnit id="MercLiberator" parent="VikingFighter">
         <LifeMax value="250"/>
         <LifeStart value="250"/>
         <LifeArmor value="2"/>
@@ -390,7 +396,25 @@
         <ShieldsStart value="75"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <AbilArray index="3" Link="MercLiberatorDeploy"/>
         <BehaviorArray Link="WoLULiberatorUpgrades"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="20" Face="AssaultMode" Type="AbilCmd" AbilCmd="MercLiberatorDeploy,Execute" Row="2" Column="2"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="MercLiberatorAG" parent="VikingAssault">
+        <LifeMax value="250"/>
+        <LifeStart value="250"/>
+        <LifeArmor value="2"/>
+        <ShieldsMax value="75"/>
+        <ShieldsStart value="75"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+        <AbilArray index="3" Link="MercLiberatorUndeploy"/>
+        <BehaviorArray Link="WoLULiberatorUpgrades"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="20" Face="FighterMode" Type="AbilCmd" AbilCmd="MercLiberatorUndeploy,Execute" Row="2" Column="2"/>
+        </CardLayouts>
     </CUnit>
 
     <!-- Senior Ghost = special elite ghost merc (user request). Ghost clone with the NCO

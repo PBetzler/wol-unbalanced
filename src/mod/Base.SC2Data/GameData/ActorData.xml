@@ -48,14 +48,19 @@
         <Model value="Wraith"/>
         <PortraitModel value="WraithPortrait"/>
     </CActorUnit>
-    <!-- Liberator merc wears the Liberator model (CModel "Liberator" — base CASC). -->
+    <!-- Liberator merc (transforming): Fighter form wears the Liberator model, Defender
+         form (MercLiberatorAG) wears the LiberatorAG model — both base-CASC CModels. -->
     <CActorUnit id="MercLiberator">
         <Model value="Liberator"/>
         <PortraitModel value="LiberatorPortrait"/>
     </CActorUnit>
-    <!-- Senior Ghost wears the NCO Nova model (CModel "Nova" — base CASC). -->
+    <CActorUnit id="MercLiberatorAG">
+        <Model value="LiberatorAG"/>
+        <PortraitModel value="LiberatorPortrait"/>
+    </CActorUnit>
+    <!-- Senior Ghost wears the standard NCO-era Ghost model (not Nova's character model). -->
     <CActorUnit id="MercSeniorGhost">
-        <Model value="Nova"/>
-        <PortraitModel value="NovaPortrait"/>
+        <Model value="Ghost"/>
+        <PortraitModel value="GhostPortrait"/>
     </CActorUnit>
 </Catalog>

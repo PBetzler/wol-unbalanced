@@ -59,11 +59,11 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 | Condor* | (non-AP bonus) | Hellion | +50 sh, 200 HP, drops 2 |
 | Jotun | Mercenary Thor | Thor | +100 sh, 500 HP, +2 armor, drops 1 |
 | Winged Nightmares | Mercenary Wraiths | Wraith (cloaked) | +50 sh, 200 HP, drops 2 |
-| Midnight Riders | Mercenary Liberators | Wraith + **Liberator model** | +75 sh, 250 HP, +4 range, +2 vis, cloak, drops 2 |
-| Senior Ghost | (special) | Ghost + **Nova model** | 1.5× life/energy/regen/dmg, +3 armor, +75 sh, drops 1 |
+| Midnight Riders | Mercenary Liberators | Viking + **Liberator/LiberatorAG models** | +75 sh, 250 HP, +4 range, +2 vis, **transforms**, drops 2 |
+| Senior Ghost | (special) | Ghost + **Ghost model** | 1.5× life/energy/regen/dmg, +3 armor, +75 sh, drops 1 |
 
-- [ ] [RISK] **Midnight Riders renders as a Liberator** (Wraith clone wearing the `Liberator` model) — if it looks like a Wraith or is invisible, the `Model="Liberator"` token didn't resolve. It's a reskin (no real Defender-Mode transform), cloaked, +4 range.
-- [ ] [RISK] **Senior Ghost renders as Nova** (`Model="Nova"`) with **1.5× stats** — bigger life/energy bar, hits ~50% harder, +3 armor; keeps Snipe/EMP/cloak. If damage looks unchanged, the `DamageDealtFraction=0.5` behavior didn't read as +50% (the one schema guess here).
+- [ ] [RISK] **Midnight Riders transforms** — summons as a flying Liberator (VikingFighter clone, `Liberator` model). It has a morph button (R2C2) that deploys it to **Defender Mode** (VikingAssault clone, `LiberatorAG` model), and a button to revert. *This is the new high-risk item — the redirected Viking morph + the two model tokens are all unverified. If it looks like a Viking, is invisible, or the morph button does nothing/turns it into a real Viking, report which.*
+- [ ] [RISK] **Senior Ghost renders as a standard Ghost** (`Model="Ghost"`, NOT Nova) with **1.5× stats** — bigger life/energy bar, hits ~50% harder, +3 armor; keeps Snipe/EMP/cloak. If damage looks unchanged, the `DamageDealtFraction=0.5` behavior didn't read as +50%.
 
 - [ ] [RISK] **The Merc Compound's main card has an "Elite Mercenaries" submenu button** (top-right, R0C4). The vanilla 8 merc buttons + Rally/SelectBuilder/Halt/Cancel are all **back/intact**.
 - [ ] [RISK] **Clicking it opens a second page** listing the 5 elite mercs (row 0) + a Cancel button (bottom-right) that returns to the main card. *This is the #1 risk — a dependency mod adding a whole new `CardLayouts` page (index 1, CardId `EMrc`) is unverified. If the submenu button does nothing or the page is empty, that's the thing to debug.*
