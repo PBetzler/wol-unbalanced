@@ -30,6 +30,18 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 
 - [ ] **The elite-merc submenu should stay open after buying a merc**, so you can buy a second without re-opening it. Seen v0.2.3. Standard SC2 resets the card to the main page after a command — needs a flag or a different submenu approach.
 
+## Flagged mechanisms — implemented but unverified (harden by static investigation)
+
+These shipped and *probably* work, but the field/semantics were assumptions. Verify each against the reference catalogs (`mods/_reference`, `scripts/xmlq.py`) and fix if wrong — don't wait for in-game testing to find out.
+
+- [ ] **BC "ignore armor" via `ArmorReduction=500`** (`ATSLaserBatteryU`/`ATALaserBatteryU`) — confirm `ArmorReduction` is the right field + subtracts target armor (cf. how SnipeDamage zeroes armor).
+- [ ] **Yamato structure discrimination** — currently skips ALL structures; should only skip non-defensive ones (fire on Spine/Spore/Cannons/Turrets/Bunkers, not supply/production). Needs an attack-capable validator.
+- [ ] **Defensive Matrix autocast** (BC/SV) — instant self-buff autocast had no clean blueprint; confirm it actually autocasts (manual always works).
+- [ ] **Graduating Range** — confirm 5 stacks = +5 sieged range (`WoLUGraduatingRange` MaxStackCount).
+- [ ] **Assumption values** — Optimized Logistics = −25% train time; Diamondback Hyperfluxor/Maglev ±25%. Settle against AP data if findable.
+- [ ] **Risky field paths to re-verify resolve + apply**: `Charge.*`/`Cooldown.TimeStart` on `SummonMercenaries` train infos; `Button.Requirements` swap on Hercules (likely a link-field no-op — the same class as the Marauder tech-lab bug); `Cost[0].Vital[Energy]` on cloak abils; `heal.TargetFilters` string edit (= the Medic mech-heal bug); `AttributeBonus[Light]` Add on `FirebatUFull`; Medivac `TotalCargoSpace`.
+- [ ] **Stat discrepancies to settle** (then correct genlib): Ghost cost 150/150 vs 200/100; Diamondback supply; Wraith gas.
+
 ## Resolved (most recent first)
 
 - [x] **Thor ground attack felt slow / "windup didn't reflect"** — RESOLVED v0.2.3: the `DamagePoint` cap (0.831→0.1) was already applied; the real cause was the slow `Period` (1.93s). Added the unit-table's Rapid Reload (`ThorsHammer`/`Odin` Period→1.0, backswing→0.1).

@@ -20,6 +20,11 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 - Reaper: Jet Pack Overdrive (fly + attack air).
 - Hellbat Aspect (Hellion morph) — needs HotS assets; the one named rule-1 exception.
 
+## Cross-cutting
+
+- **Tactical Jump** (Hercules / Science Vessel / BC / Predator per the table) — `CEffectTeleport` is the confirmed primitive (Moebius survey). A clean win.
+- **Combined/visible upgrade display** — extend the passive `Type=Passive` card icons to any unit still missing them; verify the audit-flagged icon paths.
+
 ## WP-D — custom features (highest risk, build last)
 
 - Raven kit: permanent summons (Durable Materials → 3600 s, shipped) + Point-Defense-Drone as a Raven self-autocast (PDD-as-unit).
