@@ -23,7 +23,7 @@ SC2 = "/Applications/StarCraft II"
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 def patch_document_info(map_path: str) -> None:
