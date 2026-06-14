@@ -58,9 +58,11 @@
         <Model value="LiberatorAG"/>
         <PortraitModel value="LiberatorPortrait"/>
     </CActorUnit>
-    <!-- Senior Ghost wears the standard NCO-era Ghost model (not Nova's character model). -->
+    <!-- Senior Ghost wears the GhostAlternate model — a ghost variant defined in
+         liberty.sc2mod (Liberty Mod, already a dependency), so no LotV/Void inclusion is
+         needed: models are CASC assets referenced by id, unlike the Liberator UNIT data. -->
     <CActorUnit id="MercSeniorGhost">
-        <Model value="Ghost"/>
-        <PortraitModel value="GhostPortrait"/>
+        <Model value="GhostAlternate"/>
+        <PortraitModel value="GhostAlternatePortrait"/>
     </CActorUnit>
 </Catalog>
