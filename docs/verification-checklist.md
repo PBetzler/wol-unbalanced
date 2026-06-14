@@ -60,10 +60,10 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 | Jotun | Mercenary Thor | Thor | +100 sh, 500 HP, +2 armor, drops 1 |
 | Winged Nightmares | Mercenary Wraiths | Wraith (cloaked) | +50 sh, 200 HP, drops 2 |
 | Midnight Riders | Mercenary Liberators | Viking + **Liberator/LiberatorAG models** | +75 sh, 250 HP, +4 range, **transforms (both forms airborne)**, drops 2 |
-| Senior Ghost | (special) | Ghost + **Ghost model** | 1.5× life/energy/regen/dmg, +3 armor, +75 sh, drops 1 |
+| Senior Ghost | (special) | Ghost + **GhostAlternate model** | 1.5× life/energy/regen/dmg, +3 armor, +75 sh, drops 1 |
 
 - [ ] [RISK] **Midnight Riders transforms and STAYS AIRBORNE** — summons as a flying Liberator (VikingFighter clone, `Liberator` model, mobile). The morph button (R2C2) deploys it to **Defender Mode** (now a stationary *flying* VikingFighter clone with `LiberatorAG` model + an anti-ground gun — it should hover, NOT drop to the ground), and a button reverts it. *High-risk item — the redirected morph, both model tokens, the Speed=0 hover, and the ground-weapon swap are all unverified. If it lands on the ground, looks like a Viking, or the morph fails, report which.*
-- [ ] [RISK] **Senior Ghost renders as a standard Ghost** (`Model="Ghost"`, NOT Nova) with **1.5× stats** — bigger life/energy bar, hits ~50% harder, +3 armor; keeps Snipe/EMP/cloak. If damage looks unchanged, the `DamageDealtFraction=0.5` behavior didn't read as +50%.
+- [ ] [RISK] **Senior Ghost renders with the GhostAlternate model** (a ghost variant from Liberty Mod, NOT Nova) with **1.5× stats** — bigger life/energy bar, hits ~50% harder, +3 armor; keeps Snipe/EMP/cloak. If damage looks unchanged, the `DamageDealtFraction=0.5` behavior didn't read as +50%.
 
 - [ ] [RISK] **The Merc Compound's main card has an "Elite Mercenaries" submenu button** (top-right, R0C4). The vanilla 8 merc buttons + Rally/SelectBuilder/Halt/Cancel are all **back/intact**.
 - [ ] [RISK] **Clicking it opens a second page** listing the 5 elite mercs (row 0) + a Cancel button (bottom-right) that returns to the main card. *This is the #1 risk — a dependency mod adding a whole new `CardLayouts` page (index 1, CardId `EMrc`) is unverified. If the submenu button does nothing or the page is empty, that's the thing to debug.*
