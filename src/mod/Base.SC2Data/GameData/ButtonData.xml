@@ -25,4 +25,33 @@
     <CButton id="WoLUUpgSmartServos">
         <Icon value="Assets\Textures\btn-upgrade-terran-transformationservos.dds"/>
     </CButton>
+
+    <!-- Hire buttons for the extra elite mercs. Icons reuse the base unit card icons by
+         CASC path (standard terran unit-icon naming). FLAG: a wrong icon path shows a
+         blank button but the calldown still works — cosmetic only. -->
+    <CButton id="HireMercMedic">
+        <Icon value="Assets\Textures\btn-unit-terran-medic.dds"/>
+    </CButton>
+    <CButton id="HireMercReaper">
+        <Icon value="Assets\Textures\btn-unit-terran-reaper.dds"/>
+    </CButton>
+    <CButton id="HireMercHellion">
+        <Icon value="Assets\Textures\btn-unit-terran-hellion.dds"/>
+    </CButton>
+    <CButton id="HireMercThor">
+        <Icon value="Assets\Textures\btn-unit-terran-thor.dds"/>
+    </CButton>
+    <CButton id="HireMercWraith">
+        <Icon value="Assets\Textures\btn-unit-terran-wraith.dds"/>
+    </CButton>
+    <CButton id="HireMercLiberator">
+        <Icon value="Assets\Textures\btn-unit-terran-liberator.dds"/>
+    </CButton>
+    <CButton id="HireMercSeniorGhost">
+        <Icon value="Assets\Textures\btn-unit-terran-nova-ghost.dds"/>
+    </CButton>
+    <!-- Submenu button that opens the elite-merc page on the Merc Compound. -->
+    <CButton id="WoLUEliteMercs">
+        <Icon value="Assets\Textures\btn-building-terran-merccompound.dds"/>
+    </CButton>
 </Catalog>

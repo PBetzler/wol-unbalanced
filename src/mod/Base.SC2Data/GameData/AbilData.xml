@@ -213,4 +213,117 @@
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
     </CAbilEffectTarget>
+
+    <!-- Extra elite-merc calldowns. Appended to the existing SummonMercenaries train
+         ability as Train9-11 (Moebius proves Train9+ is valid). Each reuses the vanilla
+         merc squad-drop effect (MercGroundDrop) and drops 2 of the elite unit. Charges
+         are unlimited and full from start (CountMax/Start 99, CountUse 0, no cooldown) —
+         the genlib merc loop also reasserts this per-player. No State/Requirements => the
+         button is always available (these are NOT in the campaign merc-panel system, so
+         nothing else enables them). Explicit InfoArray indices required for the append. -->
+    <CAbilTrain id="SummonMercenaries">
+        <InfoArray index="Train9" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="100"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercMedic"/>
+            <Unit value="MercMedic"/>
+            <Unit value="MercMedic"/>
+        </InfoArray>
+        <InfoArray index="Train10" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="100"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercReaper"/>
+            <Unit value="MercReaper"/>
+            <Unit value="MercReaper"/>
+        </InfoArray>
+        <InfoArray index="Train11" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="100"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercHellion"/>
+            <Unit value="MercHellion"/>
+            <Unit value="MercHellion"/>
+        </InfoArray>
+        <InfoArray index="Train12" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="200"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercThor"/>
+            <Unit value="MercThor"/>
+        </InfoArray>
+        <InfoArray index="Train13" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="150"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercWraith"/>
+            <Unit value="MercWraith"/>
+            <Unit value="MercWraith"/>
+        </InfoArray>
+        <InfoArray index="Train14" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="175"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercLiberator"/>
+            <Unit value="MercLiberator"/>
+            <Unit value="MercLiberator"/>
+        </InfoArray>
+        <InfoArray index="Train15" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="175"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercSeniorGhost"/>
+            <Unit value="MercSeniorGhost"/>
+        </InfoArray>
+    </CAbilTrain>
 </Catalog>

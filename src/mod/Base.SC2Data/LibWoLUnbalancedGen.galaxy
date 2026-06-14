@@ -117,6 +117,41 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train8].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train9].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train9].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train9].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train9].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train9].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train11].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train11].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train11].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train11].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train11].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train12].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train12].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train12].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train12].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train12].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train13].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train13].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train13].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train13].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train13].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train14].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train14].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train14].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train14].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train14].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
 
     // --- Per-unit stats (unit-table comments) ---
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)
@@ -293,6 +328,12 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogWeapon, "FusionCutter", "Period", p, "0.7", c_upgradeOperationSet);  // SCV: faster attack (Hostile Env Adaptation)
     CatalogFieldValueModify(c_gameCatalogWeapon, "Vulture", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Vulture Auto-Launchers: fire while moving
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "LifeMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x life
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "LifeStart", p, "1.5", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyStart", p, "1.5", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyRegenRate", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy regen
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercLiberator", "Sight", p, "2", c_upgradeOperationAdd);  // Midnight Riders: Liberator LTS +2 vision
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);

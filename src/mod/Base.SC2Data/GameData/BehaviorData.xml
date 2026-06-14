@@ -49,4 +49,27 @@
         <MaxStackCount value="5"/>
         <Modification WeaponRange="1"/>
     </CBehaviorBuff>
+
+    <!-- Senior Ghost merc: +50% damage dealt (the "1.5x dmg" part — Life/Energy/regen are
+         scaled via genlib Multiply 1.5; armor is flat in the clone). DamageDealtFraction is
+         an ADDITIVE fraction (0.5 => x1.5). Innate + hidden, on the MercSeniorGhost clone
+         only (player-exclusive). FLAG: confirm 0.5 reads as +50% in game. -->
+    <CBehaviorBuff id="WoLUSeniorGhostBoost">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Modification DamageDealtFraction="0.5"/>
+    </CBehaviorBuff>
+
+    <!-- Midnight Riders (Liberator merc): AP Liberator upgrade bundle as a buff — Advanced
+         Ballistics (+3 range) + Laser Targeting (+1 range) = +4 WeaponRange. Cloak is free
+         from the Wraith base; vision via genlib Sight Add. Innate + hidden, clone-only. -->
+    <CBehaviorBuff id="WoLULiberatorUpgrades">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Modification WeaponRange="4"/>
+    </CBehaviorBuff>
 </Catalog>

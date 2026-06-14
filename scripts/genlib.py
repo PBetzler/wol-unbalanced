@@ -171,7 +171,10 @@ def emit():
     # unlimited. For effectively-unlimited-from-start: start full (CountStart high),
     # big cap (CountMax high), uses cost nothing (CountUse=0), and no cooldown wait
     # (TimeStart/TimeUse=0) so it never runs dry.
-    for n in range(1, 9):
+    # Train1-8 = the vanilla mercs; Train9-15 = our extra elite mercs (Skibi's Angels /
+    # Death Heads / Condor / Jotun / Winged Nightmares / Midnight Riders / Senior Ghost,
+    # defined in static XML) — reassert unlimited-from-start on top of their static defaults.
+    for n in range(1, 16):
         for field, val in (
             ("Charge.CountMax", "99"),
             ("Charge.CountStart", "99"),
@@ -415,6 +418,17 @@ def emit():
         # -- Vulture: Auto-Launchers — attack while moving (AP). Ion Thrusters speed
         #    + Jerry-Rigged + Cerberus mine count handled earlier. --
         ("Weapon", "Vulture", "AllowedMovement", "Moving", "Set", "Vulture Auto-Launchers: fire while moving"),
+
+        # --- Special elite mercs (player-only clones; rule-9 safe) ---
+        # Senior Ghost: 1.5x Life/Energy/regen via Multiply on the Ghost-clone's inherited
+        # base values (damage +50% + armor are handled in static XML — see UnitData).
+        ("Unit", "MercSeniorGhost", "LifeMax", "1.5", "Multiply", "Senior Ghost: 1.5x life"),
+        ("Unit", "MercSeniorGhost", "LifeStart", "1.5", "Multiply", ""),
+        ("Unit", "MercSeniorGhost", "EnergyMax", "1.5", "Multiply", "Senior Ghost: 1.5x energy"),
+        ("Unit", "MercSeniorGhost", "EnergyStart", "1.5", "Multiply", ""),
+        ("Unit", "MercSeniorGhost", "EnergyRegenRate", "1.5", "Multiply", "Senior Ghost: 1.5x energy regen"),
+        # Midnight Riders (Liberator merc): AP Laser Targeting +2 vision (range via behavior).
+        ("Unit", "MercLiberator", "Sight", "2", "Add", "Midnight Riders: Liberator LTS +2 vision"),
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""

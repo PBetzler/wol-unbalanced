@@ -21,4 +21,41 @@
         <Model value="WoLUMagrailImpact"/>
         <HostSiteOps Ops="SOpTargetPoint"/>
     </CActorModel>
+
+    <!-- Actors for the extra elite mercs. A CActorUnit auto-binds to the unit whose id
+         it shares (cf. Moebius's BroodLord actor) and renders the referenced base model.
+         Each new merc reuses its base counterpart's CASC model + portrait by name (model
+         id == unit name is the SC2 convention) — no asset bundling needed (same approach
+         as the Magrail beam). FLAG: model/portrait token names assumed from convention;
+         if a unit is invisible in game, the Model/PortraitModel value is the thing to fix. -->
+    <CActorUnit id="MercMedic">
+        <Model value="Medic"/>
+        <PortraitModel value="MedicPortrait"/>
+    </CActorUnit>
+    <CActorUnit id="MercReaper">
+        <Model value="Reaper"/>
+        <PortraitModel value="ReaperPortrait"/>
+    </CActorUnit>
+    <CActorUnit id="MercHellion">
+        <Model value="Hellion"/>
+        <PortraitModel value="HellionPortrait"/>
+    </CActorUnit>
+    <CActorUnit id="MercThor">
+        <Model value="Thor"/>
+        <PortraitModel value="ThorPortrait"/>
+    </CActorUnit>
+    <CActorUnit id="MercWraith">
+        <Model value="Wraith"/>
+        <PortraitModel value="WraithPortrait"/>
+    </CActorUnit>
+    <!-- Liberator merc wears the Liberator model (CModel "Liberator" — base CASC). -->
+    <CActorUnit id="MercLiberator">
+        <Model value="Liberator"/>
+        <PortraitModel value="LiberatorPortrait"/>
+    </CActorUnit>
+    <!-- Senior Ghost wears the NCO Nova model (CModel "Nova" — base CASC). -->
+    <CActorUnit id="MercSeniorGhost">
+        <Model value="Nova"/>
+        <PortraitModel value="NovaPortrait"/>
+    </CActorUnit>
 </Catalog>

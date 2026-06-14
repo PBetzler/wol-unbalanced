@@ -66,12 +66,18 @@ void libWoLU_GrantCampaignTech (int p) {
     // Rule 2: every armory upgrade counts as purchased.
     libCamp_gf_TS_BuyAllTech();
 
-    // Rules 3/6: every merc whose counterpart is unlocked counts as hired.
+    // Rule 6 + user override of rule 3 ("all mercs available from the beginning,
+    // always unlocked, with upgrades" — speeds up testing and fits the mod's
+    // everything-unlocked spirit): mark EVERY campaign merc Purchased unconditionally,
+    // even before its counterpart unit exists in the story. ApplyMercenaryTech below
+    // then allows each merc's calldown command (it gates purely on Purchased status),
+    // and ApplyMercUpgrades grants their upgrades. The genlib already makes the
+    // calldowns unlimited-charge and ready at mission start (Merc Compound still
+    // required to exist). This is exactly the state you'd reach by hiring every merc
+    // on the Hyperion, applied at every mission init.
     i = libCamp_gv_TSC_MERC_FIRST;
     while (i <= libCamp_gv_TSC_MERC_LAST) {
-        if ((libCamp_gf_MercStatusCheck(libCamp_gv_tS_MercID[i], libCamp_ge_StoryMercStatus_Locked) == false)) {
-            libCamp_gf_SetMercStatus(libCamp_gv_tS_MercID[i], libCamp_ge_StoryMercStatus_Purchased);
-        }
+        libCamp_gf_SetMercStatus(libCamp_gv_tS_MercID[i], libCamp_ge_StoryMercStatus_Purchased);
         i = i + 1;
     }
 
@@ -105,6 +111,17 @@ void libWoLU_GrantCampaignTech (int p) {
     // Unlock the WoLU clone abilities (autocast Super Stimpack etc.) — the flag
     // upgrade is the requirement gate that only the human player ever satisfies.
     TechTreeUpgradeAddLevel(p, "WoLUnbalancedFlag", 1);
+
+    // Extra elite-merc calldowns (Field Engineer Zeta / Grim Reaper / Condor) are added
+    // in static XML as SummonMercenaries Train9-11. They're not in the campaign merc-panel
+    // system, so allow their unit types directly (their hire buttons are un-restricted).
+    TechTreeUnitAllow(p, "MercMedic", true);
+    TechTreeUnitAllow(p, "MercReaper", true);
+    TechTreeUnitAllow(p, "MercHellion", true);
+    TechTreeUnitAllow(p, "MercThor", true);
+    TechTreeUnitAllow(p, "MercWraith", true);
+    TechTreeUnitAllow(p, "MercLiberator", true);
+    TechTreeUnitAllow(p, "MercSeniorGhost", true);
 }
 
 void libWoLU_ForceGrantAllTechRewards (int p) {

@@ -311,4 +311,123 @@
             <LayoutButtons index="11" Face="Obliterate" Type="AbilCmd" AbilCmd="ObliterateWoLU,Execute" Row="1" Column="2"/>
         </CardLayouts>
     </CUnit>
+
+    <!-- ============================================================================
+         EXTRA ELITE MERCS (user request). In spirit from the Moebius pack's bonus merc
+         calldowns — Field Engineer Zeta / Grim Reaper / Condor (= Medic / Reaper /
+         Hellion mercs). Moebius's own units have no actors and incomplete models, so
+         instead of a fragile verbatim transplant these are player-exclusive CLONES of
+         the base units (parent=) — guaranteed-working models/weapons/abilities — buffed
+         to elite-merc status (+shields, +HP, +armor) and named per Moebius. Summoned
+         ONLY via the Merc Compound (SummonMercenaries Train9-11), so no mission unit-type
+         check is affected (these ids never appear in WoL maps; rule-9 safe). Actors +
+         buttons + calldown wiring live in ActorData/ButtonData/AbilData; names in
+         GameStrings. FLAG: clone stat/visual fidelity unverified in game. ============= -->
+    <CUnit id="MercMedic" parent="Medic">
+        <LifeMax value="150"/>
+        <LifeStart value="150"/>
+        <LifeArmor value="1"/>
+        <ShieldsMax value="50"/>
+        <ShieldsStart value="50"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+    </CUnit>
+    <CUnit id="MercReaper" parent="Reaper">
+        <LifeMax value="150"/>
+        <LifeStart value="150"/>
+        <LifeArmor value="1"/>
+        <ShieldsMax value="50"/>
+        <ShieldsStart value="50"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+    </CUnit>
+    <CUnit id="MercHellion" parent="Hellion">
+        <LifeMax value="200"/>
+        <LifeStart value="200"/>
+        <LifeArmor value="1"/>
+        <ShieldsMax value="50"/>
+        <ShieldsStart value="50"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+    </CUnit>
+
+    <!-- "Jotun" — the Thor merc. No data source defines a Jotun unit ("Jotun" exists
+         only as the Viking Jotun Boosters upgrade + a planet name), so it's built here
+         as a Thor clone to match the other elite mercs (user request). -->
+    <CUnit id="MercThor" parent="Thor">
+        <LifeMax value="500"/>
+        <LifeStart value="500"/>
+        <LifeArmor value="2"/>
+        <ShieldsMax value="100"/>
+        <ShieldsStart value="100"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+    </CUnit>
+
+    <!-- Winged Nightmares = AP "Mercenary Wraiths". Clone of the WoL Wraith (cloaked).
+         (The other AP extras — Midnight Riders=Liberator [LotV] and Brynhilds=Valkyrie
+         [custom BW asset] — are not WoL units and can't be cloned in a WoL-map context.) -->
+    <CUnit id="MercWraith" parent="Wraith">
+        <LifeMax value="200"/>
+        <LifeStart value="200"/>
+        <LifeArmor value="1"/>
+        <ShieldsMax value="50"/>
+        <ShieldsStart value="50"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+    </CUnit>
+
+    <!-- Midnight Riders = AP "Mercenary Liberators". We have no default Liberator unit in
+         WoL deps, so (per user) this is a Wraith clone wearing the Liberator MODEL (CModel
+         "Liberator" exists) — a cloaked dual-target air gunship. AP Liberator upgrades:
+         +4 weapon range (WoLULiberatorUpgrades behavior), +2 vision (genlib), cloak (Wraith
+         innate). FLAG: reskin — no real Defender-Mode transform; model token unverified. -->
+    <CUnit id="MercLiberator" parent="Wraith">
+        <LifeMax value="250"/>
+        <LifeStart value="250"/>
+        <LifeArmor value="2"/>
+        <ShieldsMax value="75"/>
+        <ShieldsStart value="75"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+        <BehaviorArray Link="WoLULiberatorUpgrades"/>
+    </CUnit>
+
+    <!-- Senior Ghost = special elite ghost merc (user request). Ghost clone with the NCO
+         Nova MODEL (CModel "Nova" exists), 1.5x Life/Energy/regen (genlib Multiply), +50%
+         damage (WoLUSeniorGhostBoost behavior), flat elite armor + shields. Keeps the full
+         Ghost kit (Snipe/EMP/cloak). FLAG: Nova model token + 1.5x scaling unverified. -->
+    <CUnit id="MercSeniorGhost" parent="Ghost">
+        <LifeArmor value="3"/>
+        <ShieldsMax value="75"/>
+        <ShieldsStart value="75"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+        <BehaviorArray Link="WoLUSeniorGhostBoost"/>
+    </CUnit>
+
+    <!-- Merc Compound: the extra elite mercs live on a SECOND card page (a submenu), so
+         the vanilla 8 merc buttons + utility (Rally/SelectBuilder/Halt/Cancel) stay fully
+         intact. The main card (index 0) gets ONE "Elite Mercs" Submenu button at its free
+         R0C4 cell (index 21); the new page (CardLayouts index 1, CardId="EMrc") holds all
+         the extra calldowns + a CancelSubmenu back button. Pattern copied verbatim from the
+         vanilla SCV build menu (TerranBuild → TBl1/TBl2 submenus). Explicit indices
+         throughout (dependency-mod array entries need them). Row 1 of the submenu is left
+         open for the deferred Liberator/Valkyrie mercs. FLAG: a dependency adding a whole
+         new CardLayouts page is unverified — confirm the submenu opens + lists the mercs. -->
+    <CUnit id="MercCompound">
+        <CardLayouts index="0">
+            <LayoutButtons index="21" Face="WoLUEliteMercs" Type="Submenu" SubmenuCardId="EMrc" Row="0" Column="4"/>
+        </CardLayouts>
+        <CardLayouts index="1" CardId="EMrc">
+            <LayoutButtons index="0" Face="HireMercMedic" Type="AbilCmd" AbilCmd="SummonMercenaries,Train9" Row="0" Column="0"/>
+            <LayoutButtons index="1" Face="HireMercReaper" Type="AbilCmd" AbilCmd="SummonMercenaries,Train10" Row="0" Column="1"/>
+            <LayoutButtons index="2" Face="HireMercHellion" Type="AbilCmd" AbilCmd="SummonMercenaries,Train11" Row="0" Column="2"/>
+            <LayoutButtons index="3" Face="HireMercThor" Type="AbilCmd" AbilCmd="SummonMercenaries,Train12" Row="0" Column="3"/>
+            <LayoutButtons index="4" Face="HireMercWraith" Type="AbilCmd" AbilCmd="SummonMercenaries,Train13" Row="0" Column="4"/>
+            <LayoutButtons index="6" Face="HireMercLiberator" Type="AbilCmd" AbilCmd="SummonMercenaries,Train14" Row="1" Column="0"/>
+            <LayoutButtons index="7" Face="HireMercSeniorGhost" Type="AbilCmd" AbilCmd="SummonMercenaries,Train15" Row="1" Column="1"/>
+            <LayoutButtons index="5" Face="Cancel" Type="CancelSubmenu" Row="2" Column="4"/>
+        </CardLayouts>
+    </CUnit>
 </Catalog>

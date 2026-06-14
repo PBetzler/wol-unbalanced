@@ -19,3 +19,26 @@ Button/Tooltip/WoLUUpgSmartServos=<c val="00FF40">Faster transform, attack while
 Abil/Name/YamatoWoLU=Yamato Cannon (Autocast)
 Abil/Name/MissilePodsWoLU=Missile Pods (Autocast)
 Abil/Name/DefensiveMatrixWoLU=Defensive Matrix (Autocast)
+Unit/Name/MercMedic=Skibi's Angels
+Unit/Name/MercReaper=Death Heads
+Unit/Name/MercHellion=Condor
+Button/Name/HireMercMedic=Skibi's Angels
+Button/Tooltip/HireMercMedic=Calls down <c val="FFFF00">2 Skibi's Angels</c> elite medics (+50 shields, +HP, +armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
+Button/Name/HireMercReaper=Death Heads
+Button/Tooltip/HireMercReaper=Calls down <c val="FFFF00">2 Death Heads</c> elite reapers (+50 shields, +HP, +armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
+Button/Name/HireMercHellion=Condor
+Button/Tooltip/HireMercHellion=Calls down <c val="FFFF00">2 Condor</c> elite hellions (+50 shields, +HP, +armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
+Unit/Name/MercThor=Jotun
+Button/Name/HireMercThor=Jotun
+Button/Tooltip/HireMercThor=Calls down a <c val="FFFF00">Jotun</c> elite Thor (+100 shields, +HP, +2 armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
+Unit/Name/MercWraith=Winged Nightmares
+Button/Name/HireMercWraith=Winged Nightmares
+Button/Tooltip/HireMercWraith=Calls down <c val="FFFF00">2 Winged Nightmares</c> elite cloaked Wraiths (+50 shields, +HP, +armor).<n/>WoL Unbalanced: Archipelago merc — unlimited charges, ready from start.
+Button/Name/WoLUEliteMercs=Elite Mercenaries
+Button/Tooltip/WoLUEliteMercs=Open the <c val="FFFF00">elite mercenary</c> roster (Archipelago mercs).<n/>Skibi's Angels, Death Heads, Condor, Jotun, Winged Nightmares, Midnight Riders, Senior Ghost.
+Unit/Name/MercLiberator=Midnight Riders
+Button/Name/HireMercLiberator=Midnight Riders
+Button/Tooltip/HireMercLiberator=Calls down <c val="FFFF00">2 Midnight Riders</c> elite Liberators (cloaked, +4 range, +2 vision, +shields/HP/armor).<n/>WoL Unbalanced: Archipelago merc — unlimited charges, ready from start.
+Unit/Name/MercSeniorGhost=Senior Ghost
+Button/Name/HireMercSeniorGhost=Senior Ghost
+Button/Tooltip/HireMercSeniorGhost=Calls down a <c val="FFFF00">Senior Ghost</c> — an elite Nova-model Ghost with <c val="FFFF00">1.5x</c> life, energy, regen, armor and damage. Keeps Snipe / EMP / cloak.<n/>WoL Unbalanced: special merc — unlimited charges, ready from start.
