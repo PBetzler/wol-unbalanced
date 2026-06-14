@@ -19,6 +19,7 @@ void libWoLU_SyncWeaponArmorLevels (int p);
 void libWoLU_DisableArmoryResearch (int p);
 void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
 void libWoLU_GraduateSiegeRange (int p, string unitType);
+void libWoLU_SynthesizeVespene (int p);
 void libWoLU_ForceGrantAllTechRewards (int p);
 void libWoLU_EnableCurrentMissionUnits (int p);
 
@@ -282,10 +283,26 @@ void libWoLU_GraduateSiegeRange (int p, string unitType) {
     }
 }
 
+// Predator Vespene Synthesis (AP): the player's Predators passively synthesize gas.
+// Adds gas proportional to the number of living player Predators each tick. The
+// PlayerModifyPropertyInt resource native + c_playerPropVespene constant are engine
+// built-ins (used by the co-injected CampaignLib), so they resolve in this compile.
+void libWoLU_SynthesizeVespene (int p) {
+    unitgroup g;
+    int n;
+    g = UnitGroup("Predator", p, RegionEntireMap(), UnitFilter(0, 0, 0, (1 << (c_targetFilterDead - 32))), 0);
+    n = UnitGroupCount(g, c_unitCountAll);
+    if (n > 0) {
+        PlayerModifyPropertyInt(p, c_playerPropVespene, c_playerPropOperAdd, n * 5);
+    }
+}
+
 bool libWoLU_OnGraduateRange (bool testConds, bool runActions) {
     if (PlayerRace(libWoLU_Player) == "Terr") {
         libWoLU_GraduateSiegeRange(libWoLU_Player, "SiegeTankSieged");
         libWoLU_GraduateSiegeRange(libWoLU_Player, "SiegeBreakerSieged");
+        // Vespene Synthesis: +5 gas per living Predator on this 3 s tick (player-only).
+        libWoLU_SynthesizeVespene(libWoLU_Player);
     }
     return true;
 }
@@ -305,6 +322,8 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_AddBehaviorToType(libWoLU_Player, "MercWraith", "PersonalCloakingFree");
         // Predator Adaptive Defenses: permanent damage-halving buff (player-only).
         libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUAdaptiveDefenses");
+        // Predator Charge (AP): permanent +120% move speed (player-only).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUPredatorCharge");
     }
     return true;
 }

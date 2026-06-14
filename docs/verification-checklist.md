@@ -132,6 +132,12 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 - [ ] [RISK] **Reaper attacks AIR** (Jet Pack Overdrive) — order a Reaper to attack a Mutalisk/Banshee → it fires and damages it. (Reaper does NOT literally fly — that's a unit-type limitation, documented.) If it refuses to target air, the `P38ScytheGuassPistol` TargetFilters per-player string edit is a no-op (same risk class as Medic Adaptive Medpacks).
 - [ ] [RISK] **Viking ground (Assault mode) attack SPLASHES** (Shredder Rounds): siege 2+ clustered enemy ground units, one shot damages several. **Anti-Mechanical**: ground attack does noticeably more to mechanical targets (+20 vs Mech). ENEMY-VANILLA: enemy Vikings' ground attack stays single-target. Hel's Angels merc shows bigger splash. (Wild Missiles air-salvo NOT shipped — don't expect it.)
 
+### v0.3.1 · WP-C batch 2 (Wraith / Siege Tank / Predator / Science Vessel)
+- [ ] [RISK] **Wraith Trigger Override**: focus-fire one tough target — the Wraith's attack rate VISIBLY accelerates over ~10 shots then caps. **Adv Laser Tech**: lasers hit ~2× harder, faster. ENEMY-VANILLA: an enemy Wraith does NOT speed up. Winged Nightmares merc shares both.
+- [ ] [RISK] **Siege Tank Spider Mines**: select a Siege Tank (mobile AND sieged) → **Spider Mines** button (mine icon, R2C1 mobile / R2C0 sieged). Cast on ground near an enemy → a cloaked mine lays, burrows, detonates on approach. Unlimited (1 s cd). Works on a Siege Breaker merc too.
+- [ ] [RISK] **Predator Charge**: the player's Predators move much faster (2.2×). **Vespene Synthesis**: with ≥1 Predator alive, gas ticks up on its own (~+5 gas/Predator per 3 s) with no harvesting. ENEMY-VANILLA: enemy Predators normal speed; enemy gas unchanged. (If gas never rises, the PlayerModifyPropertyInt timer didn't fire.)
+- [ ] [RISK] **Science Vessel EMP Shockwave** (EMP icon, R1C2): target an enemy caster cluster → energy + 100 shields drained in a radius, cloaked enemies revealed, YOUR units UNTOUCHED (friendly-fire-safe). **Magellan** (2nd Nano-Repair, R1C1): manually repair two different mechs at once — both heal beams active. (Autocast-both is the open question; manual definitely works.)
+
 ---
 
 ## Part C — Lower-risk stat spot-checks (test opportunistically as units unlock)

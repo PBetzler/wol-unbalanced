@@ -51,3 +51,8 @@ Button/Tooltip/RestorationWoLU=Removes <c val="FFFF00">all harmful effects</c> f
 Abil/Name/OpticalFlareWoLU=Optical Flare
 Button/Name/OpticalFlareWoLU=Optical Flare
 Button/Tooltip/OpticalFlareWoLU=<c val="FFFF00">Blinds</c> an enemy unit for 15 s: sight reduced to ~1 and detection disabled.<n/>WoL Unbalanced: Brood War Medic ability.
+Abil/Name/NanoRepairWoLU=Nano-Repair (Magellan)
+Button/Tooltip/NanoRepairWoLU=A second <c val="FFFF00">free</c> Nano-Repair beam — repair <c val="FFFF00">two targets at once</c>.<n/>WoL Unbalanced: Magellan Computation Systems.
+Abil/Name/EMPShockwaveWoLU=EMP Shockwave
+Button/Name/EMPShockwaveWoLU=EMP Shockwave
+Button/Tooltip/EMPShockwaveWoLU=Launches an <c val="FFFF00">EMP Shockwave</c>: drains <c val="FFFF00">all energy and 100 shields</c> from enemy units in a radius and reveals cloaked units. Does not affect your own units.<n/>WoL Unbalanced: Brood War Science Vessel ability.

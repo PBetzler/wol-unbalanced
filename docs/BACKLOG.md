@@ -11,11 +11,11 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 
 ## WP-C — remaining ported AP upgrades (each a mini-project)
 
-- Wraith: Advanced Laser Technology + **Trigger Override** (stacking +10%/attack, cap +100%; reuse the Graduating-Range galaxy-stacking helper, driven off an attack event).
+- ~~Wraith: Advanced Laser Technology + Trigger Override~~ — **SHIPPED v0.3.1**. Adv Laser = genlib WraithAU/WraithGU dmg ×2 + WraithA/G Period ×0.8. Trigger Override = a stacking `AttackSpeedMultiplier=1.1` buff (MaxStackCount 10) applied on-fire via a WoLUHasFlag-gated weapon effect set — the **Moebius BarrelAccelerator** pattern (the long-blocked "on each attack" trigger is solved data-only, no galaxy). MercWraith inherits both (parent="Wraith", shared weapon ids).
 - Viking: ~~Shredder Rounds (ground splash) / Anti-Mechanical Munition~~ **SHIPPED v0.3.1** (TwinGatlingCannon → TwinGatlingCannonsWoLUSet: WoLUHasFlag splash branch + `AttributeBonus[Mechanical]=20`, ThorsHammer pattern; Hel's Angels merc parity too). **Wild Missiles (5×25 salvo)** deferred — spec ready (a 5-launch CEffectCreatePersistent clone replacing the air primary `LanzerTorpedoes`) but it swaps the Viking's main air attack, so it needs in-game validation before shipping. NOTE: air-mode splash already comes free from the auto-unlocked Ripwave Missiles upgrade.
-- Siege Tank: Spider Mines / Transport Hook.
-- Predator kit: Charge / Vespene Synthesis (Adaptive Defenses already shipped).
-- Science Vessel: Magellan / EMP Shockwave (Defensive Matrix shipped; Tactical Jump shipped v0.3.0).
+- Siege Tank: ~~Spider Mines~~ **SHIPPED v0.3.1** (`SpiderMineWoLU` reuses the vanilla `SpawnSpiderMine` → SpiderMine unit; on SiegeTank + sieged + SiegeBreaker merc, both forms). **Transport Hook** deferred — researched (a `CEffectApplyForce` negative-Amount pull, ArtanisVortexForce idiom) but the pull mechanic is experimental + has no projectile visual + needs in-game tuning.
+- Predator kit: ~~Charge / Vespene Synthesis~~ **SHIPPED v0.3.1**. Charge = permanent `WoLUPredatorCharge` (MoveSpeedMultiplier 2.2, behavior-add path, avoiding the engine-coupled CAbilAugment). Vespene Synthesis = galaxy timer `PlayerModifyPropertyInt(p, c_playerPropVespene, …, n×5)` per 3 s per living Predator (native verified via injected CampaignLib). Adaptive Defenses + Tactical Jump already shipped.
+- Science Vessel: ~~Magellan / EMP Shockwave~~ **SHIPPED v0.3.1**. Magellan = a 2nd free Nano-Repair beam (`NanoRepairWoLU`, "heal 2 at once"; autocast-both is the in-game uncertainty). EMP Shockwave = friendly-fire-safe cloned launch+area (`EMPShockwaveLaunchWoLU`) reusing the vanilla EMPSet drain + EMP2Weapon missile. Defensive Matrix + Tactical Jump already shipped.
 - ~~Medic: Restoration / Optical Flare~~ — **SHIPPED v0.3.0** (Restoration = ally debuff-cleanse via Moebius RemoveDebuff; Optical Flare = enemy blind via SightBonus −9 + SuppressDetection; + Stetmann hero parity). Adaptive Medpacks mech/air heal still pending verify (open-issues).
 - ~~Reaper: Jet Pack Overdrive~~ — **anti-air SHIPPED v0.3.0** (drop the required `Ground` token from `P38ScytheGuassPistol` TargetFilters). Literal FLIGHT is BLOCKED: flight is a unit-type/morph property (not a live-editable field) and "never clone unit types" forbids the morph route — owner decision needed if literal flight is wanted.
 - Hellbat Aspect (Hellion morph) — needs HotS assets; the one named rule-1 exception.
@@ -37,6 +37,7 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 
 ## Recently done (rolling, short)
 
+- v0.3.1: WP-C batch 2 — Wraith Adv Laser + Trigger Override, Viking ground splash + anti-mech, Siege Tank Spider Mines, Predator Charge + Vespene Synthesis, SV Magellan + EMP Shockwave.
 - v0.3.0: WP-C batch — Tactical Jump (4 units), Medic Restoration + Optical Flare (+ Stetmann), Reaper anti-air.
 - v0.2.4–0.2.5: elite-merc clone-metadata (name/portrait/Jotun anims), stim-60, bunker slot, Liberator transform button, Marauder/Hercules tech; flagged-mechanism fixes (BC ignore-armor backwards→0, Defensive Matrix autocast, Senior Ghost +50% indexed form).
 - v0.2.1–0.2.3: merc-actor fix, merc-unlock (post-regression), Thor splash ×2 + Rapid Reload, shield armor names — see [open-issues.md](open-issues.md) Resolved.

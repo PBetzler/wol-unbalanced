@@ -335,6 +335,10 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogWeapon, "FusionCutter", "Period", p, "0.7", c_upgradeOperationSet);  // SCV: faster attack (Hostile Env Adaptation)
     CatalogFieldValueModify(c_gameCatalogWeapon, "Vulture", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Vulture Auto-Launchers: fire while moving
+    CatalogFieldValueModify(c_gameCatalogEffect, "WraithAU", "Amount", p, "2", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: air laser dmg x2 (5->10)
+    CatalogFieldValueModify(c_gameCatalogEffect, "WraithGU", "Amount", p, "2", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: ground laser dmg x2 (8->16)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "WraithA", "Period", p, "0.8", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: faster air attack (1.25->1.0)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "WraithG", "Period", p, "0.8", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: faster ground attack (1.694->1.355)
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "LifeMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x life
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "LifeStart", p, "1.5", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy

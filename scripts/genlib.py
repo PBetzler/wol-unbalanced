@@ -450,6 +450,13 @@ def emit():
         # -- Vulture: Auto-Launchers — attack while moving (AP). Ion Thrusters speed
         #    + Jerry-Rigged + Cerberus mine count handled earlier. --
         ("Weapon", "Vulture", "AllowedMovement", "Moving", "Set", "Vulture Auto-Launchers: fire while moving"),
+        # Wraith Advanced Laser Technology (AP): stronger air+ground lasers, faster fire.
+        # Per-player; reaches MercWraith (Winged Nightmares) automatically — it's a
+        # parent="Wraith" clone with no WeaponArray override, so it shares WraithA/G ids.
+        ("Effect", "WraithAU", "Amount", "2", "Multiply", "Wraith Advanced Laser Tech: air laser dmg x2 (5->10)"),
+        ("Effect", "WraithGU", "Amount", "2", "Multiply", "Wraith Advanced Laser Tech: ground laser dmg x2 (8->16)"),
+        ("Weapon", "WraithA", "Period", "0.8", "Multiply", "Wraith Advanced Laser Tech: faster air attack (1.25->1.0)"),
+        ("Weapon", "WraithG", "Period", "0.8", "Multiply", "Wraith Advanced Laser Tech: faster ground attack (1.694->1.355)"),
 
         # --- Special elite mercs (player-only clones; rule-9 safe) ---
         # Senior Ghost: 1.5x Life/Energy/regen via Multiply on the Ghost-clone's inherited

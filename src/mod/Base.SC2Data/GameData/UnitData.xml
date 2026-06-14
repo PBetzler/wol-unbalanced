@@ -245,9 +245,13 @@
     <CUnit id="ScienceVessel">
         <AbilArray index="4" Link="DefensiveMatrixWoLU"/>
         <AbilArray index="5" Link="TacticalJumpWoLU"/>
+        <AbilArray index="6" Link="NanoRepairWoLU"/>
+        <AbilArray index="7" Link="EMPShockwaveWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="10" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="0"/>
+            <LayoutButtons index="11" Face="NanoRepair" Type="AbilCmd" AbilCmd="NanoRepairWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="1"/>
+            <LayoutButtons index="12" Face="EMP" Type="AbilCmd" AbilCmd="EMPShockwaveWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="2"/>
         </CardLayouts>
     </CUnit>
 
@@ -304,10 +308,34 @@
         </CardLayouts>
     </CUnit>
     <CUnit id="SiegeTank">
+        <AbilArray index="4" Link="SpiderMineWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="6"><Face value="MaelstromRounds"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
             <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
             <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+            <LayoutButtons index="9" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <!-- Spider Mines on the sieged form + the Siege Breaker merc (rule 4). New blocks; vanilla
+         counts incl. the libertystory layer: SiegeTankSieged AbilArray 3 / buttons 8 (append
+         3 / 8); SiegeBreaker AbilArray 4 / buttons 8 (append 4 / 8); SiegeBreakerSieged
+         AbilArray 3 / buttons 8 (append 3 / 8). Free Row-2 cells used. -->
+    <CUnit id="SiegeTankSieged">
+        <AbilArray index="3" Link="SpiderMineWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="SiegeBreaker">
+        <AbilArray index="4" Link="SpiderMineWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="SiegeBreakerSieged">
+        <AbilArray index="3" Link="SpiderMineWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Thor">

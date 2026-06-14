@@ -125,4 +125,45 @@
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <Behavior value="OpticalFlareBlindWoLU"/>
     </CEffectApplyBehavior>
+
+    <!-- Science Vessel EMP Shockwave (BW SV): cloned launch+area so the AoE EXCLUDES own/allied
+         units (vanilla EMPSearch SearchFilters "-;Hidden,Invulnerable" would drain our own
+         energy/shields — friendly-fire-unsafe). Reuses AmmoUnit=EMP2Weapon (missile visual binds
+         to it) and the vanilla EMPSet drain (energy + 100 shields, decloak, 0 HP). -->
+    <CEffectLaunchMissile id="EMPShockwaveLaunchWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <ImpactEffect value="EMPShockwaveSearchWoLU"/>
+        <ImpactLocation Value="TargetPoint"/>
+        <AmmoUnit value="EMP2Weapon"/>
+    </CEffectLaunchMissile>
+    <CEffectEnumArea id="EMPShockwaveSearchWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <LaunchLocation Value="TargetPoint"/>
+        <ImpactLocation Value="TargetPoint"/>
+        <AreaArray Radius="3" Effect="EMPSet"/>
+        <!-- Crucio enemy-only filter; "-;" plane hits air AND ground (BW EMP hit both). -->
+        <SearchFilters value="-;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+    </CEffectEnumArea>
+
+    <!-- Wraith Trigger Override on-attack stack. Applies WoLUWraithTriggerOverride to the
+         FIRING Wraith (WhichUnit=Source, the project convention for self-apply). Player-gated:
+         WoLUHasFlag so enemy Wraiths fire the same weapon set but this apply no-ops for them. -->
+    <CEffectApplyBehavior id="WoLUWraithTriggerOverrideApply">
+        <EditorCategories value="Race:Terran"/>
+        <Behavior value="WoLUWraithTriggerOverride"/>
+        <WhichUnit Value="Source"/>
+        <ValidatorArray value="WoLUHasFlag"/>
+    </CEffectApplyBehavior>
+    <!-- Air weapon set: original missile-pair delivery + on-fire stack. -->
+    <CEffectSet id="WraithATriggerOverrideSet">
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="WraithAPersistent"/>
+        <EffectArray value="WoLUWraithTriggerOverrideApply"/>
+    </CEffectSet>
+    <!-- Ground weapon set: original missile launch + on-fire stack. -->
+    <CEffectSet id="WraithGTriggerOverrideSet">
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="WraithGLaunchMissile"/>
+        <EffectArray value="WoLUWraithTriggerOverrideApply"/>
+    </CEffectSet>
 </Catalog>

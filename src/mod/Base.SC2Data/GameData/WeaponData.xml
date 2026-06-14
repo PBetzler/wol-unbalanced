@@ -28,4 +28,14 @@
     <CWeaponLegacy id="WreckingCrewAssault">
         <Effect value="WreckingCrewAssaultWoLU"/>
     </CWeaponLegacy>
+
+    <!-- Wraith Trigger Override: redirect both Wraith weapons' Effect to the stacking sets
+         (keeps the weapon ids → attack animations bind). The added on-fire buff is
+         WoLUHasFlag-gated at the effect level, so enemy Wraiths stay vanilla. -->
+    <CWeaponLegacy id="WraithA">
+        <Effect value="WraithATriggerOverrideSet"/>
+    </CWeaponLegacy>
+    <CWeaponLegacy id="WraithG">
+        <Effect value="WraithGTriggerOverrideSet"/>
+    </CWeaponLegacy>
 </Catalog>

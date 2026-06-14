@@ -94,4 +94,29 @@
             <StateFlags index="SuppressDetection" value="1"/>
         </Modification>
     </CBehaviorBuff>
+
+    <!-- Wraith Trigger Override (AP): each attack adds +10% attack speed, stacking up to 10
+         (~x2.6 at cap — funnily overpowered). Pattern = Moebius BarrelAccelerator (a stacking
+         AttackSpeedMultiplier buff applied on-fire by a weapon effect set). AttackSpeedMultiplier
+         confirmed from vanilla Stimpack (value>1 = faster). Decays after 4 s of not attacking. -->
+    <CBehaviorBuff id="WoLUWraithTriggerOverride">
+        <Alignment value="Positive"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <MaxStackCount value="10"/>
+        <Duration value="4"/>
+        <Modification AttackSpeedMultiplier="1.1"/>
+    </CBehaviorBuff>
+
+    <!-- Predator Charge (AP): a permanent +120% move-speed buff (the Zealot-charge feel
+         without the engine-coupled CAbilAugment, which doesn't link to its buff in data and
+         is untested on Terran units). Adapted from Protoss Charging (MoveSpeedMultiplier 2.2);
+         made permanent like WoLUAdaptiveDefenses, applied per-player via libWoLU_AddBehaviorToType. -->
+    <CBehaviorBuff id="WoLUPredatorCharge">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoIcon value="Assets\Textures\btn-ability-protoss-charge.dds"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Modification MoveSpeedMultiplier="2.2"/>
+    </CBehaviorBuff>
 </Catalog>

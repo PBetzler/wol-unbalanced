@@ -428,4 +428,57 @@
         </Cost>
         <CmdButtonArray index="Execute" DefaultButtonFace="OpticalFlareWoLU" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
+
+    <!-- Science Vessel Magellan: a SECOND free Nano-Repair beam (heal 2 targets at once).
+         Reuses the vanilla NanoRepair healer effect so the heal-beam visual binds. Manual
+         cast on a 2nd target always works; autocast-both is the in-game uncertainty. -->
+    <CAbilEffectTarget id="NanoRepairWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="NanoRepair"/>
+        <TargetFilters value="Mechanical,Visible;Self,Enemy,Structure,Missile,Uncommandable,Dead,Hidden,Invulnerable"/>
+        <Range value="4"/>
+        <Arc value="360"/>
+        <AutoCastRange value="6"/>
+        <AcquireAttackers value="1"/>
+        <Flags index="AllowMovement" value="1"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <Flags index="NoDeceleration" value="1"/>
+        <Flags index="ReExecutable" value="1"/>
+        <Flags index="Smart" value="1"/>
+        <Cost><Vital index="Energy" value="0"/></Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="NanoRepair" Requirements="WoLUHaveFlag"/>
+        <AutoCastFilters value="-;Neutral,Enemy"/>
+    </CAbilEffectTarget>
+
+    <!-- Siege Tank Spider Mines (AP): lay a cloaked Vulture spider mine. Reuses the vanilla
+         SpawnSpiderMine effect (creates the SpiderMine unit at the target point) so the mine's
+         actor/burrow visuals bind for free; effectively unlimited (1 s cooldown). Button gated
+         WoLUHaveFlag, appended to the tank (enemy-invisible). -->
+    <CAbilEffectTarget id="SpiderMineWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="SpawnSpiderMine"/>
+        <Range value="4"/>
+        <Cost>
+            <Cooldown TimeUse="1"/>
+        </Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="SpiderMine" Requirements="WoLUHaveFlag"/>
+    </CAbilEffectTarget>
+
+    <!-- Science Vessel EMP Shockwave (BW SV): manual targeted AoE energy/shield drain. Effect
+         points at the friendly-fire-safe cloned launch+area; reuses the vanilla EMP drain. -->
+    <CAbilEffectTarget id="EMPShockwaveWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="EMPShockwaveLaunchWoLU"/>
+        <Range value="10"/>
+        <PrepTime value="0.01"/>
+        <FinishTime value="2.5"/>
+        <CursorEffect value="EMPSearch"/>
+        <Cost><Vital index="Energy" value="75"/></Cost>
+        <TargetFilters value="Visible;Self,Player,Ally,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="EMP" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+        <AINotifyEffect value="EMPShockwaveLaunchWoLU"/>
+    </CAbilEffectTarget>
 </Catalog>
