@@ -331,6 +331,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
     <CUnit id="MercReaper" parent="Reaper">
         <LifeMax value="150"/>
@@ -340,6 +341,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
     <CUnit id="MercHellion" parent="Hellion">
         <LifeMax value="200"/>
@@ -349,6 +351,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
 
     <!-- "Jotun" — the Thor merc. No data source defines a Jotun unit ("Jotun" exists
@@ -362,6 +365,7 @@
         <ShieldsStart value="100"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
 
     <!-- Winged Nightmares = AP "Mercenary Wraiths". Clone of the WoL Wraith (cloaked).
@@ -375,6 +379,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
 
     <!-- Midnight Riders = AP "Mercenary Liberators". No complete Liberator unit is reachable
