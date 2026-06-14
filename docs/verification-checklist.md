@@ -130,6 +130,7 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 - [ ] [RISK] **Tactical Jump** button appears (WoLUHaveFlag-gated) on **Hercules** (R2C2), **Science Vessel** (R1C0), **Battlecruiser** (R1C2), **Predator** (R2C1). Click it, click a far map point → the unit warps there; 10 s cooldown. ENEMY-VANILLA: enemy BCs show NO Tactical Jump button.
 - [ ] [RISK] **Medic Restoration** (R2C3) — cast on a debuffed friendly (e.g. hit by EMP/slow/stun) → debuff clears. **Optical Flare** (R2C4) — cast on an enemy detector/unit → its sight collapses (~1) and it stops detecting your cloaked units for 15 s. Both buttons also on **Stetmann** (R2C2/R2C3).
 - [ ] [RISK] **Reaper attacks AIR** (Jet Pack Overdrive) — order a Reaper to attack a Mutalisk/Banshee → it fires and damages it. (Reaper does NOT literally fly — that's a unit-type limitation, documented.) If it refuses to target air, the `P38ScytheGuassPistol` TargetFilters per-player string edit is a no-op (same risk class as Medic Adaptive Medpacks).
+- [ ] [RISK] **Viking ground (Assault mode) attack SPLASHES** (Shredder Rounds): siege 2+ clustered enemy ground units, one shot damages several. **Anti-Mechanical**: ground attack does noticeably more to mechanical targets (+20 vs Mech). ENEMY-VANILLA: enemy Vikings' ground attack stays single-target. Hel's Angels merc shows bigger splash. (Wild Missiles air-salvo NOT shipped — don't expect it.)
 
 ---
 

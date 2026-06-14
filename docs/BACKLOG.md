@@ -12,7 +12,7 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 ## WP-C — remaining ported AP upgrades (each a mini-project)
 
 - Wraith: Advanced Laser Technology + **Trigger Override** (stacking +10%/attack, cap +100%; reuse the Graduating-Range galaxy-stacking helper, driven off an attack event).
-- Viking: Shredder Rounds (ground splash) / Anti-Mechanical Munition / Wild Missiles (5×25 salvo). **Researched (reference-cited spec ready):** air splash already comes free from auto-unlocked Ripwave; ground splash + anti-mech need the ThorsHammer-style clone (TwinGatlingCannons has no AreaArray/AttributeBonus); Wild Missiles = a 5-launch CEffectCreatePersistent salvo clone. Pending integration.
+- Viking: ~~Shredder Rounds (ground splash) / Anti-Mechanical Munition~~ **SHIPPED v0.3.1** (TwinGatlingCannon → TwinGatlingCannonsWoLUSet: WoLUHasFlag splash branch + `AttributeBonus[Mechanical]=20`, ThorsHammer pattern; Hel's Angels merc parity too). **Wild Missiles (5×25 salvo)** deferred — spec ready (a 5-launch CEffectCreatePersistent clone replacing the air primary `LanzerTorpedoes`) but it swaps the Viking's main air attack, so it needs in-game validation before shipping. NOTE: air-mode splash already comes free from the auto-unlocked Ripwave Missiles upgrade.
 - Siege Tank: Spider Mines / Transport Hook.
 - Predator kit: Charge / Vespene Synthesis (Adaptive Defenses already shipped).
 - Science Vessel: Magellan / EMP Shockwave (Defensive Matrix shipped; Tactical Jump shipped v0.3.0).

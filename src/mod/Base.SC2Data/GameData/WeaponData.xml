@@ -11,4 +11,21 @@
     <CWeaponLegacy id="ThorsHammer">
         <Effect value="ThorsHammerWoLUSet"/>
     </CWeaponLegacy>
+
+    <!-- Viking ground (Assault) attack: Shredder Rounds (splash) + Anti-Mechanical Munition
+         (bonus vs Mechanical). Same approach as Thor — keep the vanilla weapon id (attack
+         animation binds to it), redirect its Effect to a player-gated effect set. The vanilla
+         TwinGatlingCannons effect has no AreaArray/AttributeBonus, so these can only be added
+         via a clone (runtime array-create is a no-op). Enemy Vikings hit the vanilla branch. -->
+    <CWeaponLegacy id="TwinGatlingCannon">
+        <Effect value="TwinGatlingCannonsWoLUSet"/>
+    </CWeaponLegacy>
+
+    <!-- Hel's Angels (Viking merc, player-exclusive): same Shredder + Anti-Mech as the base
+         Viking, scaled up for the merc % advantage. No flag gate needed (no enemy uses this
+         merc weapon); redirect the weapon's Effect to a splash clone (keeps the weapon id so
+         attack visuals bind). -->
+    <CWeaponLegacy id="WreckingCrewAssault">
+        <Effect value="WreckingCrewAssaultWoLU"/>
+    </CWeaponLegacy>
 </Catalog>

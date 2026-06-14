@@ -59,6 +59,38 @@
         <AreaArray Radius="2.5" Fraction="0.5"/>
     </CEffectDamage>
 
+    <!-- Viking ground (Assault) Shredder Rounds + Anti-Mechanical Munition. Same Shaped-Blast
+         pattern as ThorsHammerWoLUSet above: vanilla branch (WoLUNoFlag) for enemy Vikings,
+         buffed branch (WoLUHasFlag) for the player = radial splash + bonus vs Mechanical.
+         GROUND plane SearchFilters (Crucio enemy-only pattern). "Line" splash is approximated
+         as concentric radii (legacy weapons can't express true line geometry). -->
+    <CEffectSet id="TwinGatlingCannonsWoLUSet">
+        <EffectArray value="TwinGatlingCannonsVanillaWoLU"/>
+        <EffectArray value="TwinGatlingCannonsWoLU"/>
+    </CEffectSet>
+    <CEffectDamage id="TwinGatlingCannonsVanillaWoLU" parent="TwinGatlingCannons">
+        <ValidatorArray value="WoLUNoFlag"/>
+    </CEffectDamage>
+    <CEffectDamage id="TwinGatlingCannonsWoLU" parent="TwinGatlingCannons">
+        <ValidatorArray value="WoLUHasFlag"/>
+        <Kind value="Splash"/>
+        <KindSplash value="Splash"/>
+        <SearchFilters value="Ground;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AreaArray Radius="0.8" Fraction="1"/>
+        <AreaArray Radius="1.5" Fraction="0.5"/>
+        <AttributeBonus index="Mechanical" value="20"/>
+    </CEffectDamage>
+    <!-- Hel's Angels merc ground splash (player-exclusive — no flag gate). Bigger radii +
+         mech bonus than the base for the merc % advantage. -->
+    <CEffectDamage id="WreckingCrewAssaultWoLU" parent="WreckingCrewAssault">
+        <Kind value="Splash"/>
+        <KindSplash value="Splash"/>
+        <SearchFilters value="Ground;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AreaArray Radius="1.0" Fraction="1"/>
+        <AreaArray Radius="1.8" Fraction="0.5"/>
+        <AttributeBonus index="Mechanical" value="28"/>
+    </CEffectDamage>
+
     <!-- Marine Magrail Munitions bonus shot. Instant damage; the railgun BEAM visual
          is a one-shot beam actor bound to this effect's Start (WoLUMagrailBeam in
          ActorData.xml), using the base-game WarHound railgun model. -->
