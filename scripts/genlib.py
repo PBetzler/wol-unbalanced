@@ -377,6 +377,14 @@ def emit():
         # -- Base-unit LTS gaps (AP list has Laser Targeting: +1 range, +2 sight) --
         ("Weapon", "P38ScytheGuassPistol", "Range", "1", "Add", "Reaper LTS: +1 range"),
         ("Unit", "Reaper", "Sight", "2", "Add", "Reaper LTS: +2 sight"),
+        # Reaper Jet Pack Overdrive (AP): the Reaper can now attack AIR. Vanilla TargetFilters
+        # required group leads with "Ground," (forces a ground-plane target); dropping that one
+        # token lets it hit both ground and air (cf. Marine GuassRifle has no Ground requirement,
+        # Viking AA uses "Air,"). Per-player string-field edit (same class as the Medic heal
+        # TargetFilters). NOTE: literal FLIGHT is NOT shipped — flight is a unit-type/morph
+        # property (Viking AssaultMode→FighterMode), not a live-editable field, and "never clone
+        # unit types" forbids the morph route; the headline capability (hit air) is delivered here.
+        ("Weapon", "P38ScytheGuassPistol", "TargetFilters", "Visible;Structure,Missile,Stasis,Dead,Hidden,Invulnerable", "Set", "Reaper Jet Pack Overdrive: can attack air (drop required Ground token)"),
         ("Weapon", "CrucioShockCannon", "Range", "1", "Add", "Siege Tank LTS: +1 sieged range"),
         ("Weapon", "90mmCannons", "Range", "1", "Add", "Siege Tank LTS: +1 mobile range"),
         ("Unit", "SiegeTank", "Sight", "2", "Add", "Siege Tank LTS: +2 sight"),

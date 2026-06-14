@@ -220,10 +220,12 @@
         <AbilArray index="5" Link="MissilePodsWoLU"/>
         <AbilArray index="6" Link="DefensiveMatrixWoLU"/>
         <AbilArray index="7" Link="YamatoWoLU"/>
+        <AbilArray index="8" Link="TacticalJumpWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="6" Face="MissilePods" Type="AbilCmd" AbilCmd="MissilePodsWoLU,Execute" Row="2" Column="1"/>
             <LayoutButtons index="7" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="8" Face="YamatoGun" Type="AbilCmd" AbilCmd="YamatoWoLU,Execute" Row="2" Column="3"/>
+            <LayoutButtons index="11" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="2"/>
             <!-- BC has Internal Tech Module + Optimized Logistics (NOT Laser Targeting —
                  its targeting upgrade is Field-Assist, a range aura). -->
             <LayoutButtons index="9">
@@ -242,8 +244,49 @@
          2,0 NanoRepair / 2,1 Irradiate / 2,3 Detector). -->
     <CUnit id="ScienceVessel">
         <AbilArray index="4" Link="DefensiveMatrixWoLU"/>
+        <AbilArray index="5" Link="TacticalJumpWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="10" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="0"/>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- Tactical Jump (AP) appended to Hercules + Predator. Vanilla counts: Hercules
+         AbilArray 3 / LayoutButtons 8 (append 3 / 8, free cell R2C2); Predator AbilArray 3 /
+         LayoutButtons 7 (append 3 / 7, free cell R2C1). Button gated WoLUHaveFlag. -->
+    <CUnit id="Hercules">
+        <AbilArray index="3" Link="TacticalJumpWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="2" Column="2"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Predator">
+        <AbilArray index="3" Link="TacticalJumpWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="7" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="2" Column="1"/>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- AP Medic kit: Restoration (ally debuff-cleanse) + Optical Flare (enemy blind).
+         Appended (enemy-invisible cards). Medic vanilla AbilArray 4 / LayoutButtons 9 →
+         appends 4,5 / 9,10; free card cells R2C3, R2C4. -->
+    <CUnit id="Medic">
+        <AbilArray index="4" Link="RestorationWoLU"/>
+        <AbilArray index="5" Link="OpticalFlareWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="9" Face="RestorationWoLU" Type="AbilCmd" AbilCmd="RestorationWoLU,Execute" Row="2" Column="3"/>
+            <LayoutButtons index="10" Face="OpticalFlareWoLU" Type="AbilCmd" AbilCmd="OpticalFlareWoLU,Execute" Row="2" Column="4"/>
+        </CardLayouts>
+    </CUnit>
+    <!-- Rule 10 hero parity: Stetmann (=Medic) gets the same kit. Stetmann has a different
+         base kit (no `heal`), so it doesn't inherit the Medic appends — replicate them.
+         Stetmann vanilla AbilArray 3 / LayoutButtons 8 → appends 3,4 / 8,9; free R2C2, R2C3. -->
+    <CUnit id="Stetmann">
+        <AbilArray index="3" Link="RestorationWoLU"/>
+        <AbilArray index="4" Link="OpticalFlareWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8" Face="RestorationWoLU" Type="AbilCmd" AbilCmd="RestorationWoLU,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="9" Face="OpticalFlareWoLU" Type="AbilCmd" AbilCmd="OpticalFlareWoLU,Execute" Row="2" Column="3"/>
         </CardLayouts>
     </CUnit>
 

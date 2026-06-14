@@ -12,17 +12,17 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 ## WP-C — remaining ported AP upgrades (each a mini-project)
 
 - Wraith: Advanced Laser Technology + **Trigger Override** (stacking +10%/attack, cap +100%; reuse the Graduating-Range galaxy-stacking helper, driven off an attack event).
-- Viking: Shredder Rounds (line splash) / Anti-Mechanical Munition / Wild Missiles (5×25 salvo).
+- Viking: Shredder Rounds (ground splash) / Anti-Mechanical Munition / Wild Missiles (5×25 salvo). **Researched (reference-cited spec ready):** air splash already comes free from auto-unlocked Ripwave; ground splash + anti-mech need the ThorsHammer-style clone (TwinGatlingCannons has no AreaArray/AttributeBonus); Wild Missiles = a 5-launch CEffectCreatePersistent salvo clone. Pending integration.
 - Siege Tank: Spider Mines / Transport Hook.
 - Predator kit: Charge / Vespene Synthesis (Adaptive Defenses already shipped).
-- Science Vessel: Magellan / EMP Shockwave / Defensive Matrix / Tactical Jump.
-- Medic: Restoration / Optical Flare. (Adaptive Medpacks = mech/air heal is a **bug**, see open-issues.)
-- Reaper: Jet Pack Overdrive (fly + attack air).
+- Science Vessel: Magellan / EMP Shockwave (Defensive Matrix shipped; Tactical Jump shipped v0.3.0).
+- ~~Medic: Restoration / Optical Flare~~ — **SHIPPED v0.3.0** (Restoration = ally debuff-cleanse via Moebius RemoveDebuff; Optical Flare = enemy blind via SightBonus −9 + SuppressDetection; + Stetmann hero parity). Adaptive Medpacks mech/air heal still pending verify (open-issues).
+- ~~Reaper: Jet Pack Overdrive~~ — **anti-air SHIPPED v0.3.0** (drop the required `Ground` token from `P38ScytheGuassPistol` TargetFilters). Literal FLIGHT is BLOCKED: flight is a unit-type/morph property (not a live-editable field) and "never clone unit types" forbids the morph route — owner decision needed if literal flight is wanted.
 - Hellbat Aspect (Hellion morph) — needs HotS assets; the one named rule-1 exception.
 
 ## Cross-cutting
 
-- **Tactical Jump** (Hercules / Science Vessel / BC / Predator per the table) — `CEffectTeleport` is the confirmed primitive (Moebius survey). A clean win.
+- ~~**Tactical Jump** (Hercules / Science Vessel / BC / Predator)~~ — **SHIPPED v0.3.0** via `CEffectTeleport` (`TacticalJumpWoLU`, point-target warp, WoLUHaveFlag-gated button on all 4 units).
 - **Combined/visible upgrade display** — extend the passive `Type=Passive` card icons to any unit still missing them; verify the audit-flagged icon paths.
 
 ## WP-D — custom features (highest risk, build last)
@@ -37,6 +37,8 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 
 ## Recently done (rolling, short)
 
+- v0.3.0: WP-C batch — Tactical Jump (4 units), Medic Restoration + Optical Flare (+ Stetmann), Reaper anti-air.
+- v0.2.4–0.2.5: elite-merc clone-metadata (name/portrait/Jotun anims), stim-60, bunker slot, Liberator transform button, Marauder/Hercules tech; flagged-mechanism fixes (BC ignore-armor backwards→0, Defensive Matrix autocast, Senior Ghost +50% indexed form).
 - v0.2.1–0.2.3: merc-actor fix, merc-unlock (post-regression), Thor splash ×2 + Rapid Reload, shield armor names — see [open-issues.md](open-issues.md) Resolved.
 - v0.2.0: elite-merc roster (AP Terran Mercenaries + Senior Ghost) via a Merc Compound submenu; all-mercs-from-start.
 - The big parity/visible-upgrade/AP-port sweeps — see [plan.md](../plan.md) Status.

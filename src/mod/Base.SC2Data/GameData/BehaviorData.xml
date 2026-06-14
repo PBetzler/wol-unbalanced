@@ -80,4 +80,18 @@
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <Modification WeaponRange="4"/>
     </CBehaviorBuff>
+
+    <!-- Optical Flare (AP Medic): blind an enemy — sight collapses to ~1 (SightBonus form
+         from liberty's SightReduction) and it can no longer detect cloak/burrow
+         (StateFlags SuppressDetection, form from liberty's Salvage Modification). Negative
+         alignment, 15 s. -->
+    <CBehaviorBuff id="OpticalFlareBlindWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Alignment value="Negative"/>
+        <InfoIcon value="Assets\Textures\btn-ability-zerg-blindingcloud.dds"/>
+        <Duration value="15"/>
+        <Modification SightBonus="-9">
+            <StateFlags index="SuppressDetection" value="1"/>
+        </Modification>
+    </CBehaviorBuff>
 </Catalog>

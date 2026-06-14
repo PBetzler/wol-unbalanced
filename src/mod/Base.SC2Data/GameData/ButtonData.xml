@@ -54,4 +54,17 @@
     <CButton id="WoLUEliteMercs">
         <Icon value="Assets\Textures\btn-building-terran-merccompound.dds"/>
     </CButton>
+
+    <!-- Tactical Jump — the real Hercules Tactical Jump icon (base-CASC path). -->
+    <CButton id="TacticalJumpWoLU">
+        <Icon value="Assets\Textures\btn-ability-terran-hercules-tacticaljump.dds"/>
+    </CButton>
+
+    <!-- Medic Restoration + Optical Flare (AP). Base-CASC icon paths. -->
+    <CButton id="RestorationWoLU">
+        <Icon value="Assets\Textures\btn-ability-terran-heal-color.dds"/>
+    </CButton>
+    <CButton id="OpticalFlareWoLU">
+        <Icon value="Assets\Textures\btn-ability-zerg-blindingcloud.dds"/>
+    </CButton>
 </Catalog>

@@ -126,6 +126,11 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 - [ ] [RISK] **Wraith permanent free cloak** (periodic behavior-apply)
 - [ ] Note: Wraith **Trigger Override** (stacking attack speed) and **Advanced Laser Tech** are **not yet implemented** — don't expect them.
 
+### v0.3.0 · WP-C feature batch (Tactical Jump / Medic kit / Reaper anti-air)
+- [ ] [RISK] **Tactical Jump** button appears (WoLUHaveFlag-gated) on **Hercules** (R2C2), **Science Vessel** (R1C0), **Battlecruiser** (R1C2), **Predator** (R2C1). Click it, click a far map point → the unit warps there; 10 s cooldown. ENEMY-VANILLA: enemy BCs show NO Tactical Jump button.
+- [ ] [RISK] **Medic Restoration** (R2C3) — cast on a debuffed friendly (e.g. hit by EMP/slow/stun) → debuff clears. **Optical Flare** (R2C4) — cast on an enemy detector/unit → its sight collapses (~1) and it stops detecting your cloaked units for 15 s. Both buttons also on **Stetmann** (R2C2/R2C3).
+- [ ] [RISK] **Reaper attacks AIR** (Jet Pack Overdrive) — order a Reaper to attack a Mutalisk/Banshee → it fires and damages it. (Reaper does NOT literally fly — that's a unit-type limitation, documented.) If it refuses to target air, the `P38ScytheGuassPistol` TargetFilters per-player string edit is a no-op (same risk class as Medic Adaptive Medpacks).
+
 ---
 
 ## Part C — Lower-risk stat spot-checks (test opportunistically as units unlock)

@@ -377,4 +377,55 @@
             </SectionArray>
         </InfoArray>
     </CAbilMorph>
+
+    <!-- Tactical Jump (AP): point-target teleport for Hercules/ScienceVessel/Battlecruiser/
+         Predator. Modeled on the Stalker Blink ability (CAbilEffectTarget, Range=500 =
+         effectively map-wide, Arc=360, 10 s cooldown). Effect set EXPLICITLY (a CAbilEffectTarget
+         with no Effect defaults the link to its own id -> nonexistent effect; learnings). Button
+         gated WoLUHaveFlag (player-only); appended (never overrides an AI slot). One shared ability
+         for all 4 units. -->
+    <CAbilEffectTarget id="TacticalJumpWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="TacticalJumpWoLU"/>
+        <Range value="500"/>
+        <Arc value="360"/>
+        <Flags index="RequireTargetVision" value="0"/>
+        <Cost>
+            <Cooldown TimeUse="10"/>
+        </Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="TacticalJumpWoLU" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+
+    <!-- Restoration (AP/BW Medic): ally-target cleanse (removes all debuffs). MANUAL (no
+         autocast — without a "target has a debuff" gate, autocast would spam every nearby
+         ally). TargetFilters = ally units (excludes Self/Enemy/Structure). Effect set
+         explicitly (a CAbilEffectTarget with no Effect defaults to its own id). Button gated
+         WoLUHaveFlag. -->
+    <CAbilEffectTarget id="RestorationWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="RestorationCleanseWoLU"/>
+        <TargetFilters value="Visible;Self,Enemy,Structure,Missile,Dead,Hidden,Invulnerable"/>
+        <Range value="6"/>
+        <Cost>
+            <Cooldown TimeUse="1"/>
+        </Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="RestorationWoLU" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+
+    <!-- Optical Flare (AP/BW Medic): enemy-target blind. Manual (offensive utility). Effect
+         applies OpticalFlareBlindWoLU. Form from the BioStasis enemy-debuff ability. -->
+    <CAbilEffectTarget id="OpticalFlareWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="OpticalFlareApplyWoLU"/>
+        <TargetFilters value="Visible;Self,Player,Ally,Missile,Dead,Hidden,Invulnerable,Stasis"/>
+        <Range value="9"/>
+        <Cost>
+            <Cooldown TimeUse="3"/>
+        </Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="OpticalFlareWoLU" Requirements="WoLUHaveFlag"/>
+    </CAbilEffectTarget>
 </Catalog>

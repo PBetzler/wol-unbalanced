@@ -42,3 +42,12 @@ Button/Tooltip/HireMercLiberator=Calls down <c val="FFFF00">2 Midnight Riders</c
 Unit/Name/MercSeniorGhost=Senior Ghost
 Button/Name/HireMercSeniorGhost=Senior Ghost
 Button/Tooltip/HireMercSeniorGhost=Calls down a <c val="FFFF00">Senior Ghost</c> — an elite Ghost with <c val="FFFF00">1.5x</c> life, energy, regen, armor and damage. Keeps Snipe / EMP / cloak.<n/>WoL Unbalanced: special merc — unlimited charges, ready from start.
+Abil/Name/TacticalJumpWoLU=Tactical Jump
+Button/Name/TacticalJumpWoLU=Tactical Jump
+Button/Tooltip/TacticalJumpWoLU=<c val="FFFF00">Warp instantly</c> to a target location anywhere on the map.<n/>WoL Unbalanced ability — 10 s cooldown.
+Abil/Name/RestorationWoLU=Restoration
+Button/Name/RestorationWoLU=Restoration
+Button/Tooltip/RestorationWoLU=Removes <c val="FFFF00">all harmful effects</c> from a friendly unit.<n/>WoL Unbalanced: Brood War Medic ability.
+Abil/Name/OpticalFlareWoLU=Optical Flare
+Button/Name/OpticalFlareWoLU=Optical Flare
+Button/Tooltip/OpticalFlareWoLU=<c val="FFFF00">Blinds</c> an enemy unit for 15 s: sight reduced to ~1 and detection disabled.<n/>WoL Unbalanced: Brood War Medic ability.

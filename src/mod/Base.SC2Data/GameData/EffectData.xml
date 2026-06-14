@@ -69,4 +69,28 @@
         <Amount value="20"/>
         <Death value="Normal"/>
     </CEffectDamage>
+
+    <!-- Tactical Jump (AP): caster warps to the clicked point. Verbatim adaptation of the
+         campaign SS_ScienceVesselTeleportTeleport (WhichUnit=Caster + TargetLocation=
+         TargetPoint moves the caster to the target point). No persistent-invuln wrapper. -->
+    <CEffectTeleport id="TacticalJumpWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <WhichUnit Value="Caster"/>
+        <TargetLocation Value="TargetPoint"/>
+    </CEffectTeleport>
+
+    <!-- Restoration (AP/BW Medic): strip all debuffs from a friendly target. Verbatim from
+         Moebius RemoveDebuff (empty BehaviorLink + BehaviorAlignment=Negative removes every
+         negatively-aligned behavior). -->
+    <CEffectRemoveBehavior id="RestorationCleanseWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <BehaviorLink value=""/>
+        <BehaviorAlignment value="Negative"/>
+    </CEffectRemoveBehavior>
+
+    <!-- Optical Flare apply (AP Medic): blind the enemy target (form from BioStasisApplyBehavior). -->
+    <CEffectApplyBehavior id="OpticalFlareApplyWoLU">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Behavior value="OpticalFlareBlindWoLU"/>
+    </CEffectApplyBehavior>
 </Catalog>

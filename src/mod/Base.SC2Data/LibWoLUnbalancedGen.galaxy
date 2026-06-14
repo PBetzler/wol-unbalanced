@@ -285,6 +285,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "Range", p, "1", c_upgradeOperationAdd);  // Reaper LTS: +1 range
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "Sight", p, "2", c_upgradeOperationAdd);  // Reaper LTS: +2 sight
+    CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "TargetFilters", p, "Visible;Structure,Missile,Stasis,Dead,Hidden,Invulnerable", c_upgradeOperationSet);  // Reaper Jet Pack Overdrive: can attack air (drop required Ground token)
     CatalogFieldValueModify(c_gameCatalogWeapon, "CrucioShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 sieged range
     CatalogFieldValueModify(c_gameCatalogWeapon, "90mmCannons", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 mobile range
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "Sight", p, "2", c_upgradeOperationAdd);  // Siege Tank LTS: +2 sight
