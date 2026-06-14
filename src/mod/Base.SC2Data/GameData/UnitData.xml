@@ -383,7 +383,9 @@
          reskin the Viking — the one WoL unit with a real working morph. Fighter form is a
          VikingFighter clone wearing the Liberator model; it morphs (via MercLiberatorDeploy,
          a clone of the Viking AssaultMode redirected to MercLiberatorAG) into the Defender
-         form, a VikingAssault clone wearing the LiberatorAG model. AbilArray[3] is the
+         form — a stationary (Speed=0) but still-FLYING VikingFighter clone wearing the
+         LiberatorAG model, so it hovers like a real Liberator instead of dropping to the
+         ground. AbilArray[3] is the
          Viking's morph slot (stop/attack/move/AssaultMode); we override it to the redirected
          morph and add a card button (the inherited AssaultMode button auto-hides since its
          ability is no longer on the unit). FLAG: reskin (Viking weapons, not real Liberator
@@ -402,7 +404,11 @@
             <LayoutButtons index="20" Face="AssaultMode" Type="AbilCmd" AbilCmd="MercLiberatorDeploy,Execute" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
-    <CUnit id="MercLiberatorAG" parent="VikingAssault">
+    <!-- Defender form: also a VikingFighter clone so it STAYS AIRBORNE (the old
+         VikingAssault base dropped it to the ground — wrong for a Liberator). Speed=0
+         makes it stationary like a deployed Liberator, and its weapon is swapped to the
+         Viking's anti-ground TwinGatlingCannon so it sieges the ground while hovering. -->
+    <CUnit id="MercLiberatorAG" parent="VikingFighter">
         <LifeMax value="250"/>
         <LifeStart value="250"/>
         <LifeArmor value="2"/>
@@ -410,6 +416,8 @@
         <ShieldsStart value="75"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <Speed value="0"/>
+        <WeaponArray index="0" Link="TwinGatlingCannon"/>
         <AbilArray index="3" Link="MercLiberatorUndeploy"/>
         <BehaviorArray Link="WoLULiberatorUpgrades"/>
         <CardLayouts index="0">
