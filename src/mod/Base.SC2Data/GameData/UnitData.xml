@@ -160,13 +160,14 @@
         </CardLayouts>
     </CUnit>
 
-    <!-- Super Stimpack rollout per the unit-table Comments: Reaper (heal 30, "add super
-         stim and cloak"), Ghost/Spectre (heal 30, part of their autocast kit), Hellion
-         (heal 60 — NCO gives the Hellbat line the 60-heal marauder set). -->
+    <!-- Super Stimpack rollout per the unit-table Comments. Heal amount tracks HP:
+         units with MORE life than a Marine (65 after our +20) use the 60-heal marauder
+         set so the heal stays proportional — Reaper (70), Ghost/Spectre (100), Hellion.
+         Marine + Raynor variants keep the 30-heal Marine set. (open-issues: stim-60.) -->
     <CUnit id="Reaper">
-        <AbilArray index="3" Link="StimpackWoLU"/>
+        <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
             <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
@@ -187,22 +188,22 @@
          Ghost buttons (liberty.sc2mod order): [7]=Snipe, [11]=EMP.
          Spectre buttons (liberty.sc2campaign order): [12]=Obliterate. -->
     <CUnit id="Ghost">
-        <AbilArray index="9" Link="StimpackWoLU"/>
+        <AbilArray index="9" Link="StimpackMarauderWoLU"/>
         <AbilArray index="10" Link="SnipeWoLU"/>
         <AbilArray index="11" Link="EMPWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="7" AbilCmd="SnipeWoLU,Execute"/>
             <LayoutButtons index="11" AbilCmd="EMPWoLU,Execute"/>
-            <LayoutButtons index="13" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
+            <LayoutButtons index="13" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="1" Column="1"/>
             <LayoutButtons index="14"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="Spectre">
-        <AbilArray index="9" Link="StimpackWoLU"/>
+        <AbilArray index="9" Link="StimpackMarauderWoLU"/>
         <AbilArray index="10" Link="ObliterateWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="12" AbilCmd="ObliterateWoLU,Execute"/>
-            <LayoutButtons index="14" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="0"/>
+            <LayoutButtons index="14" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="1" Column="0"/>
             <LayoutButtons index="15"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
@@ -292,11 +293,11 @@
          EMP. Appended at next free abil index (7+); buttons in Nova's free row-1 cells
          (1,2 / 1,3 / 1,4). Nova's own NovaSnipe etc. stay. -->
     <CUnit id="Nova">
-        <AbilArray index="7" Link="StimpackWoLU"/>
+        <AbilArray index="7" Link="StimpackMarauderWoLU"/>
         <AbilArray index="8" Link="SnipeWoLU"/>
         <AbilArray index="9" Link="EMPWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="12" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="2"/>
+            <LayoutButtons index="12" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="1" Column="2"/>
             <LayoutButtons index="13" Face="Snipe" Type="AbilCmd" AbilCmd="SnipeWoLU,Execute" Row="1" Column="3"/>
             <LayoutButtons index="14" Face="EMP" Type="AbilCmd" AbilCmd="EMPWoLU,Execute" Row="1" Column="4"/>
         </CardLayouts>
@@ -304,10 +305,10 @@
     <!-- Rule 10: Tosh (=Spectre) inherits Super Stim + Psionic Lash (Obliterate).
          Appended at abil 7/8; buttons in Tosh's free row-1 cells (1,1 / 1,2). -->
     <CUnit id="Tosh">
-        <AbilArray index="7" Link="StimpackWoLU"/>
+        <AbilArray index="7" Link="StimpackMarauderWoLU"/>
         <AbilArray index="8" Link="ObliterateWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="10" Face="Stim" Type="AbilCmd" AbilCmd="StimpackWoLU,Execute" Row="1" Column="1"/>
+            <LayoutButtons index="10" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="1" Column="1"/>
             <LayoutButtons index="11" Face="Obliterate" Type="AbilCmd" AbilCmd="ObliterateWoLU,Execute" Row="1" Column="2"/>
         </CardLayouts>
     </CUnit>
@@ -324,6 +325,7 @@
          buttons + calldown wiring live in ActorData/ButtonData/AbilData; names in
          GameStrings. FLAG: clone stat/visual fidelity unverified in game. ============= -->
     <CUnit id="MercMedic" parent="Medic">
+        <Name value="Unit/Name/MercMedic"/>
         <LifeMax value="150"/>
         <LifeStart value="150"/>
         <LifeArmor value="1"/>
@@ -334,6 +336,7 @@
         <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
     <CUnit id="MercReaper" parent="Reaper">
+        <Name value="Unit/Name/MercReaper"/>
         <LifeMax value="150"/>
         <LifeStart value="150"/>
         <LifeArmor value="1"/>
@@ -344,6 +347,7 @@
         <ShieldArmorName value="Defensive Matrix"/>
     </CUnit>
     <CUnit id="MercHellion" parent="Hellion">
+        <Name value="Unit/Name/MercHellion"/>
         <LifeMax value="200"/>
         <LifeStart value="200"/>
         <LifeArmor value="1"/>
@@ -358,6 +362,7 @@
          only as the Viking Jotun Boosters upgrade + a planet name), so it's built here
          as a Thor clone to match the other elite mercs (user request). -->
     <CUnit id="MercThor" parent="Thor">
+        <Name value="Unit/Name/MercThor"/>
         <LifeMax value="500"/>
         <LifeStart value="500"/>
         <LifeArmor value="2"/>
@@ -372,6 +377,7 @@
          (The other AP extras — Midnight Riders=Liberator [LotV] and Brynhilds=Valkyrie
          [custom BW asset] — are not WoL units and can't be cloned in a WoL-map context.) -->
     <CUnit id="MercWraith" parent="Wraith">
+        <Name value="Unit/Name/MercWraith"/>
         <LifeMax value="200"/>
         <LifeStart value="200"/>
         <LifeArmor value="1"/>
@@ -396,6 +402,7 @@
          ability is no longer on the unit). FLAG: reskin (Viking weapons, not real Liberator
          AA/siege); confirm the morph fires and both models render. -->
     <CUnit id="MercLiberator" parent="VikingFighter">
+        <Name value="Unit/Name/MercLiberator"/>
         <LifeMax value="250"/>
         <LifeStart value="250"/>
         <LifeArmor value="2"/>
@@ -405,8 +412,12 @@
         <ShieldRegenDelay value="10"/>
         <AbilArray index="3" Link="MercLiberatorDeploy"/>
         <BehaviorArray Link="WoLULiberatorUpgrades"/>
+        <!-- Override the INHERITED AssaultMode button (VikingFighter LayoutButtons index 5)
+             to drive the new morph. Appending at a high index (was 20) left a 14-slot gap
+             and the button never rendered; overriding the existing slot keeps it on the
+             card. The ability swap above means the vanilla AbilCmd would auto-hide anyway. -->
         <CardLayouts index="0">
-            <LayoutButtons index="20" Face="AssaultMode" Type="AbilCmd" AbilCmd="MercLiberatorDeploy,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="5" Face="AssaultMode" Type="AbilCmd" AbilCmd="MercLiberatorDeploy,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <!-- Defender form: also a VikingFighter clone so it STAYS AIRBORNE (the old
@@ -414,6 +425,7 @@
          makes it stationary like a deployed Liberator, and its weapon is swapped to the
          Viking's anti-ground TwinGatlingCannon so it sieges the ground while hovering. -->
     <CUnit id="MercLiberatorAG" parent="VikingFighter">
+        <Name value="Unit/Name/MercLiberator"/>
         <LifeMax value="250"/>
         <LifeStart value="250"/>
         <LifeArmor value="2"/>
@@ -425,8 +437,10 @@
         <WeaponArray index="0" Link="TwinGatlingCannon"/>
         <AbilArray index="3" Link="MercLiberatorUndeploy"/>
         <BehaviorArray Link="WoLULiberatorUpgrades"/>
+        <!-- Same fix as the Fighter form: override the inherited AssaultMode button slot
+             (index 5) rather than appending at index 20 (which left a gap and never rendered). -->
         <CardLayouts index="0">
-            <LayoutButtons index="20" Face="FighterMode" Type="AbilCmd" AbilCmd="MercLiberatorUndeploy,Execute" Row="2" Column="2"/>
+            <LayoutButtons index="5" Face="FighterMode" Type="AbilCmd" AbilCmd="MercLiberatorUndeploy,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
 
@@ -435,6 +449,7 @@
          damage (WoLUSeniorGhostBoost behavior), flat elite armor + shields. Keeps the full
          Ghost kit (Snipe/EMP/cloak). FLAG: Nova model token + 1.5x scaling unverified. -->
     <CUnit id="MercSeniorGhost" parent="Ghost">
+        <Name value="Unit/Name/MercSeniorGhost"/>
         <LifeArmor value="3"/>
         <ShieldsMax value="75"/>
         <ShieldsStart value="75"/>

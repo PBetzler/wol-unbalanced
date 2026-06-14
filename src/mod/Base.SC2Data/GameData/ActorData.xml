@@ -29,37 +29,58 @@
          LiberatorSkinPreview = GenericUnitBase + unitName + Model="Liberator"). -->
     <CActorUnit id="MercMedic" parent="GenericUnitBase" unitName="MercMedic">
         <Model value="Medic"/>
-        <PortraitModel value="MedicPortrait"/>
+        <PortraitModel value="MercMedicPortrait"/>
     </CActorUnit>
     <CActorUnit id="MercReaper" parent="GenericUnitBase" unitName="MercReaper">
         <Model value="Reaper"/>
-        <PortraitModel value="ReaperPortrait"/>
+        <PortraitModel value="MercReaperPortrait"/>
     </CActorUnit>
     <CActorUnit id="MercHellion" parent="GenericUnitBase" unitName="MercHellion">
         <Model value="Hellion"/>
-        <PortraitModel value="HellionPortrait"/>
+        <PortraitModel value="MercHellionPortrait"/>
     </CActorUnit>
+    <!-- Jotun: Thor's attack animation events are bound to its SPECIFIC weapon ids
+         (ground ThorsHammer, air JavelinMissileLaunchers) on the vanilla Thor actor; a
+         bare GenericUnitBase actor only has the generic WeaponStart.*.AttackStart bracket,
+         so the Thor model plays its air-cover pose against ground targets and never fires
+         the ground muzzle. Copy the vanilla Thor actor's weapon-anim events verbatim (the
+         weapons exist on MercThor via parent="Thor", the anims exist in the Thor model we
+         wear) so the ground attack animates + muzzles correctly. -->
     <CActorUnit id="MercThor" parent="GenericUnitBase" unitName="MercThor">
         <Model value="Thor"/>
-        <PortraitModel value="ThorPortrait"/>
+        <PortraitModel value="MercThorPortrait"/>
+        <On Terms="Abil.attack.ReadyStart" Send="AnimGroupApply Ready"/>
+        <On Terms="ActorCreation" Send="AnimPlay CoverStand Cover,Stand PlayForever 0.000000"/>
+        <On Terms="WeaponStart.JavelinMissileLaunchers.AttackStart" Send="TimerKill CoverDelay"/>
+        <On Terms="WeaponStart.JavelinMissileLaunchers.AttackStart" Send="AnimClear CoverStand"/>
+        <On Terms="WeaponStart.JavelinMissileLaunchers.AttackStart" Send="AnimPlay Cover Cover PlayForever"/>
+        <On Terms="WeaponStop.JavelinMissileLaunchers.AttackStop" Send="TimerSet 2.500000 CoverDelay"/>
+        <On Terms="TimerExpired; TimerName CoverDelay" Send="AnimClear Cover"/>
+        <On Terms="TimerExpired; TimerName CoverDelay" Send="AnimPlay CoverStand Cover,Stand PlayForever"/>
+        <On Terms="WeaponStart.ThorsHammer.AttackStart; WeaponTargetElevation GE 20.000000" Send="AnimBracketStart Attack Attack,Superior"/>
+        <On Terms="WeaponStart.ThorsHammer.AttackStart; WeaponTargetElevation LE -20.000000" Send="AnimBracketStart Attack Attack,Inferior"/>
+        <On Terms="WeaponStart.ThorsHammer.AttackStart; WeaponTargetDistance LE 1.000000" Send="AnimBracketStart Attack Spell,B"/>
+        <On Terms="WeaponStart.ThorsHammer.AttackStart" Send="AnimBracketStart Attack Attack"/>
+        <On Terms="WeaponStop.*.AttackStop" Send="AnimBracketStop Attack"/>
+        <On Terms="Abil.attack.ReadyStop" Send="AnimGroupRemove Ready"/>
     </CActorUnit>
     <CActorUnit id="MercWraith" parent="GenericUnitBase" unitName="MercWraith">
         <Model value="Wraith"/>
-        <PortraitModel value="WraithPortrait"/>
+        <PortraitModel value="MercWraithPortrait"/>
     </CActorUnit>
     <!-- Liberator merc (transforming): Fighter form wears the Liberator model, Defender
          form (MercLiberatorAG) wears the LiberatorAG model — both base-CASC CModels. -->
     <CActorUnit id="MercLiberator" parent="GenericUnitBase" unitName="MercLiberator">
         <Model value="Liberator"/>
-        <PortraitModel value="LiberatorPortrait"/>
+        <PortraitModel value="MercLiberatorPortrait"/>
     </CActorUnit>
     <CActorUnit id="MercLiberatorAG" parent="GenericUnitBase" unitName="MercLiberatorAG">
         <Model value="LiberatorAG"/>
-        <PortraitModel value="LiberatorPortrait"/>
+        <PortraitModel value="MercLiberatorPortrait"/>
     </CActorUnit>
     <!-- Senior Ghost wears the GhostAlternate model (a ghost variant in liberty.sc2mod). -->
     <CActorUnit id="MercSeniorGhost" parent="GenericUnitBase" unitName="MercSeniorGhost">
         <Model value="GhostAlternate"/>
-        <PortraitModel value="GhostAlternatePortrait"/>
+        <PortraitModel value="MercSeniorGhostPortrait"/>
     </CActorUnit>
 </Catalog>

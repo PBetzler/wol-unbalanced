@@ -231,6 +231,13 @@ def emit():
         ("Unit", "Marauder", "CargoSize", "1", "Set", ""),
         ("Unit", "Ghost", "CargoSize", "1", "Set", ""),
         ("Unit", "Spectre", "CargoSize", "1", "Set", ""),
+        # CargoSize per-player is read at bunker LOAD time and the runtime edit doesn't
+        # reach it (confirmed in game — Ghost still took 2 slots; see learnings/open-issues).
+        # Achieve the rule's INTENT (a bunker holds 4 of ANY infantry, including the size-2
+        # Ghost/Marauder/Firebat/Spectre) by bumping the bunker's TotalCargoSpace to
+        # MaxCargoCount(4) x MaxCargoSize(2) = 8. TotalCargoSpace is a scalar field (same
+        # class as the MedivacTransport edit that works), so it DOES apply per player.
+        ("Abil", "BunkerTransport", "TotalCargoSpace", "8", "Set", "Bunker holds 4 of any infantry (size-2 units no longer eat 2 slots)"),
         # damage flattening: base damage = old total vs bonus attribute
         ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: 10(+10 light) -> 20 flat"),
         ("Effect", "C10CanisterRifle", "AttributeBonus[Light]", "0", "Set", ""),
@@ -254,8 +261,16 @@ def emit():
         # Siege tank: no friendly fire (campaign implements FF via separate friendly effects)
         ("Effect", "CrucioShockCannonFriendlyDamage", "Amount", "0", "Set", "tank sieged splash: no friendly fire"),
         ("Effect", "CrucioShockCannonFriendlyTargetDamage", "Amount", "0", "Set", ""),
-        # Hercules trainable without Fusion Core
-        ("Abil", "StarportTrain", "InfoArray[Train6].Button.Requirements", "HaveAttachedTechLab", "Set", "Hercules: no Fusion Core needed"),
+        # Build-prerequisite drops (per-player, rule-9 safe). NOTE: Button.Requirements is
+        # a requirement-LINK field; per-player runtime link edits are often silent no-ops
+        # (see learnings). These are the rule-compliant attempt — set the train button's
+        # requirement to empty (= always available, like Marine Train1). VERIFY IN GAME: if
+        # the unit still needs the building, the field is a no-op and the only working lever
+        # is TechTreeRestrictionsEnable(p,false), which is rejected here because it would also
+        # strip the Merc Compound requirement (violates rule 6).
+        ("Abil", "StarportTrain", "InfoArray[Train6].Button.Requirements", "", "Set", "Hercules: no Fusion Core needed (drop requirement)"),
+        # Marauder "Internal Tech Module": build without a Tech Lab (BarracksTrain Train4).
+        ("Abil", "BarracksTrain", "InfoArray[Train4].Button.Requirements", "", "Set", "Marauder Internal Tech Module: no Tech Lab needed"),
         # --- Hero/merc parity (rules 4/10): keep % advantage over changed base units ---
         ("Unit", "Raynor01", "LifeMax", "1.4444", "Multiply", "Marine line: x65/45 (Raynor variants + War Pigs)"),
         ("Unit", "Raynor01", "LifeStart", "1.4444", "Multiply", ""),

@@ -198,6 +198,12 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // Healthy => acount=5, m4=MagrailWoLU. If acount=4 / m4 empty, appends are dropped
     // (then new abilities must use explicit indices, not indexless appends).
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag2: acount=" + IntToString(CatalogFieldValueCount(c_gameCatalogUnit, "Marine", "AbilArray", libWoLU_Player)) + " m4=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[4].Link", libWoLU_Player) + " bcount=" + IntToString(CatalogFieldValueCount(c_gameCatalogUnit, "Marine", "CardLayouts[0].LayoutButtons", libWoLU_Player))));
+    // Damage-flatten diagnostic: does a per-player indexed-ARRAY effect edit apply?
+    // We set C10CanisterRifle (Ghost rifle) Amount 10->20 and AttributeBonus[Light] 10->0.
+    // Healthy => gAmt=20 gLgt=0 (flatten worked: 20 flat, no "+vs light"). If gLgt=10 the
+    // indexed-array edit is a no-op (top-level Amount applies, array element does not) and
+    // the flatten needs the Shaped-Blast clone pattern instead (open-issues: damage display).
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag3: gAmt=" + CatalogFieldValueGet(c_gameCatalogEffect, "C10CanisterRifle", "Amount", libWoLU_Player) + " gLgt=" + CatalogFieldValueGet(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", libWoLU_Player)));
     return true;
 }
 

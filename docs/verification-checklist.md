@@ -16,6 +16,8 @@ The mod proves it ran via three subtitle lines (bottom-centre) that fire togethe
   - `clone=5` = stim clone XML loaded · `fx=WoLUStimSet` = stim effect wired (this was the old autocast-killer) · `flag=1` = player-only gate granted · `m3=StimpackWoLU` = Marine slot-3 override applied · `t1=ThorsHammer` = Thor weapon kept (splash via effect-override).
 - [ ] **Diag2 line** — healthy value: `WoLU diag2: acount=5 m4=MagrailWoLU bcount=<N>`
   - `acount=5` + `m4=MagrailWoLU` = static-XML ability appends are applying. If `acount=4` / `m4` empty ⇒ appends dropped (every new ability/icon would be silently missing — high-impact failure).
+- [ ] **Diag3 line** (v0.2.4) — healthy value: `WoLU diag3: gAmt=20 gLgt=0`
+  - This settles the **damage-flatten** question. `gAmt=20` = the top-level effect `Amount` edit applied (Ghost rifle 10→20). `gLgt=0` = the indexed `AttributeBonus[Light]` edit ALSO applied → the "+vs light" line is gone and the card shows a flat 20. **If `gLgt=10`**, per-player indexed-array effect edits are a no-op: the flatten (and `FirebatUFull` Pre-Igniter) must move to the Shaped-Blast clone pattern, and Amount=20 should be reverted (else light targets take 30). Report the exact `gLgt` value.
 
 If any of these three is wrong, note the **literal text you saw** — it tells me exactly which layer broke.
 
@@ -37,7 +39,7 @@ Infantry only, no production, enemy Dominion present → perfect for the foundat
 ### M2 · The Outlaws — Medic (flagged string-field edits)
 - [ ] Medic cost **−25 / −25** and **−1** supply vs vanilla (75/50→50/25, 2→1)
 - [ ] Medic heal **range 4** (was 2)
-- [ ] [RISK] **Adaptive Medpacks** (string-field edit on `heal.TargetFilters`): Medic can heal **mechanical and air** units (try healing an SCV / a Viking). **KNOWN BROKEN (v0.2.0 test):** can't heal mech — the Biological gate is likely at the heal *effect* level (core CASC), not the ability's `TargetFilters`. Needs a deeper fix.
+- [ ] [RISK] **Adaptive Medpacks** (string-field edit on `heal.TargetFilters`): Medic can heal **mechanical and air** units (try healing an SCV / a Viking). v0.2.4 CONFIRMED by static investigation that the ONLY biological/ground gate is the `heal` ability's `TargetFilters` — the heal *effect* (`CEffectCreateHealer`) and its validators have no attribute filter, and the smart/autocast validators (`healSmartTargetFilters`) only exclude Enemy. So the genlib edit targets the right field; the remaining unknown is whether a per-player *string-field* edit reflects. If it still can't heal mech, a per-player string edit is a no-op → fall back to a player-gated `heal` clone.
   <!-- (Removed an incorrect note that Tychus appears in The Outlaws — he does not.) -->
 
 ### M3 · Zero Hour — mercs-from-start + bunker
@@ -72,6 +74,15 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 - [ ] Button icons show the unit card icon (cosmetic — blank still works).
 
 > Provenance (corrected): the AP **Terran Mercenaries** group has the 8 standard + 6 extras — Skibi's Angels (Medics), Death Heads (Reapers), **Winged Nightmares (Wraiths)**, Midnight Riders (Liberators), Brynhilds (Valkyries), **Jotun (Thor)**. Confirmed from `archipelago-sc2/content-docs` `item_data.json`. *Condor (Hellion) is a Moebius bonus, not AP.* **Deferred:** Midnight Riders (Liberator = LotV unit, not loaded in WoL maps) and Brynhilds (Valkyrie = custom BW asset AP bundles, no base unit) — both need cross-expansion unit access / asset transplant.
+
+#### v0.2.4 clone-metadata + functional fixes (verify on the elite mercs)
+- [ ] **Each elite merc shows its OWN name** when selected — "Jotun", "Winged Nightmares", "Skibi's Angels", "Senior Ghost", etc. — NOT the parent's ("Thor"/"Wraith"/"Medic"/"Ghost"). *(Fix: explicit `<Name>` field.)*
+- [ ] **Each elite merc shows a real PORTRAIT** (the base unit's talking head), NOT the default "heart". *(Fix: local `Merc*Portrait` CModels → real `.m3` path.)* If a specific one is still a heart, name it — its `.m3` folder doesn't match the SCV-confirmed convention.
+- [ ] **Jotun's ground attack** plays the Thor's hammer-smash animation (NOT the air-missile pose) and shows the muzzle/impact. *(Fix: copied Thor weapon-anim events.)*
+- [ ] **Midnight Riders' transform button now appears** (R2C1, the inherited AssaultMode slot) and morphs Fighter↔Defender. *(Fix: override button index 5 instead of appending at 20.)*
+- [ ] **Bunker holds 4 of ANY infantry** — load 4 Ghosts (or Marauders) into one bunker; all 4 fit (previously only 2). *(Fix: `BunkerTransport.TotalCargoSpace=8`.)*
+- [ ] **Advanced stim heals 60** on Reaper / Ghost / Spectre / Nova / Tosh (green +60 on stim), still 30 on Marine/Raynor.
+- [ ] **Marauder builds with no Tech Lab** and **Hercules builds with no Fusion Core** (just the Barracks/Starport). *(If they STILL need the building, `Button.Requirements` is a per-player no-op — report it; the fallback violates rule 6 so it needs an owner call.)*
 
 ### M7 · The Devil's Playground — Reaper + Vulture (perma-cloak)
 - [ ] [RISK] **Reaper permanent free cloak** (periodic behavior-apply): Reapers are cloaked at all times, no energy drain

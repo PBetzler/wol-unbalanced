@@ -193,6 +193,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CargoSize", p, "1", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "8", c_upgradeOperationSet);  // Bunker holds 4 of any infantry (size-2 units no longer eat 2 slots)
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: 10(+10 light) -> 20 flat
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: 15(+5 armored) -> 20 flat
@@ -206,7 +207,8 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "Backswing", p, "0.1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyDamage", "Amount", p, "0", c_upgradeOperationSet);  // tank sieged splash: no friendly fire
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyTargetDamage", "Amount", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Button.Requirements", p, "HaveAttachedTechLab", c_upgradeOperationSet);  // Hercules: no Fusion Core needed
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Button.Requirements", p, "", c_upgradeOperationSet);  // Hercules: no Fusion Core needed (drop requirement)
+    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksTrain", "InfoArray[Train4].Button.Requirements", p, "", c_upgradeOperationSet);  // Marauder Internal Tech Module: no Tech Lab needed
     CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);  // Marine line: x65/45 (Raynor variants + War Pigs)
     CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "LifeStart", p, "1.4444", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);

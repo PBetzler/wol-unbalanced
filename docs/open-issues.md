@@ -8,27 +8,20 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 
 ## Clone metadata (the Merc* elite mercs)
 
-- [ ] **Cloned merc units show the PARENT's name** (Jotun→"Thor", Midnight Riders→"Viking", Winged Nightmares→"Wraith", Senior Ghost→"Ghost"). Seen v0.2.3. The `Unit/Name/Merc*` strings exist and the *buy-button* name is correct, so it's specific to how a `parent=` unit clone resolves its display name (the v0.2.1 actor fix gave them models + unitName but not the name). Needs a dig — possibly the unit needs an explicit name field, or the clone inherits a name token from the parent.
-- [ ] **Cloned merc portraits show the default "heart" placeholder.** Seen v0.2.3. The `CActorUnit` sets `PortraitModel="<base>Portrait"` but it doesn't bind. `scripts/audit.py` flags every such token as base-CASC (MedicPortrait/ThorPortrait/GhostAlternatePortrait/…) — one of those is the wrong id, or PortraitModel isn't the right mechanism for a GenericUnitBase actor.
-- [ ] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`); re-verify the life-armor category reads correctly on all elite mercs.
+- [ ] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`); re-verify the life-armor category reads correctly on all elite mercs. (In-game check.)
 
 ## Damage display + values
 
-- [ ] **"X dmg + X vs light/armored" should flatten to "X dmg"** everywhere (Ghost 20+20, Thor AA 35+35, Spectre, etc.). Seen v0.2.3. The genlib `AttributeBonus[Light/Armored]=0` edits aren't reflecting on the card. Needs the right effect field (the effect lives in core CASC, not the local reference dump).
-- [ ] **Senior Ghost should read 30 dmg** (base ghost 20 × the merc's +50% `DamageDealtFraction`). The card shows 20; the behavior buff may not display on the card (in-game damage may still be 30 — confirm), or the +50% isn't applying.
-- [ ] **Advanced-stim units with > Marine HP should heal 60, not 30** (Reaper/Ghost/Spectre/Hellion currently on the 30-heal stim variant). Reassign them to the 60-heal `StimpackMarauderWoLU` variant.
+- [ ] **"X dmg + X vs light/armored" should flatten to "X dmg"** (Ghost, Thor AA, Spectre). v0.2.4: the effect/field paths are CONFIRMED correct (`C10CanisterRifle`/`SpecterU`/`JavelinMissileLaunchersDamage` `AttributeBonus[Light/Armored]`, same class as the working `CostResource[Minerals]`). The open question is whether a per-player *indexed-array* effect edit reflects on the card. Added **diag3** readback (`gAmt`/`gLgt`) — if `gLgt=0` it works; if `gLgt=10` the array edit is a no-op and the fix is the Shaped-Blast clone pattern (like ThorsHammer). VERIFY the diag, then act.
+- [ ] **Senior Ghost should read 30 dmg** (base ghost 20 × +50% `DamageDealtFraction`). The card shows weapon base (20) because a damage-dealt behavior never changes the *displayed* weapon damage — in-game damage should be 30. Confirm `WoLUSeniorGhostBoost` applies in game (a behavior-fraction buff has no card display by design).
 
 ## Units / mechanics
 
-- [ ] **Liberator merc (Midnight Riders) has no transform button.** Seen v0.2.1–0.2.3. `MercLiberator` overrides AbilArray[3] → `MercLiberatorDeploy` + a card button, but the button doesn't appear. Investigate after the clone metadata is sorted (the broken actor may have masked it).
-- [ ] **Jotun (Thor merc): no projectile/muzzle on its ground attack, and it plays the AA-attack animation against ground targets.** Seen v0.2.1–0.2.3. Weapon-actor binding on the Thor clone — the attack visuals bind to the base `Thor`, not `MercThor`.
-- [ ] **Ghost takes 2 bunker slots despite genlib `CargoSize=1`** (base Ghost = 2, base Reaper = 1). Seen v0.2.3. The per-player runtime `CargoSize` edit may not affect bunker capacity (read at a different time). Needs a different lever or a static (rule-9-bending) edit.
-- [ ] **Marauder "Internal Tech Module" upgrade doesn't drop the Tech Lab requirement** — still needs a Tech Lab to build. Seen v0.2.3. Apply the Hercules-style `Button.Requirements` edit to the Marauder train command.
-- [ ] **All 8 standard mercs available from start** — ATTEMPTED v0.2.2 (direct `TechTreeUnitAllow` of the merc unit types, after v0.2.1's tech-subgroup approach regressed). Needs re-test: do all 8 now appear, with no counterpart/building leakage?
+- [ ] **All 8 standard mercs available from start** — logic CONFIRMED correct v0.2.4 (direct `TechTreeUnitAllow` of all 8 merc unit types; no counterpart-subgroup leakage). In-game re-test only: do all 8 appear with no Marauder/Firebat/Factory leakage?
 
 ## UX
 
-- [ ] **The elite-merc submenu should stay open after buying a merc**, so you can buy a second without re-opening it. Seen v0.2.3. Standard SC2 resets the card to the main page after a command — needs a flag or a different submenu approach.
+- [ ] **The elite-merc submenu collapses after buying a merc** (can't buy a second without re-opening). v0.2.4 INVESTIGATED to ground truth: SC2 returns the command card to its root after *any* issued command — there is **no data flag** to keep a native submenu open (the full flag list has no such option). The only fix is a trigger-built dialog that re-implements the card, which `plan.md` explicitly rules out (loses native autocast circles/hotkeys). **Accepted SC2 limitation** unless the owner wants the dialog route. (Mitigation available if desired: make the elite-merc page the *root* card so it persists, demoting the vanilla 8 to a submenu.)
 
 ## Flagged mechanisms — implemented but unverified (harden by static investigation)
 
@@ -39,10 +32,19 @@ These shipped and *probably* work, but the field/semantics were assumptions. Ver
 - [ ] **Defensive Matrix autocast** (BC/SV) — instant self-buff autocast had no clean blueprint; confirm it actually autocasts (manual always works).
 - [ ] **Graduating Range** — confirm 5 stacks = +5 sieged range (`WoLUGraduatingRange` MaxStackCount).
 - [ ] **Assumption values** — Optimized Logistics = −25% train time; Diamondback Hyperfluxor/Maglev ±25%. Settle against AP data if findable.
-- [ ] **Risky field paths to re-verify resolve + apply**: `Charge.*`/`Cooldown.TimeStart` on `SummonMercenaries` train infos; `Button.Requirements` swap on Hercules (likely a link-field no-op — the same class as the Marauder tech-lab bug); `Cost[0].Vital[Energy]` on cloak abils; `heal.TargetFilters` string edit (= the Medic mech-heal bug); `AttributeBonus[Light]` Add on `FirebatUFull`; Medivac `TotalCargoSpace`.
+- [ ] **`Button.Requirements` per-player edit (Marauder Tech Lab + Hercules Fusion Core)** — v0.2.4 set both train buttons' `Requirements` to empty (rule-compliant attempt). This is a requirement-LINK field; per-player link edits are often no-ops. VERIFY: can the player build a Marauder with no Tech Lab / a Hercules with no Fusion Core? If not, the field is a no-op and the only working lever (`TechTreeRestrictionsEnable(p,false)`) is rejected because it also strips the Merc Compound requirement (rule 6).
+- [ ] **Medic Adaptive Medpacks (heal mech + air)** — v0.2.4 CONFIRMED the only biological/ground gate is the `heal` ability `TargetFilters` (no effect/validator gate); the genlib edit drops it correctly. Open question: does a per-player *string-field* edit apply? VERIFY the Medic can heal a Marauder/Viking in game.
+- [ ] **Risky field paths still to re-verify resolve + apply**: `Charge.*`/`Cooldown.TimeStart` on `SummonMercenaries` train infos; `Cost[0].Vital[Energy]` on cloak abils; `AttributeBonus[Light]` Add on `FirebatUFull` (same class as the damage-flatten question — diag3 will settle it).
 - [ ] **Stat discrepancies to settle** (then correct genlib): Ghost cost 150/150 vs 200/100; Diamondback supply; Wraith gas.
 
 ## Resolved (most recent first)
+
+- [x] **Cloned merc units show the PARENT's name** (Jotun→"Thor" etc.) — RESOLVED v0.2.4: added an explicit `<Name value="Unit/Name/Merc*"/>` field to each Merc* CUnit. A `parent=` clone with no Name field inherits the parent's; the explicit field (used by 74 vanilla units) pins it.
+- [x] **Cloned merc portraits show the "heart" placeholder** — RESOLVED v0.2.4: a base-CASC portrait token referenced from a dependency mod for a non-base unit identity isn't preloaded. Defined local `Merc*Portrait` CModels pointing at the real portrait `.m3` by CASC path (the Moebius SCVPortrait2 pattern), so the `##unitName##Portrait` token resolves to a loaded model. (FLAG: per-unit `.m3` folder follows the SCV-confirmed convention; verify each renders.)
+- [x] **Jotun (Thor merc) plays AA animation vs ground + no muzzle** — RESOLVED v0.2.4: Thor's attack animations bind to its specific weapon ids (`ThorsHammer`/`JavelinMissileLaunchers`); a bare `GenericUnitBase` actor only had the generic bracket. Copied Thor's weapon-anim `<On>` events into the MercThor actor.
+- [x] **Liberator merc (Midnight Riders) has no transform button** — RESOLVED v0.2.4: the button was appended at index 20 (VikingFighter's next-free is 6), leaving a gap that dropped it. Now overrides the inherited AssaultMode button at index 5 to drive the morph.
+- [x] **Advanced-stim units with > Marine HP heal only 30** — RESOLVED v0.2.4: reassigned Reaper/Ghost/Spectre (+ hero parity Nova/Tosh) to the 60-heal `StimpackMarauderWoLU`; Hellion was already on it. Marine + Raynor stay on the 30-heal set.
+- [x] **Ghost takes 2 bunker slots despite `CargoSize=1`** — RESOLVED v0.2.4: `CargoSize` per-player is read at bunker load and the runtime edit doesn't reach it. Instead bumped `BunkerTransport.TotalCargoSpace` to 8 (= MaxCargoCount 4 × MaxCargoSize 2) per player, so a bunker holds 4 of any infantry, incl. the size-2 Ghost/Marauder.
 
 - [x] **Thor ground attack felt slow / "windup didn't reflect"** — RESOLVED v0.2.3: the `DamagePoint` cap (0.831→0.1) was already applied; the real cause was the slow `Period` (1.93s). Added the unit-table's Rapid Reload (`ThorsHammer`/`Odin` Period→1.0, backswing→0.1).
 - [x] **Merc-unlock regression: Marauder/Firebat/Factory/Armory/Starport buildable in early missions** — RESOLVED v0.2.2: v0.2.1's `EnableCampaignTechUnit` on merc tech-subgroups mapped to the *counterpart* units; replaced with direct `TechTreeUnitAllow` of the merc unit types.

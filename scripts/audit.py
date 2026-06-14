@@ -121,7 +121,9 @@ def main():
 
     # INFO — model/portrait tokens that are base-CASC (not in our XML, not in the ref dump).
     refs = ref_ids()
-    our_ids = defined_unit_ids | set(our_actors)
+    models = our_catalog("ModelData.xml")
+    our_model_ids = {m.get("id") for m in models if m.tag == "CModel" and m.get("id")}
+    our_ids = defined_unit_ids | set(our_actors) | our_model_ids
     casc = set()
     for toks in actor_models.values():
         for t in toks:
