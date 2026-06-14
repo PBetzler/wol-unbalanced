@@ -22,46 +22,43 @@
         <HostSiteOps Ops="SOpTargetPoint"/>
     </CActorModel>
 
-    <!-- Actors for the extra elite mercs. A CActorUnit auto-binds to the unit whose id
-         it shares (cf. Moebius's BroodLord actor) and renders the referenced base model.
-         Each new merc reuses its base counterpart's CASC model + portrait by name (model
-         id == unit name is the SC2 convention) — no asset bundling needed (same approach
-         as the Magrail beam). FLAG: model/portrait token names assumed from convention;
-         if a unit is invisible in game, the Model/PortraitModel value is the thing to fix. -->
-    <CActorUnit id="MercMedic">
+    <!-- Actors for the extra elite mercs. A unit actor MUST inherit GenericUnitBase and
+         declare unitName= (that's what creates the model on birth + drives weapon/attack
+         visuals) — a bare <Model>-only actor renders a sphere with no attack (the v0.2.0
+         bug). The <Model> element reskins it to the base unit's model (cf. liberty's
+         LiberatorSkinPreview = GenericUnitBase + unitName + Model="Liberator"). -->
+    <CActorUnit id="MercMedic" parent="GenericUnitBase" unitName="MercMedic">
         <Model value="Medic"/>
         <PortraitModel value="MedicPortrait"/>
     </CActorUnit>
-    <CActorUnit id="MercReaper">
+    <CActorUnit id="MercReaper" parent="GenericUnitBase" unitName="MercReaper">
         <Model value="Reaper"/>
         <PortraitModel value="ReaperPortrait"/>
     </CActorUnit>
-    <CActorUnit id="MercHellion">
+    <CActorUnit id="MercHellion" parent="GenericUnitBase" unitName="MercHellion">
         <Model value="Hellion"/>
         <PortraitModel value="HellionPortrait"/>
     </CActorUnit>
-    <CActorUnit id="MercThor">
+    <CActorUnit id="MercThor" parent="GenericUnitBase" unitName="MercThor">
         <Model value="Thor"/>
         <PortraitModel value="ThorPortrait"/>
     </CActorUnit>
-    <CActorUnit id="MercWraith">
+    <CActorUnit id="MercWraith" parent="GenericUnitBase" unitName="MercWraith">
         <Model value="Wraith"/>
         <PortraitModel value="WraithPortrait"/>
     </CActorUnit>
     <!-- Liberator merc (transforming): Fighter form wears the Liberator model, Defender
          form (MercLiberatorAG) wears the LiberatorAG model — both base-CASC CModels. -->
-    <CActorUnit id="MercLiberator">
+    <CActorUnit id="MercLiberator" parent="GenericUnitBase" unitName="MercLiberator">
         <Model value="Liberator"/>
         <PortraitModel value="LiberatorPortrait"/>
     </CActorUnit>
-    <CActorUnit id="MercLiberatorAG">
+    <CActorUnit id="MercLiberatorAG" parent="GenericUnitBase" unitName="MercLiberatorAG">
         <Model value="LiberatorAG"/>
         <PortraitModel value="LiberatorPortrait"/>
     </CActorUnit>
-    <!-- Senior Ghost wears the GhostAlternate model — a ghost variant defined in
-         liberty.sc2mod (Liberty Mod, already a dependency), so no LotV/Void inclusion is
-         needed: models are CASC assets referenced by id, unlike the Liberator UNIT data. -->
-    <CActorUnit id="MercSeniorGhost">
+    <!-- Senior Ghost wears the GhostAlternate model (a ghost variant in liberty.sc2mod). -->
+    <CActorUnit id="MercSeniorGhost" parent="GenericUnitBase" unitName="MercSeniorGhost">
         <Model value="GhostAlternate"/>
         <PortraitModel value="GhostAlternatePortrait"/>
     </CActorUnit>

@@ -21,6 +21,7 @@ void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
 void libWoLU_GraduateSiegeRange (int p, string unitType);
 void libWoLU_ForceGrantAllTechRewards (int p);
 void libWoLU_EnableCurrentMissionUnits (int p);
+void libWoLU_EnableAllMercUnits (int p);
 
 void libWoLU_ApplyPlayer (int p) {
     libWoLUGen_Apply(p);
@@ -85,6 +86,10 @@ void libWoLU_GrantCampaignTech (int p) {
     libCamp_gf_ApplyCampaignTech(p);
     libCamp_gf_TS_ApplyMercenaryTech(p);
     libCamp_gf_TS_ApplyMercUpgrades(p);
+    // Setting all mercs Purchased only allows their CALLDOWN BUTTON; the merc UNIT is
+    // gated by its tech subgroup (which the story enables only on its unlock mission —
+    // why only War Pigs showed in v0.2.0). Enable every merc's subgroups directly.
+    libWoLU_EnableAllMercUnits(p);
     libWoLU_SyncWeaponArmorLevels(p);
     libWoLU_DisableArmoryResearch(p);
 
@@ -164,6 +169,28 @@ void libWoLU_EnableCurrentMissionUnits (int p) {
             libCamp_gf_EnableCampaignTechUnit(true, grp, p);
         }
         j = j + 1;
+    }
+}
+
+// Enable EVERY campaign merc's unit tech subgroups (up to 2 each), so all 8 standard
+// mercs are buildable from the Merc Compound regardless of which unlock mission you're on
+// — mirrors what the story does per-merc on its unlock mission, but for all of them.
+void libWoLU_EnableAllMercUnits (int p) {
+    int i;
+    int mercID;
+    int grp;
+    i = libCamp_gv_TSC_MERC_FIRST;
+    while (i <= libCamp_gv_TSC_MERC_LAST) {
+        mercID = libCamp_gv_tS_MercID[i];
+        grp = libCamp_gv_tS_MercTechSubGroup[mercID][1];
+        if ((grp != libCamp_ge_StoryTechGroup_StoryTechGroupNone)) {
+            libCamp_gf_EnableCampaignTechUnit(true, grp, p);
+        }
+        grp = libCamp_gv_tS_MercTechSubGroup[mercID][2];
+        if ((grp != libCamp_ge_StoryTechGroup_StoryTechGroupNone)) {
+            libCamp_gf_EnableCampaignTechUnit(true, grp, p);
+        }
+        i = i + 1;
     }
 }
 
@@ -280,6 +307,8 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_AddBehaviorToType(libWoLU_Player, "Reaper", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Medivac", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Wraith", "PersonalCloakingFree");
+        // Winged Nightmares (Wraith merc) inherit the Wraith's permanent cloak.
+        libWoLU_AddBehaviorToType(libWoLU_Player, "MercWraith", "PersonalCloakingFree");
         // Predator Adaptive Defenses: permanent damage-halving buff (player-only).
         libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUAdaptiveDefenses");
     }
