@@ -58,4 +58,10 @@
         <Model value="Assets\Portraits\Terran\GhostPortrait\GhostPortrait.m3"/>
         <EditorCategories value="Race:Terran"/>
     </CModel>
+    <!-- Brynhilds portrait — Valkyrie portrait by the confirmed convention; if absent in
+         CASC the unit just shows the default head (no regression). -->
+    <CModel id="MercValkyriePortrait">
+        <Model value="Assets\Portraits\Terran\ValkyriePortrait\ValkyriePortrait.m3"/>
+        <EditorCategories value="Race:Terran"/>
+    </CModel>
 </Catalog>

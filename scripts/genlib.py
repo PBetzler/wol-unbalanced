@@ -171,10 +171,10 @@ def emit():
     # unlimited. For effectively-unlimited-from-start: start full (CountStart high),
     # big cap (CountMax high), uses cost nothing (CountUse=0), and no cooldown wait
     # (TimeStart/TimeUse=0) so it never runs dry.
-    # Train1-8 = the vanilla mercs; Train9-15 = our extra elite mercs (Skibi's Angels /
-    # Death Heads / Condor / Jotun / Winged Nightmares / Midnight Riders / Senior Ghost,
-    # defined in static XML) — reassert unlimited-from-start on top of their static defaults.
-    for n in range(1, 16):
+    # Train1-8 = the vanilla mercs; Train9-16 = our extra elite mercs (Skibi's Angels /
+    # Death Heads / Condor / Jotun / Winged Nightmares / Midnight Riders / Senior Ghost /
+    # Brynhilds, defined in static XML) — reassert unlimited-from-start on their static defaults.
+    for n in range(1, 17):
         for field, val in (
             ("Charge.CountMax", "99"),
             ("Charge.CountStart", "99"),

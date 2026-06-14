@@ -330,6 +330,21 @@
             <Button DefaultButtonFace="HireMercSeniorGhost"/>
             <Unit value="MercSeniorGhost"/>
         </InfoArray>
+        <InfoArray index="Train16" Effect="MercGroundDrop">
+            <Resource index="Minerals" value="150"/>
+            <Charge>
+                <CountMax value="99"/>
+                <CountStart value="99"/>
+                <CountUse value="0"/>
+            </Charge>
+            <Cooldown>
+                <TimeStart value="0"/>
+                <TimeUse value="0"/>
+            </Cooldown>
+            <Button DefaultButtonFace="HireMercValkyrie"/>
+            <Unit value="MercValkyrie"/>
+            <Unit value="MercValkyrie"/>
+        </InfoArray>
     </CAbilTrain>
 
     <!-- Liberator merc transform: clones of the Viking AssaultMode/FighterMode morphs with

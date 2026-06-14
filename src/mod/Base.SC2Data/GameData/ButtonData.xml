@@ -50,6 +50,9 @@
     <CButton id="HireMercSeniorGhost">
         <Icon value="Assets\Textures\btn-unit-terran-nova-ghost.dds"/>
     </CButton>
+    <CButton id="HireMercValkyrie">
+        <Icon value="Assets\Textures\btn-unit-terran-wraith.dds"/>
+    </CButton>
     <!-- Submenu button that opens the elite-merc page on the Merc Compound. -->
     <CButton id="WoLUEliteMercs">
         <Icon value="Assets\Textures\btn-building-terran-merccompound.dds"/>

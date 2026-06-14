@@ -83,4 +83,10 @@
         <Model value="GhostAlternate"/>
         <PortraitModel value="MercSeniorGhostPortrait"/>
     </CActorUnit>
+    <!-- Brynhilds wears the base-CASC "Valkyrie" model (a Valkyrie CActorUnit exists in
+         liberty data → the model token resolves from CASC). -->
+    <CActorUnit id="MercValkyrie" parent="GenericUnitBase" unitName="MercValkyrie">
+        <Model value="Valkyrie"/>
+        <PortraitModel value="MercValkyriePortrait"/>
+    </CActorUnit>
 </Catalog>

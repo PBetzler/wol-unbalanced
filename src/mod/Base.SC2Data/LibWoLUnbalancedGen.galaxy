@@ -152,6 +152,11 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Charge.CountMax", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Charge.CountStart", p, "99", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Charge.CountUse", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
 
     // --- Per-unit stats (unit-table comments) ---
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)

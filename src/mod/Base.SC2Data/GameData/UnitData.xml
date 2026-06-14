@@ -519,6 +519,24 @@
          Nova MODEL (CModel "Nova" exists), 1.5x Life/Energy/regen (genlib Multiply), +50%
          damage (WoLUSeniorGhostBoost behavior), flat elite armor + shields. Keeps the full
          Ghost kit (Snipe/EMP/cloak). FLAG: Nova model token + 1.5x scaling unverified. -->
+    <!-- Brynhilds = the last AP "Terran Mercenary" extra (Mercenary Valkyries). Cloned from
+         the Wraith (an anti-air missile flyer — WraithA fires missile pairs, which fits the
+         Valkyrie's barrage) wearing the base-CASC "Valkyrie" model (a Valkyrie CActorUnit
+         exists in liberty data → the model is in CASC, no third-party bundling). As a
+         parent="Wraith" clone it also inherits the player's Wraith Adv-Laser + Trigger-Override
+         buffs (shared weapon ids). Buffed to elite status. -->
+    <CUnit id="MercValkyrie" parent="Wraith">
+        <Name value="Unit/Name/MercValkyrie"/>
+        <LifeMax value="300"/>
+        <LifeStart value="300"/>
+        <LifeArmor value="2"/>
+        <ShieldsMax value="75"/>
+        <ShieldsStart value="75"/>
+        <ShieldRegenRate value="5"/>
+        <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Defensive Matrix"/>
+    </CUnit>
+
     <CUnit id="MercSeniorGhost" parent="Ghost">
         <Name value="Unit/Name/MercSeniorGhost"/>
         <LifeArmor value="3"/>
@@ -550,6 +568,7 @@
             <LayoutButtons index="4" Face="HireMercWraith" Type="AbilCmd" AbilCmd="SummonMercenaries,Train13" Row="0" Column="4"/>
             <LayoutButtons index="6" Face="HireMercLiberator" Type="AbilCmd" AbilCmd="SummonMercenaries,Train14" Row="1" Column="0"/>
             <LayoutButtons index="7" Face="HireMercSeniorGhost" Type="AbilCmd" AbilCmd="SummonMercenaries,Train15" Row="1" Column="1"/>
+            <LayoutButtons index="8" Face="HireMercValkyrie" Type="AbilCmd" AbilCmd="SummonMercenaries,Train16" Row="1" Column="2"/>
             <LayoutButtons index="5" Face="Cancel" Type="CancelSubmenu" Row="2" Column="4"/>
         </CardLayouts>
     </CUnit>

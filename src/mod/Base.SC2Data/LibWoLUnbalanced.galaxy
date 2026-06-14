@@ -139,6 +139,7 @@ void libWoLU_GrantCampaignTech (int p) {
     TechTreeUnitAllow(p, "MercLiberator", true);
     TechTreeUnitAllow(p, "MercLiberatorAG", true);
     TechTreeUnitAllow(p, "MercSeniorGhost", true);
+    TechTreeUnitAllow(p, "MercValkyrie", true);
 }
 
 void libWoLU_ForceGrantAllTechRewards (int p) {

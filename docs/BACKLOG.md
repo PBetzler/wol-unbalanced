@@ -7,7 +7,7 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 ## Active / next (prioritized)
 
 1. **Clear the open-issues bug list** ([open-issues.md](open-issues.md)) — the elite-merc clone metadata (name/portrait), damage-display flatten, and the functional fixes (stim-60, transform button, bunker slot, Marauder tech-lab) are ahead of new features while the owner is actively playtesting.
-2. **Brynhilds — Valkyrie merc** (the one remaining AP Terran-Mercenary extra). Needs the AP/Brood-War Valkyrie unit + bundled `.m3` assets transplanted — not a base unit. Submenu has a free row for it.
+2. ~~**Brynhilds — Valkyrie merc**~~ — **SHIPPED v0.3.2**. No third-party transplant needed after all: a `Valkyrie` CActorUnit exists in base liberty data, so the **"Valkyrie" model is in base CASC** and path-referenceable. Built as a standard elite-merc clone — `MercValkyrie` (parent="Wraith", wears the Valkyrie model, +shields/HP/armor), SummonMercenaries Train16, submenu button at the free R1C2 slot. As a Wraith clone it also inherits the player's Wraith Adv-Laser + Trigger-Override. This completes the AP "Terran Mercenaries" roster. (FLAG: Valkyrie model + portrait are base-CASC tokens, unverified locally.)
 
 ## WP-C — remaining ported AP upgrades (each a mini-project)
 
