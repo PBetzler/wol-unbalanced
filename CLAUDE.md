@@ -2,7 +2,7 @@
 
 Source of truth for AI coding agents working on **WoL Unbalanced** — a funnily overpowered, player-only StarCraft II: Wings of Liberty campaign mod for GiantGrantGames' Custom Campaign Manager. Not to be taken seriously; balance is a non-goal by design.
 
-What lives where: [README.md](README.md) (overview, credits, license, build), [plan.md](plan.md) (architecture, work packages, **status & open items**), [unit-table.md](unit-table.md) (the spec — per-unit changes; the user's Comments column is authoritative, never overwrite it), [docs/learnings.md](docs/learnings.md) (hard-won SC2 modding gotchas).
+What lives where: [README.md](README.md) (overview, credits, license, build), [plan.md](plan.md) (architecture & work packages — the *how*), [unit-table.md](unit-table.md) (the spec — per-unit changes; the user's Comments column is authoritative, never overwrite it), [docs/learnings.md](docs/learnings.md) (hard-won SC2 modding gotchas), [docs/open-issues.md](docs/open-issues.md) (the bug tracker — confirmed defects), [docs/BACKLOG.md](docs/BACKLOG.md) (forward feature work, prioritized), [docs/verification-checklist.md](docs/verification-checklist.md) (the in-game test plan), [docs/debug-toolkit.md](docs/debug-toolkit.md) (symptom→fix recipes + what `audit.py` auto-catches).
 
 ## Session-Start Protocol
 
@@ -17,11 +17,13 @@ What lives where: [README.md](README.md) (overview, credits, license, build), [p
 ```sh
 python3 scripts/genlib.py        # regenerate the per-player apply script from reference XML
 python3 scripts/galaxy_lint.py   # MANDATORY before build — catches black-map compile bugs
+python3 scripts/audit.py         # static catalog/actor audit — catches sphere-no-model + dead calldowns
 python3 scripts/build.py build   # patch maps + assemble campaign into build/
 python3 scripts/build.py install # copy into /Applications/StarCraft II
 ```
 
-- **You cannot run the game.** The user verifies in game. Always tell them exactly what to check and in which mission.
+- **You cannot run the game.** The user verifies in game. Always tell them exactly what to check and in which mission. `galaxy_lint.py` + `audit.py` are the only *automatic* debugging we have (no SC2 MCP); runtime debugging is the in-game diag line + the owner — see [docs/debug-toolkit.md](docs/debug-toolkit.md).
+- Run `scripts/hooks/install.sh` once to wire the pre-commit gate (lint + audit + untracked warning) — a broken commit becomes a broken auto-release.
 - **Load canary**: the subtitle message "WoL Unbalanced: data applied …" at ~1 s/10 s into a mission. Absent ⇒ our library didn't run. Black map with no error ⇒ Galaxy compile failure (see learnings).
 - Reference data (vanilla catalogs, CampaignLib sources, reference mods) lives under `mods/_reference/` and `mods/` — gitignored, never committed.
 

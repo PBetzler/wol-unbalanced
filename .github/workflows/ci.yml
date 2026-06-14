@@ -20,3 +20,5 @@ jobs:
           fi
       - name: Galaxy library sanity (braces, parens, declaration order)
         run: python scripts/galaxy_lint.py
+      - name: Static catalog/actor audit (actor consistency, calldown wiring)
+        run: python scripts/audit.py --quiet

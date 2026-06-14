@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Pre-commit gate for WoL Unbalanced. BLOCKS on a broken Galaxy lint or a failed
+# static audit (these become broken auto-releases — every change is push+released),
+# and WARNS on untracked files (we must never commit mods/ build/ vendor/ — see
+# CLAUDE.md "Repo Hygiene"). Bypass with `git commit --no-verify`.
+#
+# Install (once; .git/hooks is not versioned): scripts/hooks/install.sh
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" 2>/dev/null || exit 0
+
+fail=0
+python3 scripts/galaxy_lint.py >/dev/null 2>&1 || { echo "pre-commit: galaxy_lint FAILED:"; python3 scripts/galaxy_lint.py; fail=1; }
+python3 scripts/audit.py --quiet  || { echo "pre-commit: audit FAILED (run: python3 scripts/audit.py)"; fail=1; }
+
+untracked="$(git ls-files --others --exclude-standard 2>/dev/null || true)"
+if [ -n "$untracked" ]; then
+  echo "pre-commit WARN: untracked file(s) — stage, gitignore, or leave with a reason:"
+  printf '%s\n' "$untracked" | head -10
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo "pre-commit: blocking. Fix the above, or 'git commit --no-verify' to bypass."
+  exit 1
+fi
+exit 0
