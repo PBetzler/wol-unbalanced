@@ -240,6 +240,13 @@ def emit():
         ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA: HIP floor 35/rocket (LotV Punisher)"),
         ("Effect", "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", "0", "Set", ""),
         ("Weapon", "JavelinMissileLaunchers", "Range", "12", "Set", "Thor AA range = HIP range 11 + 1"),
+        # Thor "Rapid Reload" (AP, unit-table) — the ground attack's slow Period (1.93 s)
+        # + 0.25 s backswing read as a long "windup" even though DamagePoint is already
+        # capped to 0.1. Speed up the attack rate and trim the recovery (Odin mirrors it).
+        ("Weapon", "ThorsHammer", "Period", "1.0", "Set", "Thor Rapid Reload: faster ground attack (1.93->1.0)"),
+        ("Weapon", "ThorsHammer", "Backswing", "0.1", "Set", "Thor: minimal attack recovery"),
+        ("Weapon", "Odin", "Period", "1.0", "Set", "Odin mirrors Thor Rapid Reload"),
+        ("Weapon", "Odin", "Backswing", "0.1", "Set", ""),
         # (Thor ground splash is wired by overriding vanilla ThorsHammer's Effect in
         #  WeaponData.xml; the windup cap on ThorsHammer is applied per player above.)
         # (legacy note — runtime catalog

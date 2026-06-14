@@ -200,6 +200,10 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "Amount", p, "35", c_upgradeOperationSet);  // Thor AA: HIP floor 35/rocket (LotV Punisher)
     CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogWeapon, "JavelinMissileLaunchers", "Range", p, "12", c_upgradeOperationSet);  // Thor AA range = HIP range 11 + 1
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Period", p, "1.0", c_upgradeOperationSet);  // Thor Rapid Reload: faster ground attack (1.93->1.0)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Backswing", p, "0.1", c_upgradeOperationSet);  // Thor: minimal attack recovery
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "Period", p, "1.0", c_upgradeOperationSet);  // Odin mirrors Thor Rapid Reload
+    CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "Backswing", p, "0.1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyDamage", "Amount", p, "0", c_upgradeOperationSet);  // tank sieged splash: no friendly fire
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyTargetDamage", "Amount", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Button.Requirements", p, "HaveAttachedTechLab", c_upgradeOperationSet);  // Hercules: no Fusion Core needed
