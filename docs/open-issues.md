@@ -44,6 +44,61 @@ These are investigated to ground truth but need an owner decision (a rule-9 tole
 - [x] **Reaper literal flight / anti-air** — owner is fine with the Reaper not shooting air; the flight morph is forbidden. Reverted the interim anti-air edit; Reaper keeps vanilla ground-only targeting.
 - [x] **Hellbat Aspect** — owner: not pulling in HotS assets. Dropped from the backlog.
 
+## In-game playtest batch (2026-06-15, fixed in v0.3.5 — pending re-test)
+
+13 issues reported from a fresh playthrough. Root causes traced statically (catalog-merge
+simulator + reference catalogs); fixes below. Items marked ⚠ are best-effort / not locally
+verifiable.
+
+- [x] **#3 Marauder has no stim** — the campaign REMOVES the Marauder's stim ability
+  (`AbilArray index=3 removed=1`) and our old button override only set `AbilCmd` on the
+  *AblativeScales passive* button (index 6) → stayed Type=Passive, never worked. Re-added the
+  ability (index-3 override) and APPEND a real stim button at index 10 (cell 2,0). Devil Dog
+  was already structurally correct (identical to Firebat) — re-verify it shows.
+- [x] **#4 Siege Breaker spider mine "Can't turn towards target"** — a SIEGED tank can't turn;
+  the ability needed `Flags IgnoreFacing=1`. Also switched the effect to the vanilla
+  `SpawnSpiderMineSet` (the raw create skipped the burrow set) + added `Placeholder`.
+- [x] **#5 Jackson's Revenge: Yamato not autocast / no attack upgrades** — added autocast
+  clones `DukesRevenge{Yamato,MissilePods,DefensiveMatrix}WoLU` (re-pointed its 3 buttons),
+  added ignore-armor (`ArmorReduction=0`) on its DR damage effects (the missing "attack side"),
+  and a fire-while-moving passive display.
+- [x] **#6 Brynhilds = Wraith look/upgrades** & **#9 Midnight Riders = Viking** — REMOVED both
+  (owner decision). Their intended Valkyrie/Liberator models don't exist in WoL, so they only
+  ever reskinned to Wraith/Viking. Units, actors, portraits, morphs, calldowns, buttons,
+  strings all deleted.
+- [x] **#11 cloaking units don't spawn cloaked** — `PersonalCloakingFree` is a permanent-cloak
+  buff (StateFlags Cloak=1); it was only applied to ~6 unit types. Expanded the periodic
+  apply to ALL cloak-capable player units (Ghost, Spectre, Banshee, Wraith, Reaper, Medivac,
+  Predator, Nova, Tosh, Dusk Wings, Winged Nightmares, Senior Ghost). Cloaked ≤2 s after spawn.
+- [x] **#12 Spartan Company missing upgrades** — it's a separate Goliath *merc*, not a clone, so
+  it never inherited Goliath's WoL upgrade displays. Added Shaped Hull + Optimized Logistics
+  passives (stat parity was already applied in genlib on `SpartanCompany*`).
+- [x] **#2 bunker "full but slots empty"** — `TotalCargoSpace=8` but `MaxCargoCount=4`: size-1
+  marines hit the 4-unit cap while the 8-space bar showed room. Set `MaxCargoCount=8` to match.
+- [x] **#7 Jotun (Thor merc) upgrade panel** — the base-Thor passive display was at index 7,
+  clobbering the 250mm Cancel button + colliding at cell 1,0. Appended at 10/11 (Laser
+  Targeting + Shaped Hull); MercThor inherits them via `parent="Thor"`. ⚠ AA still reads
+  35 (+ residual "vs light"): the per-player `AttributeBonus[Light]=0` array-edit is a no-op
+  (see damage-display item); the *value* (35) is correct — full flatten needs an effect clone.
+- [x] **#13 Medic doesn't heal mechanical** — the per-player `heal.TargetFilters` string edit
+  is a no-op. Added a `HealWoLU` clone (parent `heal`, broad TargetFilters incl. Mechanical+Air,
+  explicit `Effect=heal` so it doesn't re-default to a nonexistent id), autocast + gated button,
+  on Medic (Skibi's Angels inherit) + Stetmann.
+- [x] **#1 Command Center: no MULE** — our mod never touched the CC. Per owner, added a free,
+  unlimited Calldown: MULE + Extra Supplies kit (`CalldownMULEWoLU`/`SupplyDropWoLU`, no Orbital
+  requirement, WoLUHaveFlag-gated). ⚠ buttons appended at index 14/15 assuming the campaign CC
+  has 14 card buttons (3-layer merge) — verify they appear.
+- [x] **#8 elite mercs: heart portrait + "unknown" shield** — shield: `ShieldArmorName` was a raw
+  string "Defensive Matrix"; the engine wants a string-table KEY (vanilla uses
+  `Unit/ShieldArmorName/...`) → added `Unit/ShieldArmorName/WoLUDefensiveMatrix`. ⚠ portrait:
+  the old custom `Merc*Portrait` CModels pointed at GUESSED `.m3` paths (→ heart); switched the
+  actors to reference the base portrait CModel ids (`MedicPortrait`, `ReaperPortrait`, …) which
+  must exist (the real units resolve them via `##unitName##Portrait`). Not locally verifiable.
+- [ ] **⚠ #10 Senior Ghost "two stim buttons"** — NOT statically reproducible. The merged
+  Senior Ghost card has EXACTLY ONE stim button (index 13), identical to the regular Ghost which
+  works fine; no second source exists in any catalog layer (merge simulator confirmed). If it
+  persists after v0.3.5, need a screenshot — possibly a multi-select / AbilSetId UI artifact.
+
 ## Resolved (most recent first)
 
 - [x] **BC "ignore armor" was BACKWARDS** — RESOLVED v0.2.5: `ArmorReduction` is a MULTIPLIER on how much the target's armor applies (reference values are only 0 / 0.334 / 1; `SnipeDamage` ignores armor via `ArmorReduction=0`). The shipped `ArmorReduction=500` would have made armor reduce BC damage 500× (≈0 damage to any armored target). Corrected to `0` on `ATSLaserBatteryU`/`ATALaserBatteryU`.

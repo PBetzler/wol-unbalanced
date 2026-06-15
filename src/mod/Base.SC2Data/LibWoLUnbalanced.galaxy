@@ -136,10 +136,15 @@ void libWoLU_GrantCampaignTech (int p) {
     TechTreeUnitAllow(p, "MercHellion", true);
     TechTreeUnitAllow(p, "MercThor", true);
     TechTreeUnitAllow(p, "MercWraith", true);
-    TechTreeUnitAllow(p, "MercLiberator", true);
-    TechTreeUnitAllow(p, "MercLiberatorAG", true);
     TechTreeUnitAllow(p, "MercSeniorGhost", true);
-    TechTreeUnitAllow(p, "MercValkyrie", true);
+
+    // Command Center OP economy (user request): the player's CC gets a free, unlimited
+    // Calldown: MULE + Extra Supplies kit (CalldownMULEWoLU/SupplyDropWoLU clones, gated
+    // on WoLUHaveFlag so enemy CCs stay vanilla). Allow the MULE unit + the clone abils so
+    // they're usable without the (campaign-absent) Orbital Command upgrade.
+    TechTreeUnitAllow(p, "MULE", true);
+    TechTreeAbilityAllow(p, AbilityCommand("CalldownMULEWoLU", 0), true);
+    TechTreeAbilityAllow(p, AbilityCommand("SupplyDropWoLU", 0), true);
 }
 
 void libWoLU_ForceGrantAllTechRewards (int p) {
@@ -311,16 +316,27 @@ bool libWoLU_OnGraduateRange (bool testConds, bool runActions) {
 bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
     if (PlayerRace(libWoLU_Player) == "Terr") {
         libWoLU_SyncWeaponArmorLevels(libWoLU_Player);
-        libWoLU_AddBehaviorToType(libWoLU_Player, "Nova", "PersonalCloakingFree");
-        libWoLU_AddBehaviorToType(libWoLU_Player, "Tosh", "SpectreCloakingFree");
-        // AP permanent-cloak ports (unit-table): Reaper "add ... cloak", Medivac/Wraith
-        // Advanced/Unregistered Cloaking — the 2 s period also catches units trained
-        // mid-mission. Player-scoped by construction (rule 9).
+        // Rule 11 (user): EVERY cloak-capable player unit spawns + stays permanently
+        // cloaked, for free. PersonalCloakingFree is a permanent-cloak buff
+        // (Modification.StateFlags[Cloak]=1, no energy) — adding it makes the unit
+        // invisible from the moment it appears. The 2 s period also catches units
+        // trained mid-mission (≤2 s after spawn). Player-scoped by construction (rule 9).
+        // SpectreCloakingFree is the spectre-flavoured variant (same effect).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Ghost", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Spectre", "SpectreCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Banshee", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Wraith", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Reaper", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Medivac", "PersonalCloakingFree");
-        libWoLU_AddBehaviorToType(libWoLU_Player, "Wraith", "PersonalCloakingFree");
-        // Winged Nightmares (Wraith merc) inherit the Wraith's permanent cloak.
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "PersonalCloakingFree");
+        // Heroes inherit their base unit's cloak (Nova=Ghost, Tosh=Spectre).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Nova", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Tosh", "SpectreCloakingFree");
+        // Mercs inherit their counterpart's cloak: Dusk Wings (Banshee), Winged
+        // Nightmares (Wraith), Senior Ghost (Ghost).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "DuskWing", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "MercWraith", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "MercSeniorGhost", "PersonalCloakingFree");
         // Predator Adaptive Defenses: permanent damage-halving buff (player-only).
         libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUAdaptiveDefenses");
         // Predator Charge (AP): permanent +120% move speed (player-only).

@@ -152,11 +152,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Charge.CountUse", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Charge.CountMax", p, "99", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Charge.CountStart", p, "99", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Charge.CountUse", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train16].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
 
     // --- Per-unit stats (unit-table comments) ---
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)
@@ -199,6 +194,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "8", c_upgradeOperationSet);  // Bunker holds 4 of any infantry (size-2 units no longer eat 2 slots)
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "8", c_upgradeOperationSet);  // match unit-count cap to TotalCargoSpace (no confusing empty slots)
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: 10(+10 light) -> 20 flat
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: 15(+5 armored) -> 20 flat
@@ -340,6 +336,10 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Jackson's Revenge: fire while moving (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "AllowedMovement", p, "Moving", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "DRBattlecruiserGU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // Jackson's Revenge ignores armor (ground)
+    CatalogFieldValueModify(c_gameCatalogEffect, "DRBattlecruiserAU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // Jackson's Revenge ignores armor (air)
+    CatalogFieldValueModify(c_gameCatalogEffect, "DRCannonsG", "ArmorReduction", p, "0", c_upgradeOperationSet);  // Jackson's Revenge cannons ignore armor (ground)
+    CatalogFieldValueModify(c_gameCatalogEffect, "DRCannonsA", "ArmorReduction", p, "0", c_upgradeOperationSet);  // Jackson's Revenge cannons ignore armor (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "FusionCutter", "Period", p, "0.7", c_upgradeOperationSet);  // SCV: faster attack (Hostile Env Adaptation)
     CatalogFieldValueModify(c_gameCatalogWeapon, "Vulture", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Vulture Auto-Launchers: fire while moving
     CatalogFieldValueModify(c_gameCatalogEffect, "WraithAU", "Amount", p, "2", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: air laser dmg x2 (5->10)
@@ -351,7 +351,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyStart", p, "1.5", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyRegenRate", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy regen
-    CatalogFieldValueModify(c_gameCatalogUnit, "MercLiberator", "Sight", p, "2", c_upgradeOperationAdd);  // Midnight Riders: Liberator LTS +2 vision
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);

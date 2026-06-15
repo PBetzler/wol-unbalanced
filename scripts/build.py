@@ -23,7 +23,7 @@ SC2 = "/Applications/StarCraft II"
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
-VERSION = "0.3.4"
+VERSION = "0.3.5"
 
 # --- Optional Nightmare-difficulty base (LOCAL-ONLY) -------------------------------
 # `python3 scripts/build.py build nightmare` (or `package nightmare`) layers our mod on

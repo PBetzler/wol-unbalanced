@@ -35,13 +35,7 @@ Unit/Name/MercWraith=Winged Nightmares
 Button/Name/HireMercWraith=Winged Nightmares
 Button/Tooltip/HireMercWraith=Calls down <c val="FFFF00">2 Winged Nightmares</c> elite cloaked Wraiths (+50 shields, +HP, +armor).<n/>WoL Unbalanced: Archipelago merc — unlimited charges, ready from start.
 Button/Name/WoLUEliteMercs=Elite Mercenaries
-Button/Tooltip/WoLUEliteMercs=Open the <c val="FFFF00">elite mercenary</c> roster (Archipelago mercs).<n/>Skibi's Angels, Death Heads, Condor, Jotun, Winged Nightmares, Midnight Riders, Senior Ghost.
-Unit/Name/MercLiberator=Midnight Riders
-Button/Name/HireMercLiberator=Midnight Riders
-Button/Tooltip/HireMercLiberator=Calls down <c val="FFFF00">2 Midnight Riders</c> elite Liberators that stay airborne and <c val="FFFF00">transform between mobile Fighter and stationary hovering Defender mode</c> (+4 range, +2 vision, +shields/HP/armor).<n/>WoL Unbalanced: Archipelago merc — unlimited charges, ready from start.
-Unit/Name/MercValkyrie=Brynhilds
-Button/Name/HireMercValkyrie=Brynhilds
-Button/Tooltip/HireMercValkyrie=Calls down <c val="FFFF00">2 Brynhilds</c> elite Valkyries — anti-air missile flyers (+75 shields, +HP, +2 armor; inherit the Wraith's laser/trigger upgrades).<n/>WoL Unbalanced: Archipelago merc — unlimited charges, ready from start.
+Button/Tooltip/WoLUEliteMercs=Open the <c val="FFFF00">elite mercenary</c> roster (Archipelago mercs).<n/>Skibi's Angels, Death Heads, Condor, Jotun, Winged Nightmares, Senior Ghost.
 Unit/Name/MercSeniorGhost=Senior Ghost
 Button/Name/HireMercSeniorGhost=Senior Ghost
 Button/Tooltip/HireMercSeniorGhost=Calls down a <c val="FFFF00">Senior Ghost</c> — an elite Ghost with <c val="FFFF00">1.5x</c> life, energy, regen, armor and damage. Keeps Snipe / EMP / cloak.<n/>WoL Unbalanced: special merc — unlimited charges, ready from start.
@@ -59,3 +53,10 @@ Button/Tooltip/NanoRepairWoLU=A second <c val="FFFF00">free</c> Nano-Repair beam
 Abil/Name/EMPShockwaveWoLU=EMP Shockwave
 Button/Name/EMPShockwaveWoLU=EMP Shockwave
 Button/Tooltip/EMPShockwaveWoLU=Launches an <c val="FFFF00">EMP Shockwave</c>: drains <c val="FFFF00">all energy and 100 shields</c> from enemy units in a radius and reveals cloaked units. Does not affect your own units.<n/>WoL Unbalanced: Brood War Science Vessel ability.
+Unit/ShieldArmorName/WoLUDefensiveMatrix=Defensive Matrix
+Abil/Name/HealWoLU=Adaptive Medpacks
+Abil/Name/CalldownMULEWoLU=Calldown: MULE
+Abil/Name/SupplyDropWoLU=Calldown: Extra Supplies
+Abil/Name/DukesRevengeYamatoWoLU=Yamato Cannon (Autocast)
+Abil/Name/DukesRevengeMissilePodsWoLU=Missile Pods (Autocast)
+Abil/Name/DukesRevengeDefensiveMatrixWoLU=Defensive Matrix (Autocast)

@@ -179,10 +179,12 @@ def emit():
     # unlimited. For effectively-unlimited-from-start: start full (CountStart high),
     # big cap (CountMax high), uses cost nothing (CountUse=0), and no cooldown wait
     # (TimeStart/TimeUse=0) so it never runs dry.
-    # Train1-8 = the vanilla mercs; Train9-16 = our extra elite mercs (Skibi's Angels /
-    # Death Heads / Condor / Jotun / Winged Nightmares / Midnight Riders / Senior Ghost /
-    # Brynhilds, defined in static XML) — reassert unlimited-from-start on their static defaults.
-    for n in range(1, 17):
+    # Train1-8 = the vanilla mercs; Train9-13 + Train15 = our extra elite mercs (Skibi's
+    # Angels / Death Heads / Condor / Jotun / Winged Nightmares / Senior Ghost, defined in
+    # static XML) — reassert unlimited-from-start on their static defaults. (Train14 Midnight
+    # Riders + Train16 Brynhilds removed per owner; the extra loop iterations are harmless
+    # no-ops on the now-absent InfoArray entries.)
+    for n in range(1, 16):
         for field, val in (
             ("Charge.CountMax", "99"),
             ("Charge.CountStart", "99"),
@@ -246,6 +248,11 @@ def emit():
         # MaxCargoCount(4) x MaxCargoSize(2) = 8. TotalCargoSpace is a scalar field (same
         # class as the MedivacTransport edit that works), so it DOES apply per player.
         ("Abil", "BunkerTransport", "TotalCargoSpace", "8", "Set", "Bunker holds 4 of any infantry (size-2 units no longer eat 2 slots)"),
+        # MaxCargoCount limits the NUMBER of units (vanilla 4); with TotalCargoSpace=8 but
+        # MaxCargoCount=4 a bunker of size-1 marines fills at 4 units while the capacity bar
+        # still shows 4 empty space => "full but slots free" (user report). Match the count
+        # to the space so size-1 units fill all 8 (and 4 size-2 units still cap at 8 space).
+        ("Abil", "BunkerTransport", "MaxCargoCount", "8", "Set", "match unit-count cap to TotalCargoSpace (no confusing empty slots)"),
         # damage flattening: base damage = old total vs bonus attribute
         ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: 10(+10 light) -> 20 flat"),
         ("Effect", "C10CanisterRifle", "AttributeBonus[Light]", "0", "Set", ""),
@@ -458,6 +465,13 @@ def emit():
         ("Weapon", "DRBattlecruiserA", "AllowedMovement", "Moving", "Set", "Jackson's Revenge: fire while moving (air)"),
         ("Weapon", "DRCannonsG", "AllowedMovement", "Moving", "Set", ""),
         ("Weapon", "DRCannonsA", "AllowedMovement", "Moving", "Set", ""),
+        # Jackson's Revenge attack-side parity with the base BC: ignore armor (ArmorReduction
+        # multiplier 1->0, same as the ATSLaserBatteryU fix). The user saw movement/armor
+        # boosts but "nothing on the attack side" — the DR damage effects weren't buffed.
+        ("Effect", "DRBattlecruiserGU", "ArmorReduction", "0", "Set", "Jackson's Revenge ignores armor (ground)"),
+        ("Effect", "DRBattlecruiserAU", "ArmorReduction", "0", "Set", "Jackson's Revenge ignores armor (air)"),
+        ("Effect", "DRCannonsG", "ArmorReduction", "0", "Set", "Jackson's Revenge cannons ignore armor (ground)"),
+        ("Effect", "DRCannonsA", "ArmorReduction", "0", "Set", "Jackson's Revenge cannons ignore armor (air)"),
 
         # -- SCV: Hostile Environment Adaptation — slightly faster attack (AP) --
         ("Weapon", "FusionCutter", "Period", "0.7", "Set", "SCV: faster attack (Hostile Env Adaptation)"),
@@ -480,8 +494,8 @@ def emit():
         ("Unit", "MercSeniorGhost", "EnergyMax", "1.5", "Multiply", "Senior Ghost: 1.5x energy"),
         ("Unit", "MercSeniorGhost", "EnergyStart", "1.5", "Multiply", ""),
         ("Unit", "MercSeniorGhost", "EnergyRegenRate", "1.5", "Multiply", "Senior Ghost: 1.5x energy regen"),
-        # Midnight Riders (Liberator merc): AP Laser Targeting +2 vision (range via behavior).
-        ("Unit", "MercLiberator", "Sight", "2", "Add", "Midnight Riders: Liberator LTS +2 vision"),
+        # (Midnight Riders / Brynhilds removed per owner — their intended Liberator/Valkyrie
+        #  models don't exist in WoL, so they only ever looked like a Viking/Wraith.)
     ]
     for cat, entry, field, val, op, comment in stat_edits:
         suffix = f"  // {comment}" if comment else ""

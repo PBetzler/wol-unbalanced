@@ -112,13 +112,20 @@
             </LayoutButtons>
         </CardLayouts>
     </CUnit>
+    <!-- Marauder stim: the campaign REMOVES the vanilla StimpackMarauder ability
+         (AbilArray index 3 removed="1") and replaces its stim button (index 6) with the
+         AblativeScales passive. Our AbilArray index-3 override re-adds the ability (merge
+         verified). The OLD button override only set AbilCmd on index 6 — that's the
+         AblativeScales PASSIVE button, so it stayed Type=Passive/Face=AblativeScales and
+         never worked as stim (the bug). Fix: leave AblativeScales alone and APPEND a real
+         stim button at the next free index (10) in a free cell (2,0). -->
     <CUnit id="Marauder">
         <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="6" AbilCmd="StimpackMarauderWoLU,Execute"/>
             <LayoutButtons index="7"><Face value="JuggernautPlating"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
             <LayoutButtons index="8"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
             <LayoutButtons index="9"><Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+            <LayoutButtons index="10" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="0"/>
         </CardLayouts>
     </CUnit>
     <!-- Rule 4: War Pigs (Marine merc) inherit Marine upgrades — stim (index-override
@@ -239,6 +246,26 @@
         </CardLayouts>
     </CUnit>
 
+    <!-- Jackson's Revenge (DukesRevenge) = the BC hero. It already has its own three
+         actives (DukesRevengeYamato/MissilePods/DefensiveMatrix at abils 3/4/5, buttons
+         5/6/7) but they never autocast (issue 5). Append autocast clones and re-point the
+         three buttons to them (player-exclusive hero → rule-9 safe). The attack-side buffs
+         (fire-while-moving + ignore-armor, applied per-player in genlib on the DR weapons/
+         effects) weren't visible — add a "fire while moving" passive display so the attack
+         upgrades show alongside the movement/armor boosts the user already saw. -->
+    <CUnit id="DukesRevenge">
+        <AbilArray index="6" Link="DukesRevengeYamatoWoLU"/>
+        <AbilArray index="7" Link="DukesRevengeMissilePodsWoLU"/>
+        <AbilArray index="8" Link="DukesRevengeDefensiveMatrixWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="5" AbilCmd="DukesRevengeYamatoWoLU,Execute"/>
+            <LayoutButtons index="6" AbilCmd="DukesRevengeMissilePodsWoLU,Execute"/>
+            <LayoutButtons index="7" AbilCmd="DukesRevengeDefensiveMatrixWoLU,Execute"/>
+            <LayoutButtons index="8"><Face value="WoLUUpgSmartServos"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="9"><Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+
     <!-- Science Vessel: AP list includes Defensive Matrix — reuse the BC clone
          (same append + WoLUHaveFlag gate). Free card cell 2,2 (vanilla SV uses
          2,0 NanoRepair / 2,1 Irradiate / 2,3 Detector). -->
@@ -277,9 +304,13 @@
     <CUnit id="Medic">
         <AbilArray index="4" Link="RestorationWoLU"/>
         <AbilArray index="5" Link="OpticalFlareWoLU"/>
+        <AbilArray index="6" Link="HealWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="RestorationWoLU" Type="AbilCmd" AbilCmd="RestorationWoLU,Execute" Row="2" Column="3"/>
             <LayoutButtons index="10" Face="OpticalFlareWoLU" Type="AbilCmd" AbilCmd="OpticalFlareWoLU,Execute" Row="2" Column="4"/>
+            <!-- Adaptive Medpacks: mechanical+air heal (autocast). Vanilla heal button stays
+                 at 2,0; this one (1,0) covers mechanical/air. -->
+            <LayoutButtons index="11" Face="MedicHeal" Type="AbilCmd" AbilCmd="HealWoLU,Execute" Row="1" Column="0"/>
         </CardLayouts>
     </CUnit>
     <!-- Rule 10 hero parity: Stetmann (=Medic) gets the same kit. Stetmann has a different
@@ -288,9 +319,27 @@
     <CUnit id="Stetmann">
         <AbilArray index="3" Link="RestorationWoLU"/>
         <AbilArray index="4" Link="OpticalFlareWoLU"/>
+        <AbilArray index="5" Link="HealWoLU"/>
         <CardLayouts index="0">
             <LayoutButtons index="8" Face="RestorationWoLU" Type="AbilCmd" AbilCmd="RestorationWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="9" Face="OpticalFlareWoLU" Type="AbilCmd" AbilCmd="OpticalFlareWoLU,Execute" Row="2" Column="3"/>
+            <LayoutButtons index="10" Face="MedicHeal" Type="AbilCmd" AbilCmd="HealWoLU,Execute" Row="1" Column="0"/>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- Command Center OP economy (user request): the player's CC gets free, unlimited
+         Calldown: MULE + Extra Supplies (CalldownMULEWoLU / SupplyDropWoLU, defined in
+         AbilData — energy-free, no Orbital requirement, button gated WoLUHaveFlag). The
+         merged campaign CC has 10 abils (0-9) and 14 card buttons (0-13), so the abilities
+         append at 10/11 and the buttons at 14/15, placed in the free top-row cells (0,1 /
+         0,2). Static XML is global but the WoLUHaveFlag gate + free-cost clones keep enemy
+         CCs vanilla (rule 9); the lib also TechTreeUnitAllow's the MULE unit. -->
+    <CUnit id="CommandCenter">
+        <AbilArray index="10" Link="CalldownMULEWoLU"/>
+        <AbilArray index="11" Link="SupplyDropWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="14" Face="CalldownMULE" Type="AbilCmd" AbilCmd="CalldownMULEWoLU,Execute" Row="0" Column="1"/>
+            <LayoutButtons index="15" Face="SupplyDrop" Type="AbilCmd" AbilCmd="SupplyDropWoLU,Execute" Row="0" Column="2"/>
         </CardLayouts>
     </CUnit>
 
@@ -302,6 +351,17 @@
     <!-- Goliath has NO Laser Targeting (its AP list omits it): show Shaped Hull +
          Optimized Logistics (its real upgrades). -->
     <CUnit id="Goliath">
+        <CardLayouts index="0">
+            <LayoutButtons index="7"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="8"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+    <!-- Spartan Company (Goliath merc) is a SEPARATE unit, not a Goliath clone, so it never
+         inherited Goliath's WoL upgrade displays (issue 12). It already shows its vanilla
+         passives (MultiLock @2,0 / Ares-Class @2,1, buttons 5-6); append the same WoL
+         passives the Goliath shows in the free row-1 cells. The stat parity (Ares-Class
+         range +3/+1, Shaped Hull +25) is applied per-player in genlib on SpartanCompany* . -->
+    <CUnit id="SpartanCompany">
         <CardLayouts index="0">
             <LayoutButtons index="7"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
             <LayoutButtons index="8"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
@@ -338,9 +398,15 @@
             <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
         </CardLayouts>
     </CUnit>
+    <!-- Thor: the vanilla card has 10 buttons (0-9); index 7 is the 250mm Cancel button and
+         index 9 (ImmortalityProtocol) sits at cell 1,0. The old index-7 passive override
+         clobbered the Cancel button AND collided at 1,0. Append the WoL passive displays at
+         the next free indices (10+) in free row-1 cells instead. (Jotun = MercThor inherits
+         these via parent="Thor", so this also fills out its upgrade panel — issue 7.) -->
     <CUnit id="Thor">
         <CardLayouts index="0">
-            <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="10"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="11"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
     <CUnit id="VikingFighter">
@@ -404,7 +470,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
-        <ShieldArmorName value="Defensive Matrix"/>
+        <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
     </CUnit>
     <CUnit id="MercReaper" parent="Reaper">
         <Name value="Unit/Name/MercReaper"/>
@@ -415,7 +481,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
-        <ShieldArmorName value="Defensive Matrix"/>
+        <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
     </CUnit>
     <CUnit id="MercHellion" parent="Hellion">
         <Name value="Unit/Name/MercHellion"/>
@@ -426,7 +492,7 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
-        <ShieldArmorName value="Defensive Matrix"/>
+        <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
     </CUnit>
 
     <!-- "Jotun" — the Thor merc. No data source defines a Jotun unit ("Jotun" exists
@@ -441,7 +507,7 @@
         <ShieldsStart value="100"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
-        <ShieldArmorName value="Defensive Matrix"/>
+        <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
     </CUnit>
 
     <!-- Winged Nightmares = AP "Mercenary Wraiths". Clone of the WoL Wraith (cloaked).
@@ -456,87 +522,18 @@
         <ShieldsStart value="50"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
-        <ShieldArmorName value="Defensive Matrix"/>
+        <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
     </CUnit>
 
-    <!-- Midnight Riders = AP "Mercenary Liberators". No complete Liberator unit is reachable
-         in WoL deps (unit defs are in Moebius and weaponless; the LiberatorAGTarget deploy
-         is in NCO; the weapons are in core CASC). SOLUTION for the Defender-mode transform:
-         reskin the Viking — the one WoL unit with a real working morph. Fighter form is a
-         VikingFighter clone wearing the Liberator model; it morphs (via MercLiberatorDeploy,
-         a clone of the Viking AssaultMode redirected to MercLiberatorAG) into the Defender
-         form — a stationary (Speed=0) but still-FLYING VikingFighter clone wearing the
-         LiberatorAG model, so it hovers like a real Liberator instead of dropping to the
-         ground. AbilArray[3] is the
-         Viking's morph slot (stop/attack/move/AssaultMode); we override it to the redirected
-         morph and add a card button (the inherited AssaultMode button auto-hides since its
-         ability is no longer on the unit). FLAG: reskin (Viking weapons, not real Liberator
-         AA/siege); confirm the morph fires and both models render. -->
-    <CUnit id="MercLiberator" parent="VikingFighter">
-        <Name value="Unit/Name/MercLiberator"/>
-        <LifeMax value="250"/>
-        <LifeStart value="250"/>
-        <LifeArmor value="2"/>
-        <ShieldsMax value="75"/>
-        <ShieldsStart value="75"/>
-        <ShieldRegenRate value="5"/>
-        <ShieldRegenDelay value="10"/>
-        <AbilArray index="3" Link="MercLiberatorDeploy"/>
-        <BehaviorArray Link="WoLULiberatorUpgrades"/>
-        <!-- Override the INHERITED AssaultMode button (VikingFighter LayoutButtons index 5)
-             to drive the new morph. Appending at a high index (was 20) left a 14-slot gap
-             and the button never rendered; overriding the existing slot keeps it on the
-             card. The ability swap above means the vanilla AbilCmd would auto-hide anyway. -->
-        <CardLayouts index="0">
-            <LayoutButtons index="5" Face="AssaultMode" Type="AbilCmd" AbilCmd="MercLiberatorDeploy,Execute" Row="2" Column="1"/>
-        </CardLayouts>
-    </CUnit>
-    <!-- Defender form: also a VikingFighter clone so it STAYS AIRBORNE (the old
-         VikingAssault base dropped it to the ground — wrong for a Liberator). Speed=0
-         makes it stationary like a deployed Liberator, and its weapon is swapped to the
-         Viking's anti-ground TwinGatlingCannon so it sieges the ground while hovering. -->
-    <CUnit id="MercLiberatorAG" parent="VikingFighter">
-        <Name value="Unit/Name/MercLiberator"/>
-        <LifeMax value="250"/>
-        <LifeStart value="250"/>
-        <LifeArmor value="2"/>
-        <ShieldsMax value="75"/>
-        <ShieldsStart value="75"/>
-        <ShieldRegenRate value="5"/>
-        <ShieldRegenDelay value="10"/>
-        <Speed value="0"/>
-        <WeaponArray index="0" Link="TwinGatlingCannon"/>
-        <AbilArray index="3" Link="MercLiberatorUndeploy"/>
-        <BehaviorArray Link="WoLULiberatorUpgrades"/>
-        <!-- Same fix as the Fighter form: override the inherited AssaultMode button slot
-             (index 5) rather than appending at index 20 (which left a gap and never rendered). -->
-        <CardLayouts index="0">
-            <LayoutButtons index="5" Face="FighterMode" Type="AbilCmd" AbilCmd="MercLiberatorUndeploy,Execute" Row="2" Column="1"/>
-        </CardLayouts>
-    </CUnit>
+    <!-- (Midnight Riders / Brynhilds removed per owner: their intended Liberator and Valkyrie
+         models don't exist in Wings of Liberty, so the clones only ever looked like a Viking
+         or Wraith. MercLiberator/MercLiberatorAG/MercValkyrie units, actors, portraits, morph
+         abilities, calldowns and hire buttons were all deleted with them.) -->
 
     <!-- Senior Ghost = special elite ghost merc (user request). Ghost clone with the NCO
          Nova MODEL (CModel "Nova" exists), 1.5x Life/Energy/regen (genlib Multiply), +50%
          damage (WoLUSeniorGhostBoost behavior), flat elite armor + shields. Keeps the full
          Ghost kit (Snipe/EMP/cloak). FLAG: Nova model token + 1.5x scaling unverified. -->
-    <!-- Brynhilds = the last AP "Terran Mercenary" extra (Mercenary Valkyries). Cloned from
-         the Wraith (an anti-air missile flyer — WraithA fires missile pairs, which fits the
-         Valkyrie's barrage) wearing the base-CASC "Valkyrie" model (a Valkyrie CActorUnit
-         exists in liberty data → the model is in CASC, no third-party bundling). As a
-         parent="Wraith" clone it also inherits the player's Wraith Adv-Laser + Trigger-Override
-         buffs (shared weapon ids). Buffed to elite status. -->
-    <CUnit id="MercValkyrie" parent="Wraith">
-        <Name value="Unit/Name/MercValkyrie"/>
-        <LifeMax value="300"/>
-        <LifeStart value="300"/>
-        <LifeArmor value="2"/>
-        <ShieldsMax value="75"/>
-        <ShieldsStart value="75"/>
-        <ShieldRegenRate value="5"/>
-        <ShieldRegenDelay value="10"/>
-        <ShieldArmorName value="Defensive Matrix"/>
-    </CUnit>
-
     <CUnit id="MercSeniorGhost" parent="Ghost">
         <Name value="Unit/Name/MercSeniorGhost"/>
         <LifeArmor value="3"/>
@@ -544,6 +541,7 @@
         <ShieldsStart value="75"/>
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
+        <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
         <BehaviorArray Link="WoLUSeniorGhostBoost"/>
     </CUnit>
 
@@ -566,9 +564,7 @@
             <LayoutButtons index="2" Face="HireMercHellion" Type="AbilCmd" AbilCmd="SummonMercenaries,Train11" Row="0" Column="2"/>
             <LayoutButtons index="3" Face="HireMercThor" Type="AbilCmd" AbilCmd="SummonMercenaries,Train12" Row="0" Column="3"/>
             <LayoutButtons index="4" Face="HireMercWraith" Type="AbilCmd" AbilCmd="SummonMercenaries,Train13" Row="0" Column="4"/>
-            <LayoutButtons index="6" Face="HireMercLiberator" Type="AbilCmd" AbilCmd="SummonMercenaries,Train14" Row="1" Column="0"/>
-            <LayoutButtons index="7" Face="HireMercSeniorGhost" Type="AbilCmd" AbilCmd="SummonMercenaries,Train15" Row="1" Column="1"/>
-            <LayoutButtons index="8" Face="HireMercValkyrie" Type="AbilCmd" AbilCmd="SummonMercenaries,Train16" Row="1" Column="2"/>
+            <LayoutButtons index="7" Face="HireMercSeniorGhost" Type="AbilCmd" AbilCmd="SummonMercenaries,Train15" Row="1" Column="0"/>
             <LayoutButtons index="5" Face="Cancel" Type="CancelSubmenu" Row="2" Column="4"/>
         </CardLayouts>
     </CUnit>

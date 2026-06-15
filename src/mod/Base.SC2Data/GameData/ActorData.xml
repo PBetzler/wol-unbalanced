@@ -27,17 +27,23 @@
          visuals) — a bare <Model>-only actor renders a sphere with no attack (the v0.2.0
          bug). The <Model> element reskins it to the base unit's model (cf. liberty's
          LiberatorSkinPreview = GenericUnitBase + unitName + Model="Liberator"). -->
+    <!-- Portrait fix (issue 8 — heart portraits): the old custom Merc*Portrait CModels
+         pointed at GUESSED .m3 paths (wrong → heart). Reference the BASE unit's portrait
+         CModel id directly instead. These ids must exist: GenericUnitBase resolves the real
+         unit's portrait via the ##unitName##Portrait token (Medic -> "MedicPortrait"), so
+         "MedicPortrait" etc. are loaded, correct base-CASC portraits. (Body models already
+         render via <Model> for the same reason.) -->
     <CActorUnit id="MercMedic" parent="GenericUnitBase" unitName="MercMedic">
         <Model value="Medic"/>
-        <PortraitModel value="MercMedicPortrait"/>
+        <PortraitModel value="MedicPortrait"/>
     </CActorUnit>
     <CActorUnit id="MercReaper" parent="GenericUnitBase" unitName="MercReaper">
         <Model value="Reaper"/>
-        <PortraitModel value="MercReaperPortrait"/>
+        <PortraitModel value="ReaperPortrait"/>
     </CActorUnit>
     <CActorUnit id="MercHellion" parent="GenericUnitBase" unitName="MercHellion">
         <Model value="Hellion"/>
-        <PortraitModel value="MercHellionPortrait"/>
+        <PortraitModel value="HellionPortrait"/>
     </CActorUnit>
     <!-- Jotun: Thor's attack animation events are bound to its SPECIFIC weapon ids
          (ground ThorsHammer, air JavelinMissileLaunchers) on the vanilla Thor actor; a
@@ -48,7 +54,7 @@
          wear) so the ground attack animates + muzzles correctly. -->
     <CActorUnit id="MercThor" parent="GenericUnitBase" unitName="MercThor">
         <Model value="Thor"/>
-        <PortraitModel value="MercThorPortrait"/>
+        <PortraitModel value="ThorPortrait"/>
         <On Terms="Abil.attack.ReadyStart" Send="AnimGroupApply Ready"/>
         <On Terms="ActorCreation" Send="AnimPlay CoverStand Cover,Stand PlayForever 0.000000"/>
         <On Terms="WeaponStart.JavelinMissileLaunchers.AttackStart" Send="TimerKill CoverDelay"/>
@@ -66,27 +72,13 @@
     </CActorUnit>
     <CActorUnit id="MercWraith" parent="GenericUnitBase" unitName="MercWraith">
         <Model value="Wraith"/>
-        <PortraitModel value="MercWraithPortrait"/>
+        <PortraitModel value="WraithPortrait"/>
     </CActorUnit>
-    <!-- Liberator merc (transforming): Fighter form wears the Liberator model, Defender
-         form (MercLiberatorAG) wears the LiberatorAG model — both base-CASC CModels. -->
-    <CActorUnit id="MercLiberator" parent="GenericUnitBase" unitName="MercLiberator">
-        <Model value="Liberator"/>
-        <PortraitModel value="MercLiberatorPortrait"/>
-    </CActorUnit>
-    <CActorUnit id="MercLiberatorAG" parent="GenericUnitBase" unitName="MercLiberatorAG">
-        <Model value="LiberatorAG"/>
-        <PortraitModel value="MercLiberatorPortrait"/>
-    </CActorUnit>
-    <!-- Senior Ghost wears the GhostAlternate model (a ghost variant in liberty.sc2mod). -->
+    <!-- Senior Ghost wears the GhostAlternate model (a ghost variant in liberty.sc2mod);
+         portrait = the base Ghost portrait. -->
     <CActorUnit id="MercSeniorGhost" parent="GenericUnitBase" unitName="MercSeniorGhost">
         <Model value="GhostAlternate"/>
-        <PortraitModel value="MercSeniorGhostPortrait"/>
+        <PortraitModel value="GhostPortrait"/>
     </CActorUnit>
-    <!-- Brynhilds wears the base-CASC "Valkyrie" model (a Valkyrie CActorUnit exists in
-         liberty data → the model token resolves from CASC). -->
-    <CActorUnit id="MercValkyrie" parent="GenericUnitBase" unitName="MercValkyrie">
-        <Model value="Valkyrie"/>
-        <PortraitModel value="MercValkyriePortrait"/>
-    </CActorUnit>
+    <!-- (MercLiberator/MercLiberatorAG/MercValkyrie actors removed with their units.) -->
 </Catalog>

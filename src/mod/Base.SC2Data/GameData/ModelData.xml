@@ -15,53 +15,8 @@
         <EditorCategories value="Race:Terran"/>
     </CModel>
 
-    <!-- Elite-merc portrait models. ROOT CAUSE of the heart-portrait bug (v0.2.0–0.2.3):
-         a base-CASC portrait token (ThorPortrait/MedicPortrait/…) referenced from a
-         dependency mod for a NON-base unit identity is not preloaded, so the actor's
-         PortraitModel resolves to nothing -> default "heart". The Moebius pack hit the
-         same wall and fixed it by defining a LOCAL portrait CModel pointing at the real
-         base-CASC portrait .m3 (its SCVPortrait2 = Assets\Portraits\Terran\SCVPortrait\
-         SCVPortrait.m3) — that path proves the convention. We do the same: each id is named
-         Merc<Base>Portrait so the WizUnit/GenericUnitBase ##unitName##Portrait token
-         (unitName="Merc<Base>") resolves to OUR loaded model, AND the actor sets it
-         explicitly. Body models already render (Model token loads on spawn); this closes the
-         portrait gap. FLAG: the .m3 paths follow the SCV-confirmed Assets\Portraits\Terran\
-         <X>Portrait\<X>Portrait.m3 convention but the exact per-unit folder is unverified
-         locally (no core-CASC access) — if a portrait stays heart, that unit's path is the
-         culprit. No parent/Lighting/Image set: the .m3 self-contains the portrait camera
-         (worst case = slightly flat lighting, never a crash; a wrong path = heart, no regression). -->
-    <CModel id="MercMedicPortrait">
-        <Model value="Assets\Portraits\Terran\MedicPortrait\MedicPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <CModel id="MercReaperPortrait">
-        <Model value="Assets\Portraits\Terran\ReaperPortrait\ReaperPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <CModel id="MercHellionPortrait">
-        <Model value="Assets\Portraits\Terran\HellionPortrait\HellionPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <CModel id="MercThorPortrait">
-        <Model value="Assets\Portraits\Terran\ThorPortrait\ThorPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <CModel id="MercWraithPortrait">
-        <Model value="Assets\Portraits\Terran\WraithPortrait\WraithPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <CModel id="MercLiberatorPortrait">
-        <Model value="Assets\Portraits\Terran\VikingPortrait\VikingPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <CModel id="MercSeniorGhostPortrait">
-        <Model value="Assets\Portraits\Terran\GhostPortrait\GhostPortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
-    <!-- Brynhilds portrait — Valkyrie portrait by the confirmed convention; if absent in
-         CASC the unit just shows the default head (no regression). -->
-    <CModel id="MercValkyriePortrait">
-        <Model value="Assets\Portraits\Terran\ValkyriePortrait\ValkyriePortrait.m3"/>
-        <EditorCategories value="Race:Terran"/>
-    </CModel>
+    <!-- (Custom Merc*Portrait CModels removed — they pointed at guessed .m3 paths and showed
+         the "heart" placeholder. The merc actors now reference the base unit's portrait CModel
+         id directly: MedicPortrait/ReaperPortrait/HellionPortrait/ThorPortrait/WraithPortrait/
+         GhostPortrait — proven-loaded base-CASC portraits. See ActorData.xml.) -->
 </Catalog>

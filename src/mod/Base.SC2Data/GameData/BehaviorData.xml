@@ -70,16 +70,7 @@
         </Modification>
     </CBehaviorBuff>
 
-    <!-- Midnight Riders (Liberator merc): AP Liberator upgrade bundle as a buff — Advanced
-         Ballistics (+3 range) + Laser Targeting (+1 range) = +4 WeaponRange. Cloak is free
-         from the Wraith base; vision via genlib Sight Add. Innate + hidden, clone-only. -->
-    <CBehaviorBuff id="WoLULiberatorUpgrades">
-        <Alignment value="Positive"/>
-        <BehaviorFlags index="Permanent" value="1"/>
-        <InfoFlags index="Hidden" value="1"/>
-        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <Modification WeaponRange="4"/>
-    </CBehaviorBuff>
+    <!-- (WoLULiberatorUpgrades removed with the Midnight Riders merc.) -->
 
     <!-- Optical Flare (AP Medic): blind an enemy — sight collapses to ~1 (SightBonus form
          from liberty's SightReduction) and it can no longer detect cloak/burrow

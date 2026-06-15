@@ -301,21 +301,7 @@
             <Unit value="MercWraith"/>
             <Unit value="MercWraith"/>
         </InfoArray>
-        <InfoArray index="Train14" Effect="MercGroundDrop">
-            <Resource index="Minerals" value="175"/>
-            <Charge>
-                <CountMax value="99"/>
-                <CountStart value="99"/>
-                <CountUse value="0"/>
-            </Charge>
-            <Cooldown>
-                <TimeStart value="0"/>
-                <TimeUse value="0"/>
-            </Cooldown>
-            <Button DefaultButtonFace="HireMercLiberator"/>
-            <Unit value="MercLiberator"/>
-            <Unit value="MercLiberator"/>
-        </InfoArray>
+        <!-- (Train14 Midnight Riders/Liberator removed per owner.) -->
         <InfoArray index="Train15" Effect="MercGroundDrop">
             <Resource index="Minerals" value="175"/>
             <Charge>
@@ -330,68 +316,12 @@
             <Button DefaultButtonFace="HireMercSeniorGhost"/>
             <Unit value="MercSeniorGhost"/>
         </InfoArray>
-        <InfoArray index="Train16" Effect="MercGroundDrop">
-            <Resource index="Minerals" value="150"/>
-            <Charge>
-                <CountMax value="99"/>
-                <CountStart value="99"/>
-                <CountUse value="0"/>
-            </Charge>
-            <Cooldown>
-                <TimeStart value="0"/>
-                <TimeUse value="0"/>
-            </Cooldown>
-            <Button DefaultButtonFace="HireMercValkyrie"/>
-            <Unit value="MercValkyrie"/>
-            <Unit value="MercValkyrie"/>
-        </InfoArray>
+        <!-- (Train16 Brynhilds/Valkyrie removed per owner.) -->
     </CAbilTrain>
 
-    <!-- Liberator merc transform: clones of the Viking AssaultMode/FighterMode morphs with
-         the result Unit redirected to the Liberator-skinned merc forms. Durations/sections
-         copied verbatim from the vanilla Viking morphs; FighterMode's UseFighterMode
-         requirement dropped (the merc form is always allowed to revert). -->
-    <CAbilMorph id="MercLiberatorDeploy">
-        <AbilSetId value="MercLiberatorDeploy"/>
-        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <CmdButtonArray index="Execute" DefaultButtonFace="AssaultMode">
-            <Flags index="ToSelection" value="1"/>
-        </CmdButtonArray>
-        <Flags index="IgnoreFacing" value="1"/>
-        <Flags index="IgnorePlacement" value="0"/>
-        <InfoArray Unit="MercLiberatorAG" CollideRange="3.75" RandomDelayMax="0.5">
-            <SectionArray index="Actor">
-                <DurationArray index="Duration" value="2.34"/>
-            </SectionArray>
-            <SectionArray index="Mover">
-                <DurationArray index="Delay" value="0.533"/>
-                <DurationArray index="Duration" value="1.2"/>
-            </SectionArray>
-            <SectionArray index="Stats">
-                <DurationArray index="Duration" value="2.34"/>
-            </SectionArray>
-        </InfoArray>
-    </CAbilMorph>
-    <CAbilMorph id="MercLiberatorUndeploy">
-        <AbilSetId value="MercLiberatorUndeploy"/>
-        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <CmdButtonArray index="Execute" DefaultButtonFace="FighterMode">
-            <Flags index="ToSelection" value="1"/>
-        </CmdButtonArray>
-        <Flags index="IgnoreFacing" value="1"/>
-        <InfoArray Unit="MercLiberator" RandomDelayMax="0.5">
-            <SectionArray index="Actor">
-                <DurationArray index="Duration" value="2.333"/>
-            </SectionArray>
-            <SectionArray index="Mover">
-                <DurationArray index="Delay" value="0.6"/>
-                <DurationArray index="Duration" value="0.85"/>
-            </SectionArray>
-            <SectionArray index="Stats">
-                <DurationArray index="Duration" value="2.333"/>
-            </SectionArray>
-        </InfoArray>
-    </CAbilMorph>
+    <!-- (Midnight Riders / Liberator merc removed per owner — the Liberator/LiberatorAG
+         models don't exist in WoL, so the morph only ever reskinned to a Viking. The
+         MercLiberatorDeploy/Undeploy morph abilities were deleted with it.) -->
 
     <!-- Tactical Jump (AP): point-target teleport for Hercules/ScienceVessel/Battlecruiser/
          Predator. Modeled on the Stalker Blink ability (CAbilEffectTarget, Range=500 =
@@ -466,14 +396,18 @@
         <AutoCastFilters value="-;Neutral,Enemy"/>
     </CAbilEffectTarget>
 
-    <!-- Siege Tank Spider Mines (AP): lay a cloaked Vulture spider mine. Reuses the vanilla
-         SpawnSpiderMine effect (creates the SpiderMine unit at the target point) so the mine's
-         actor/burrow visuals bind for free; effectively unlimited (1 s cooldown). Button gated
-         WoLUHaveFlag, appended to the tank (enemy-invisible). -->
+    <!-- Siege Tank Spider Mines (AP): lay a cloaked Vulture spider mine. Modeled on the
+         vanilla VultureSpiderMines ability — uses its SpawnSpiderMineSet effect (the raw
+         SpawnSpiderMine create alone skips the burrow-order set), Range 3, Placeholder.
+         IgnoreFacing is REQUIRED: a SIEGED tank cannot turn, so without it the deploy fails
+         with "Can't turn towards target" (the user's bug). Effectively unlimited (1 s
+         cooldown). Button gated WoLUHaveFlag, appended to the tanks (enemy-invisible). -->
     <CAbilEffectTarget id="SpiderMineWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <Effect index="0" value="SpawnSpiderMine"/>
+        <Effect index="0" value="SpawnSpiderMineSet"/>
+        <Placeholder value="SpiderMine"/>
         <Range value="4"/>
+        <Flags index="IgnoreFacing" value="1"/>
         <Cost>
             <Cooldown TimeUse="1"/>
         </Cost>
@@ -495,5 +429,77 @@
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
         <AINotifyEffect value="EMPShockwaveLaunchWoLU"/>
+    </CAbilEffectTarget>
+
+    <!-- ============================================================================
+         Command Center OP economy (user request): free, unlimited Calldown: MULE +
+         Extra Supplies on the player's Command Center. Clones of the vanilla Orbital
+         Command abilities with the energy cost removed (campaign CCs have no energy)
+         and the button gated on WoLUHaveFlag so enemy CCs stay vanilla (rule 9). The
+         abilities are appended to the CommandCenter (UnitData) WITHOUT the Orbital
+         requirement, so they work on a plain campaign CC. ============================ -->
+    <CAbilEffectTarget id="CalldownMULEWoLU" parent="CalldownMULE">
+        <Cost>
+            <Vital index="Energy" value="0"/>
+        </Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="CalldownMULE" Requirements="WoLUHaveFlag"/>
+    </CAbilEffectTarget>
+    <CAbilEffectTarget id="SupplyDropWoLU" parent="SupplyDrop">
+        <Cost>
+            <Vital index="Energy" value="0"/>
+        </Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="SupplyDrop" Requirements="WoLUHaveFlag"/>
+    </CAbilEffectTarget>
+
+    <!-- ============================================================================
+         Jackson's Revenge (DukesRevenge) autocast kit. Its three actives work manually
+         but never autocast (user report); clone them with the same autocast blocks as
+         the base BC kit (Yamato big-target-gated + structure-skipping; Missile Pods vs
+         air; Defensive Matrix self-buff on firing). Appended to DukesRevenge with the
+         vanilla buttons re-pointed (player-exclusive hero unit, so rule-9 safe). ====== -->
+    <CAbilEffectTarget id="DukesRevengeYamatoWoLU" parent="DukesRevengeYamato">
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="10"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Structure,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastValidatorArray value="WoLUYamatoBigTarget"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="YamatoGun" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+    <CAbilEffectTarget id="DukesRevengeMissilePodsWoLU" parent="DukesRevengeMissilePods">
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="7"/>
+        <AutoCastFilters value="Air,Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="MissilePods" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectTarget>
+    <CAbilEffectInstant id="DukesRevengeDefensiveMatrixWoLU" parent="DukesRevengeDefensiveMatrix">
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="5"/>
+        <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" Requirements="WoLUHaveFlag">
+            <Flags index="ToSelection" value="1"/>
+        </CmdButtonArray>
+    </CAbilEffectInstant>
+
+    <!-- Medic Adaptive Medpacks (AP): heal MECHANICAL + air, not just biological ground.
+         The vanilla `heal` gates on TargetFilters "Ground,Biological,..." — a STRING field,
+         and per-player string edits are silent no-ops (the genlib attempt never took, user
+         report). So clone `heal` (inherits the autocast, heal effect, range, sorts) and
+         override TargetFilters to allow any visible friendly non-structure unit (mechanical
+         AND biological, ground AND air). Appended to the Medic alongside vanilla heal
+         (enemy medics keep vanilla); both autocast, so the player's medic auto-heals
+         everything. Button gated WoLUHaveFlag. -->
+    <CAbilEffectTarget id="HealWoLU" parent="heal">
+        <!-- Vanilla `heal` has no explicit Effect (defaults to its own id = the "heal"
+             CEffectCreateHealer). A clone re-defaults to its OWN id "HealWoLU" (nonexistent)
+             and would heal nothing — so set the effect explicitly to "heal". -->
+        <Effect index="0" value="heal"/>
+        <TargetFilters value="Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="MedicHeal" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
 </Catalog>
