@@ -44,6 +44,25 @@ python3 scripts/build.py build   # assemble the campaign (maps + mod + metadata)
 python3 scripts/build.py install # copy into the StarCraft II folder
 ```
 
+### Optional: Nightmare-difficulty variant (build it yourself)
+
+There's a harder variant that layers this mod on top of **Rhyme's "Nightmare Difficulty"
+pack** (your army stays overpowered, the enemy gets the Nightmare treatment). We **don't
+ship a ready-made download for it** — that would redistribute Rhyme's pack, and it has no
+published redistribution license. Instead, if you already own the Nightmare pack, build the
+combined campaign yourself: drop Rhyme's extracted maps + `NightmareMod.SC2Mod` under
+`mods/Nightmare/extracted/`, then
+
+```sh
+python3 scripts/build.py build nightmare     # or: package nightmare  (-> dist/…Nightmare…zip)
+python3 scripts/build.py install             # installs whatever was last built
+```
+
+It keeps the Nightmare dependency and appends ours after it (so our per-player edits win
+catalog conflicts) and bundles `NightmareMod.SC2Mod` — the standard self-contained-campaign
+shape for CCM. (See [docs/third-party-allowlist.md](docs/third-party-allowlist.md) for the
+policy; a public combined download would need Rhyme's permission first.)
+
 ## Credits
 
 This mod stands on the shoulders of the SC2 custom campaign community. Used as blueprints, references and data sources:
