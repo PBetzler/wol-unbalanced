@@ -24,19 +24,22 @@ The campaign maps stay vanilla — the build pipeline only patches each map's de
 
 ## Download & install
 
-Grab the latest `WoL-Unbalanced-*.zip` from the [Releases page](../../releases) and import it with [GiantGrantGames' Custom Campaign Manager](https://github.com/7thAce/SC2CCM) like any other custom campaign (the zip follows the standard CCM layout: one folder with the mission maps, the mod, and `metadata.txt`). The maps in the zip are Blizzard's own Wings of Liberty campaign maps with one changed dependency line, as is standard for CCM campaigns.
+Grab a zip from the [Releases page](../../releases) and import it with [GiantGrantGames' Custom Campaign Manager](https://github.com/7thAce/SC2CCM) like any other custom campaign — **a complete download, no building or extra steps**. Two variants per release:
 
-Releases for mod-only changes are automated: pushing a `v*` tag repacks the previous release zip with the current mod ([release workflow](.github/workflows/release.yml)). Map-affecting changes need a local `python3 scripts/build.py package` once.
+- **`WoL-Unbalanced-v*.zip`** — the standard mod (your army overpowered, enemies vanilla). Its maps are Blizzard's own WoL campaign maps with one changed dependency line, as is standard for CCM campaigns.
+- **`WoL-Unbalanced-Nightmare-v*.zip`** — the same mod layered on top of **Rhyme's "Nightmare Difficulty"** pack (overpowered you vs. a much harder enemy). This zip bundles Rhyme's pack — full credit to Rhyme, source: [the GiantGrantGames CCM Discord](https://discord.com/invite/ywvCz7CN).
 
-## Building
+**CI vs. manual:** pushing a `v*` tag auto-builds + publishes the **standard** zip ([release workflow](.github/workflows/release.yml)) — that's our own content, zero-effort. The **Nightmare** zip can't go through CI (CI has none of the third-party inputs, and we don't commit them), so it's built locally once and uploaded to the same release with `gh release upload <tag> dist/WoL-Unbalanced-Nightmare-v*.zip`.
 
-This repo contains **only our own code and data** — no Blizzard content and no third-party mod files are redistributed. To build you need to provide (under the gitignored `mods/` folder):
+## Building (contributors)
 
-1. A vanilla-equivalent WoL map set as map base (we use the *Tactical Arsenal* campaign's maps — see credits; alternatively export the campaign maps from the SC2 Editor),
-2. The Liberty catalog XML dumps from [SC2Mapster/SC2GameData](https://github.com/SC2Mapster/SC2GameData) under `mods/_reference/`,
+Players don't need this — just download a release zip. To build from source you provide the
+gitignored third-party inputs; **the build scripts fail with a clear "get X from Y" message
+if any are missing.** All of these come from **[GiantGrantGames' Custom Campaign Manager Discord](https://discord.com/invite/ywvCz7CN)** (the map bases + the Nightmare pack) or [SC2Mapster/SC2GameData](https://github.com/SC2Mapster/SC2GameData) (the catalog dumps):
+
+1. A vanilla-equivalent WoL map set as map base — the *Tactical Arsenal* campaign's maps (from the GGG Discord), into `mods/Tactical_Arsenal/...`; or export the WoL campaign maps from the SC2 Editor,
+2. The Liberty catalog XML dumps from [SC2Mapster/SC2GameData](https://github.com/SC2Mapster/SC2GameData) into `mods/_reference/`,
 3. [StormLib](https://github.com/ladislav-zezula/StormLib) cloned into `vendor/` and built, then `c++ tools/mpqpatch.c -o tools/mpqpatch -Ivendor/StormLib/src -Lvendor/StormLib/build -lstorm -lz -lbz2`.
-
-Then:
 
 ```sh
 python3 scripts/genlib.py        # regenerate the data-application Galaxy script
@@ -44,24 +47,20 @@ python3 scripts/build.py build   # assemble the campaign (maps + mod + metadata)
 python3 scripts/build.py install # copy into the StarCraft II folder
 ```
 
-### Optional: Nightmare-difficulty variant (build it yourself)
+### Rebuilding the Nightmare variant
 
-There's a harder variant that layers this mod on top of **Rhyme's "Nightmare Difficulty"
-pack** (your army stays overpowered, the enemy gets the Nightmare treatment). We **don't
-ship a ready-made download for it** — that would redistribute Rhyme's pack, and it has no
-published redistribution license. Instead, if you already own the Nightmare pack, build the
-combined campaign yourself: drop Rhyme's extracted maps + `NightmareMod.SC2Mod` under
-`mods/Nightmare/extracted/`, then
+The Nightmare release zip is built locally (CI can't — it has no third-party inputs). Drop
+Rhyme's **"Wings of Liberty Nightmare Difficulty"** pack (from the [GGG Discord](https://discord.com/invite/ywvCz7CN))
+— its extracted maps + `NightmareMod.SC2Mod` — into `mods/Nightmare/extracted/`, then:
 
 ```sh
-python3 scripts/build.py build nightmare     # or: package nightmare  (-> dist/…Nightmare…zip)
-python3 scripts/build.py install             # installs whatever was last built
+python3 scripts/build.py package nightmare   # -> dist/WoL-Unbalanced-Nightmare-v*.zip
+gh release upload v<version> dist/WoL-Unbalanced-Nightmare-v*.zip   # attach to the release
 ```
 
 It keeps the Nightmare dependency and appends ours after it (so our per-player edits win
 catalog conflicts) and bundles `NightmareMod.SC2Mod` — the standard self-contained-campaign
-shape for CCM. (See [docs/third-party-allowlist.md](docs/third-party-allowlist.md) for the
-policy; a public combined download would need Rhyme's permission first.)
+shape for CCM. Redistribution basis + credit: [docs/third-party-allowlist.md](docs/third-party-allowlist.md).
 
 ## Credits
 

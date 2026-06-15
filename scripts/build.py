@@ -39,6 +39,39 @@ NIGHTMARE_MOD = os.path.join(ROOT, "mods", "Nightmare", "extracted", "NightmareM
 NIGHTMARE_DEP = r"file:Mods\NightmareMod.SC2Mod"
 NIGHTMARE_BASE = False  # set True by the CLI `nightmare` arg
 
+# Where to obtain the gitignored third-party inputs (map bases + the Nightmare pack):
+GGG_DISCORD = "https://discord.com/invite/ywvCz7CN"  # GiantGrantGames' Custom Campaign Manager Discord
+SC2GAMEDATA = "https://github.com/SC2Mapster/SC2GameData"
+
+
+def _missing(what: str, path: str, where: str) -> None:
+    raise SystemExit(
+        f"\nbuild: cannot build — missing {what}.\n"
+        f"  expected at: {path}\n"
+        f"  how to fix:  {where}\n"
+        f"  (this repo ships only our own code; third-party inputs live under the gitignored\n"
+        f"   mods/ and vendor/ — see README §Building.)\n")
+
+
+def preflight() -> None:
+    """Fail early with a clear, actionable message if a build input is missing — so anyone
+    who clones the repo and runs a build learns exactly what to fetch and from where."""
+    if not os.path.exists(MPQPATCH):
+        _missing("the StormLib map patcher (tools/mpqpatch)", MPQPATCH,
+                 "build StormLib into vendor/ and compile tools/mpqpatch.c — see README §Building step 3.")
+    maps = NIGHTMARE_MAPS_SRC if NIGHTMARE_BASE else MAPS_SRC
+    label = "the Nightmare pack's maps" if NIGHTMARE_BASE else "the map base (Tactical Arsenal campaign)"
+    src_hint = (f"download \"Wings of Liberty Nightmare Difficulty\" by Rhyme from GiantGrantGames' "
+                f"Discord ({GGG_DISCORD}) and extract it to {NIGHTMARE_MAPS_SRC}/"
+                if NIGHTMARE_BASE else
+                f"get the \"Tactical Arsenal\" campaign from GiantGrantGames' Discord ({GGG_DISCORD}) "
+                f"and extract its maps to {MAPS_SRC}/ (or export the WoL campaign maps from the SC2 Editor)")
+    if not os.path.isdir(maps) or not any(n.endswith(".SC2Map") for n in os.listdir(maps)):
+        _missing(label, maps, src_hint)
+    if NIGHTMARE_BASE and not os.path.isfile(NIGHTMARE_MOD):
+        _missing("the Nightmare difficulty mod (NightmareMod.SC2Mod)", NIGHTMARE_MOD,
+                 f"download the Nightmare Difficulty pack by Rhyme from GiantGrantGames' Discord ({GGG_DISCORD}).")
+
 
 def patch_document_info(map_path: str) -> None:
     """Make our mod the last custom (file:Mods\\...) dependency. Idempotent.
@@ -208,6 +241,7 @@ def write_version_files(mod_dir: str) -> None:
 
 
 def build() -> None:
+    preflight()
     maps_out = os.path.join(BUILD, "Campaign")
     mods_out = os.path.join(BUILD, "Mods")
     shutil.rmtree(BUILD, ignore_errors=True)
@@ -215,8 +249,6 @@ def build() -> None:
     os.makedirs(mods_out)
 
     maps_src = NIGHTMARE_MAPS_SRC if NIGHTMARE_BASE else MAPS_SRC
-    if NIGHTMARE_BASE and not os.path.isfile(NIGHTMARE_MOD):
-        raise SystemExit(f"nightmare base requires {NIGHTMARE_MOD} (third-party, local-only) — not found")
     for name in sorted(os.listdir(maps_src)):
         src = os.path.join(maps_src, name)
         if name.endswith(".SC2Map") and os.path.isfile(src):
