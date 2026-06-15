@@ -134,6 +134,13 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 - [ ] [RISK] **Raven free kit (v0.3.3)**: the player's Raven can place **Point Defense Drones, Auto-Turrets, and Hunter-Seeker Missiles for 0 energy** (spam them), and the PDDs/turrets are **permanent** (don't time out). ENEMY-VANILLA: enemy Ravens still pay full energy (100/50/125). This is the rule-9-safe "Raven self-point-defense" — free permanent drones rather than a hidden on-unit weapon.
 - [ ] [RISK] **Viking ground (Assault mode) attack SPLASHES** (Shredder Rounds): siege 2+ clustered enemy ground units, one shot damages several. **Anti-Mechanical**: ground attack does noticeably more to mechanical targets (+20 vs Mech). ENEMY-VANILLA: enemy Vikings' ground attack stays single-target. Hel's Angels merc shows bigger splash. (Wild Missiles air-salvo NOT shipped — don't expect it.)
 
+### Standard ↔ Nightmare interchangeability (v0.3.4+)
+- [ ] [RISK] Play the **standard** build, save on the **Hyperion (between missions)**. Import the
+  **Nightmare** zip in CCM (same campaign title → swaps it in). Continue the campaign: the
+  Hyperion progress should carry and the next mission loads with Nightmare's harder enemies.
+  Swap back the same way. If progress is lost on swap, the save is NOT keyed by the shared
+  campaign title as assumed — report it. (Mid-mission `.SC2Save` is expected NOT to carry.)
+
 ### v0.3.1 · WP-C batch 2 (Wraith / Siege Tank / Predator / Science Vessel)
 - [ ] [RISK] **Wraith Trigger Override**: focus-fire one tough target — the Wraith's attack rate VISIBLY accelerates over ~10 shots then caps. **Adv Laser Tech**: lasers hit ~2× harder, faster. ENEMY-VANILLA: an enemy Wraith does NOT speed up. Winged Nightmares merc shares both.
 - [ ] [RISK] **Siege Tank Spider Mines**: select a Siege Tank (mobile AND sieged) → **Spider Mines** button (mine icon, R2C1 mobile / R2C0 sieged). Cast on ground near an enemy → a cloaked mine lays, burrows, detonates on approach. Unlimited (1 s cd). Works on a Siege Breaker merc too.
