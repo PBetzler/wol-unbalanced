@@ -43,6 +43,7 @@ All changes affect **only the player** (rule 9) — enemies stay vanilla. (1) No
 - Never commit third-party or generated content: `mods/`, `vendor/`, `build/`, `dist/`, `.claude/`, compiled `tools/mpqpatch` (all gitignored — keep it that way; CI enforces).
 - Commits authored as **PBB** (repo-local config; never push the full real name). Lint + build green before push.
 - Releases: bump `VERSION` in `scripts/build.py`; mod-only changes → push a `v*` tag (workflow repacks the previous release zip); **map-affecting changes** (dependency line, popup text, MapScript injection) → local `python3 scripts/build.py package` + manual `gh release create`.
+- **Credits check (every release / git upload):** before tagging, confirm [README.md](README.md) §Credits still lists every third-party source you newly relied on this round — any reference mod under `mods/` whose data you copied a blueprint from (e.g. Moebius, RaynorRogue kit, NCO), and the **base** mod if a build variant bundles it (the optional Nightmare build bundles Rhyme's pack → must credit Rhyme + keep the License note accurate). Run `python3 scripts/check_credits.py` for a quick coverage warning.
 
 ## Session Memory (Engram)
 

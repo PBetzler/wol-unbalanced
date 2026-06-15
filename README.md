@@ -50,9 +50,12 @@ This mod stands on the shoulders of the SC2 custom campaign community. Used as b
 
 - **[StarCraft II Archipelago](https://github.com/TheCondor07/Starcraft2ArchipelagoData)** (TheCondor07) and the [Archipelago](https://github.com/ArchipelagoMW/Archipelago) SC2 world — the main inspiration for the per-unit upgrade pool.
 - **Wings of Liberty Perpetual Randomizer** by fishmaster26 — upgrade-pool ideas and the reference for how CCM campaigns are structured.
-- **Wings of Liberty Nightmare Difficulty** by Rhyme (TheRealRhyme) — reference for clean data-catalog patching.
-- **Tactical Arsenal** by Pierre — upgrade implementation reference, and its vanilla-faithful map set is our map base.
+- **Wings of Liberty Nightmare Difficulty** by Rhyme (TheRealRhyme) — reference for clean data-catalog patching, and the base for the optional Nightmare-difficulty build (`build.py build nightmare` layers our mod on top of Rhyme's pack; if that variant is distributed it bundles `NightmareMod.SC2Mod` and Rhyme's maps, the standard CCM way — credit to Rhyme).
+- **Tactical Arsenal** by Pierre — upgrade implementation reference, and its vanilla-faithful map set is our (default) map base.
+- **Moebius / WoL Nightmare (Moebius Pack)** — data blueprints for several effects: `RemoveDebuff` (Medic Restoration), `BarrelAccelerator` (Wraith Trigger Override), `DamageResponse ModifyFraction` (Predator Adaptive Defenses), and the local-portrait-`CModel` fix (`SCVPortrait2`).
+- **Raynor has Gone Rogue(like)! (the RaynorRogue `Kit@` mod)** — blueprints for catalog-defined `CTargetSort*` (smart-Snipe priority) and the multi-target Battlecruiser battery system.
 - **EZ Upgrade** — the per-player `CatalogFieldValueModify` pattern.
+- **Blizzard's Nova Covert Ops (`novastoryassets`)** — Super Stimpack and railgun (Magrail) blueprints (Blizzard content; see the Blizzard notice below).
 - **[SC2Mapster/SC2GameData](https://github.com/SC2Mapster/SC2GameData)** — vanilla catalog and trigger-library dumps.
 - **[GiantGrantGames' Custom Campaign Manager](https://github.com/7thAce/SC2CCM)** (7thAce) and the GGG/CCM Discord community that makes all of this playable.
 - [Liquipedia](https://liquipedia.net/starcraft2/) and the [StarCraft Wiki](https://starcraft.fandom.com/) for campaign data research.
@@ -61,4 +64,4 @@ This mod stands on the shoulders of the SC2 custom campaign community. Used as b
 
 Everything original in this repository (scripts, Galaxy code, documentation) is released under the [MIT License](LICENSE) — free use, have fun.
 
-StarCraft® II, the Wings of Liberty campaign, and all related game data and assets are © Blizzard Entertainment, Inc. and subject to the Blizzard End User License Agreement. This is a non-commercial fan modification; it redistributes no Blizzard game files and no third-party mod files.
+StarCraft® II, the Wings of Liberty campaign, and all related game data and assets are © Blizzard Entertainment, Inc. and subject to the Blizzard End User License Agreement. This is a non-commercial fan modification. The **default build** redistributes no Blizzard game files and no third-party mod files (its maps are Blizzard's own WoL campaign maps with one changed dependency line). The **optional Nightmare-difficulty build** (`build.py build nightmare`) bundles Rhyme's "Nightmare Difficulty" pack — its maps and `NightmareMod.SC2Mod` — the standard self-contained-campaign approach in the CCM ecosystem; distribute that variant only with credit to Rhyme (as above).
