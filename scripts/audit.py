@@ -236,10 +236,20 @@ def main():
 
     known = ref_ids() | our_ids()
 
+    # CHECK 3/4/5 resolve ids against the gitignored reference dump (mods/_reference/).
+    # That dump is present locally (so the pre-commit gate runs the full audit) but ABSENT
+    # in CI — where ref_ids() would be empty and every vanilla parent/effect would falsely
+    # "resolve nowhere". So skip the reference-dependent checks when the dump isn't here;
+    # CI still runs the reference-independent CHECK 1/2 (+ py_compile, galaxy_lint).
+    ref_present = os.path.exists(os.path.join(REF, "mods", "liberty.sc2mod", "UnitData.xml"))
+    if not ref_present:
+        infos.append("reference dump (mods/_reference/) absent — skipping resolution checks "
+                     "CHECK3/4/5 (they run in the local pre-commit gate, where the dump exists).")
+
     # CHECK 3 — parent= resolution on our data clones (skip actors: their parents are
     # base-CASC GenericUnit*, which CHECK 1 already validates and the ref dump lacks).
-    for fn in ("AbilData.xml", "WeaponData.xml", "BehaviorData.xml", "EffectData.xml",
-               "UnitData.xml", "ValidatorData.xml", "UpgradeData.xml"):
+    for fn in (("AbilData.xml", "WeaponData.xml", "BehaviorData.xml", "EffectData.xml",
+                "UnitData.xml", "ValidatorData.xml", "UpgradeData.xml") if ref_present else ()):
         for el in our_catalog(fn):
             p = el.get("parent")
             if p and p not in known and p not in CORE_TEMPLATE_PARENTS:
@@ -249,7 +259,7 @@ def main():
 
     # CHECK 4 — Effect wiring (the clone-default trap + explicit-Effect resolution).
     eidx = index_effect_classes()
-    for fn in ("AbilData.xml", "WeaponData.xml"):
+    for fn in (("AbilData.xml", "WeaponData.xml") if ref_present else ()):
         for el in our_catalog(fn):
             if el.tag not in ("CAbilEffectTarget", "CAbilEffectInstant", "CWeaponLegacy", "CWeaponStrafe"):
                 continue
@@ -275,8 +285,8 @@ def main():
                              f"supplies one -> the engine defaults it to its own id (nonexistent) and it does "
                              f"NOTHING. Add <Effect index=\"0\" value=\"...\">.")
 
-    # CHECK 5 — command-card sanity on OUR buttons (merge-aware).
-    for u in units:
+    # CHECK 5 — command-card sanity on OUR buttons (merge-aware; needs the ref dump).
+    for u in (units if ref_present else []):
         if u.tag != "CUnit" or not u.get("id"):
             continue
         our_cells, has_our_button = {}, False
