@@ -18,6 +18,13 @@ if [ -n "$untracked" ]; then
   printf '%s\n' "$untracked" | head -10
 fi
 
+# Non-blocking credits reminder (CLAUDE.md: check credits on every git upload / release).
+cred_out="$(python3 scripts/check_credits.py 2>&1)"; cred_rc=$?
+if [ "$cred_rc" -ne 0 ]; then
+  echo "pre-commit WARN: credits may need updating (see README §Credits):"
+  printf '%s\n' "$cred_out"
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo "pre-commit: blocking. Fix the above, or 'git commit --no-verify' to bypass."
   exit 1
