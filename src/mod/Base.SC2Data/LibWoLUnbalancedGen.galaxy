@@ -284,13 +284,15 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Diamondback Maglev Propulsion (+25%, assumption)
     CatalogFieldValueModify(c_gameCatalogBehavior, "AutoTurretTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Auto-Turrets (AP Durable Materials, maxed)
     CatalogFieldValueModify(c_gameCatalogBehavior, "PointDefenseDroneTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Point Defense Drones
+    CatalogFieldValueModify(c_gameCatalogAbil, "PlacePointDefenseDrone", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);  // Raven: free Point Defense Drones (player-only)
+    CatalogFieldValueModify(c_gameCatalogAbil, "BuildAutoTurret", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);  // Raven: free Auto-Turrets (player-only)
+    CatalogFieldValueModify(c_gameCatalogAbil, "SeekerMissile", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);  // Raven: free Hunter-Seeker Missile (player-only)
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC ATX-style: fire while moving (air->surface)
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC fire while moving (air->air)
     CatalogFieldValueModify(c_gameCatalogEffect, "ATSLaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (ground): ArmorReduction multiplier 1->0
     CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "Range", p, "1", c_upgradeOperationAdd);  // Reaper LTS: +1 range
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "Sight", p, "2", c_upgradeOperationAdd);  // Reaper LTS: +2 sight
-    CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "TargetFilters", p, "Visible;Structure,Missile,Stasis,Dead,Hidden,Invulnerable", c_upgradeOperationSet);  // Reaper Jet Pack Overdrive: can attack air (drop required Ground token)
     CatalogFieldValueModify(c_gameCatalogWeapon, "CrucioShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 sieged range
     CatalogFieldValueModify(c_gameCatalogWeapon, "90mmCannons", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 mobile range
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "Sight", p, "2", c_upgradeOperationAdd);  // Siege Tank LTS: +2 sight

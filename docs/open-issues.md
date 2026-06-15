@@ -37,9 +37,12 @@ These shipped and *probably* work, but the field/semantics were assumptions. Ver
 
 These are investigated to ground truth but need an owner decision (a rule-9 tolerance call or a design choice), not more investigation.
 
-- [ ] **Raven self-Point-Defense (PDD-as-unit)** — making the Raven itself auto-intercept missiles needs the `PointDefenseLaser` weapon on the Raven. It can't be added per-player (runtime `WeaponArray` append = no-op), and a static add is GLOBAL → enemy Ravens would also intercept your Hunter-Seeker missiles (rule 9). The only route is a **cloned, WoLUHasFlag-effect-gated** `PointDefenseLaser` added globally to the Raven id (hidden weapon; effect no-ops for non-flag holders) — but that still gives enemy Ravens a (no-op) weapon they didn't have. **DECISION:** accept that minor rule-9 bend (hidden, no-op-for-enemies weapon) and ship the gated clone? Or leave the Raven's self-PDD out? The permanent-summons half of the Raven kit already ships.
-- [ ] **Reaper literal flight** (Jet Pack Overdrive) — anti-air shipped (v0.3.0); literal flight needs a Viking-style morph to a *new flying unit type*, which collides with the "never clone unit types" Hard Rule. **DECISION:** waive that rule for a player-exclusive Reaper-flight morph, or leave Reaper grounded-but-shoots-air (current)?
 - [ ] **Marauder Tech Lab / Hercules Fusion Core drop** — if the per-player `Button.Requirements=""` edit proves a no-op in game (verify), the only working lever is `TechTreeRestrictionsEnable(p,false)`, which also strips the Merc Compound requirement (rule 6). **DECISION:** accept losing the Compound gate to drop build prereqs, or leave the prereqs in place?
+
+### Owner-resolved (v0.3.3)
+- [x] **Raven self-Point-Defense** — owner rejected a hidden always-on intercept weapon (would be active on enemy Ravens). RESOLVED with the owner's energy-cost design: the player's Raven kit is made free to activate (`PlacePointDefenseDrone`/`BuildAutoTurret`/`SeekerMissile` energy → 0 per-player) so it spams free permanent PDDs/turrets; enemies keep vanilla costs (rule 9 clean).
+- [x] **Reaper literal flight / anti-air** — owner is fine with the Reaper not shooting air; the flight morph is forbidden. Reverted the interim anti-air edit; Reaper keeps vanilla ground-only targeting.
+- [x] **Hellbat Aspect** — owner: not pulling in HotS assets. Dropped from the backlog.
 
 ## Resolved (most recent first)
 

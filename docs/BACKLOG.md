@@ -17,8 +17,8 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 - Predator kit: ~~Charge / Vespene Synthesis~~ **SHIPPED v0.3.1**. Charge = permanent `WoLUPredatorCharge` (MoveSpeedMultiplier 2.2, behavior-add path, avoiding the engine-coupled CAbilAugment). Vespene Synthesis = galaxy timer `PlayerModifyPropertyInt(p, c_playerPropVespene, …, n×5)` per 3 s per living Predator (native verified via injected CampaignLib). Adaptive Defenses + Tactical Jump already shipped.
 - Science Vessel: ~~Magellan / EMP Shockwave~~ **SHIPPED v0.3.1**. Magellan = a 2nd free Nano-Repair beam (`NanoRepairWoLU`, "heal 2 at once"; autocast-both is the in-game uncertainty). EMP Shockwave = friendly-fire-safe cloned launch+area (`EMPShockwaveLaunchWoLU`) reusing the vanilla EMPSet drain + EMP2Weapon missile. Defensive Matrix + Tactical Jump already shipped.
 - ~~Medic: Restoration / Optical Flare~~ — **SHIPPED v0.3.0** (Restoration = ally debuff-cleanse via Moebius RemoveDebuff; Optical Flare = enemy blind via SightBonus −9 + SuppressDetection; + Stetmann hero parity). Adaptive Medpacks mech/air heal still pending verify (open-issues).
-- ~~Reaper: Jet Pack Overdrive~~ — **anti-air SHIPPED v0.3.0** (drop the required `Ground` token from `P38ScytheGuassPistol` TargetFilters). Literal FLIGHT is BLOCKED: flight is a unit-type/morph property (not a live-editable field) and "never clone unit types" forbids the morph route — owner decision needed if literal flight is wanted.
-- Hellbat Aspect (Hellion morph) — needs HotS assets; the one named rule-1 exception.
+- ~~Reaper: Jet Pack Overdrive~~ — **DROPPED (owner, v0.3.3)**. Literal flight needs a forbidden unit-type morph; the owner is fine with the Reaper not shooting air, so the interim anti-air edit was reverted. Reaper keeps vanilla ground-only targeting.
+- ~~Hellbat Aspect (Hellion morph)~~ — **DROPPED (owner): we are not pulling in HotS assets.**
 
 ## Cross-cutting
 
@@ -27,7 +27,7 @@ Maintain: newest decisions at the top of each section; when an item ships, move 
 
 ## WP-D — custom features (highest risk, build last)
 
-- Raven kit: permanent summons (Durable Materials → 3600 s, shipped). **Point-Defense-Drone as a Raven self-autocast** — INVESTIGATED, rule-9 blocked: `PointDefenseLaser` (the PDD's missile-intercept weapon) can't be added to the Raven per-player (runtime `WeaponArray` append is a no-op; a static global add gives ENEMY Ravens the weapon too; and the effect set `PointDefenseLaserInitialSet` is gated by a `PointDefenseDroneUnitFilter` validator that filters to PDD units). The only route is a cloned, WoLUHasFlag-effect-gated `PointDefenseLaser` added globally to the Raven (no-op for enemies, hidden weapon) — that's a structural change to enemy Ravens (hidden weapon they fire but with a no-op effect). **Owner decision needed:** is that acceptable rule-9 tolerance? (see open-issues "Blocked — needs owner").
+- ~~Raven kit~~ — **SHIPPED**: permanent summons (Durable Materials → 3600 s) + **free point-defense (v0.3.3, owner's design)**: rather than a hidden always-on intercept weapon (rejected — it would be active on enemy Ravens too), the player's whole Raven kit is made **free to activate** (`PlacePointDefenseDrone`/`BuildAutoTurret`/`SeekerMissile` energy cost → 0 per-player, the free-cloak-edit class). With the permanent duration, the player spams permanent PDDs + Auto-Turrets = a self-sustaining point-defense platform; Hunter-Seeker is a free manual nuke. Enemy Ravens keep vanilla energy costs (rule 9).
 - BC smart-batteries: the fully-blueprinted rogue-kit multi-target-no-overkill system (needs in-game iteration; pre-approved single-target fallback already works).
 - Smart-Snipe TargetSort priorities (full 4-tier shipped declaratively; verify the ordering in game).
 

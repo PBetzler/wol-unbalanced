@@ -356,6 +356,16 @@ def emit():
         # 3600 s outlasts any mission while avoiding 0/-1 sentinel semantics.
         ("Behavior", "AutoTurretTimedLife", "Duration", "3600", "Set", "Raven: permanent Auto-Turrets (AP Durable Materials, maxed)"),
         ("Behavior", "PointDefenseDroneTimedLife", "Duration", "3600", "Set", "Raven: permanent Point Defense Drones"),
+        # Raven self-point-defense, done the rule-9-safe way (owner's design): rather than a
+        # hidden always-on intercept weapon on the unit (which would also be active on enemy
+        # Ravens), the player's Raven kit is made FREE to activate — energy cost reduced to 0
+        # per player (same field/class as the free-cloak edits). Combined with the permanent
+        # duration above, the player can spam permanent Point Defense Drones + Auto-Turrets =
+        # effectively a self-sustaining point-defense platform; Hunter-Seeker stays a free
+        # manual nuke. Enemy Ravens keep the vanilla 100/50/125 energy costs (rule 9).
+        ("Abil", "PlacePointDefenseDrone", "Cost[0].Vital[Energy]", "0", "Set", "Raven: free Point Defense Drones (player-only)"),
+        ("Abil", "BuildAutoTurret", "Cost[0].Vital[Energy]", "0", "Set", "Raven: free Auto-Turrets (player-only)"),
+        ("Abil", "SeekerMissile", "Cost[0].Vital[Energy]", "0", "Set", "Raven: free Hunter-Seeker Missile (player-only)"),
         # Battlecruiser (unit-table): fire while moving (AllowedMovement enum is a
         # vanilla field; weapons ship Slowing/Moving — Moving = no slow-to-fire).
         ("Weapon", "ATSLaserBattery", "AllowedMovement", "Moving", "Set", "BC ATX-style: fire while moving (air->surface)"),
@@ -377,14 +387,10 @@ def emit():
         # -- Base-unit LTS gaps (AP list has Laser Targeting: +1 range, +2 sight) --
         ("Weapon", "P38ScytheGuassPistol", "Range", "1", "Add", "Reaper LTS: +1 range"),
         ("Unit", "Reaper", "Sight", "2", "Add", "Reaper LTS: +2 sight"),
-        # Reaper Jet Pack Overdrive (AP): the Reaper can now attack AIR. Vanilla TargetFilters
-        # required group leads with "Ground," (forces a ground-plane target); dropping that one
-        # token lets it hit both ground and air (cf. Marine GuassRifle has no Ground requirement,
-        # Viking AA uses "Air,"). Per-player string-field edit (same class as the Medic heal
-        # TargetFilters). NOTE: literal FLIGHT is NOT shipped — flight is a unit-type/morph
-        # property (Viking AssaultMode→FighterMode), not a live-editable field, and "never clone
-        # unit types" forbids the morph route; the headline capability (hit air) is delivered here.
-        ("Weapon", "P38ScytheGuassPistol", "TargetFilters", "Visible;Structure,Missile,Stasis,Dead,Hidden,Invulnerable", "Set", "Reaper Jet Pack Overdrive: can attack air (drop required Ground token)"),
+        # (Reaper Jet Pack Overdrive dropped per owner: literal flight needs a forbidden
+        #  unit-type morph, and the owner is fine with the Reaper NOT shooting air — so the
+        #  anti-air TargetFilters edit was reverted; the Reaper keeps its vanilla ground-only
+        #  targeting.)
         ("Weapon", "CrucioShockCannon", "Range", "1", "Add", "Siege Tank LTS: +1 sieged range"),
         ("Weapon", "90mmCannons", "Range", "1", "Add", "Siege Tank LTS: +1 mobile range"),
         ("Unit", "SiegeTank", "Sight", "2", "Add", "Siege Tank LTS: +2 sight"),
