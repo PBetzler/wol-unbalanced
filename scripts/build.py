@@ -265,9 +265,16 @@ def build() -> None:
     if NIGHTMARE_BASE:
         # Bundle Rhyme's difficulty mod alongside ours (it's a 132 KB MPQ file).
         shutil.copy2(NIGHTMARE_MOD, os.path.join(mods_out, "NightmareMod.SC2Mod"))
-    title = f"{TITLE} (Nightmare)" if NIGHTMARE_BASE else TITLE
-    desc = ("Funnily overpowered Wings of Liberty on Nightmare difficulty: your units OP, "
-            "enemies on Rhyme's Nightmare pack." if NIGHTMARE_BASE else
+    # IMPORTANT: both variants use the SAME campaign title (and the same WoL map names +
+    # CampaignLib banks), so CCM/SC2 treat them as ONE campaign — i.e. they're
+    # interchangeable: a between-mission (Hyperion) save made on one variant continues on
+    # the other when you swap which zip is installed. They differ only by desc + map files +
+    # the bundled NightmareMod. (Mid-mission .SC2Saves still won't transfer — those bind to
+    # the catalog; reload from the Hyperion between missions.)
+    title = TITLE
+    desc = ("[NIGHTMARE] Funnily overpowered Wings of Liberty vs. Rhyme's Nightmare-difficulty "
+            "enemies. Interchangeable with the standard build — swap freely from a Hyperion save."
+            if NIGHTMARE_BASE else
             "Funnily overpowered Wings of Liberty: your units only, enemies stay vanilla. Not to be taken seriously.")
     with open(os.path.join(BUILD, "metadata.txt"), "w") as f:
         f.write(f"title={title}\n"
@@ -286,7 +293,9 @@ def package() -> None:
     build()
     dist = os.path.join(ROOT, "dist")
     os.makedirs(dist, exist_ok=True)
-    folder = f"{TITLE} (Nightmare)" if NIGHTMARE_BASE else TITLE
+    # Same top-folder name for both variants => CCM imports them into the SAME campaign
+    # (interchangeable / shared Hyperion save). Only the zip FILENAME differs.
+    folder = TITLE
     zname = (f"WoL-Unbalanced-Nightmare-v{VERSION}.zip" if NIGHTMARE_BASE
              else f"WoL-Unbalanced-v{VERSION}.zip")
     zpath = os.path.join(dist, zname)

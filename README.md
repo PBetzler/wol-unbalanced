@@ -29,6 +29,8 @@ Grab a zip from the [Releases page](../../releases) and import it with [GiantGra
 - **`WoL-Unbalanced-v*.zip`** — the standard mod (your army overpowered, enemies vanilla). Its maps are Blizzard's own WoL campaign maps with one changed dependency line, as is standard for CCM campaigns.
 - **`WoL-Unbalanced-Nightmare-v*.zip`** — the same mod layered on top of **Rhyme's "Nightmare Difficulty"** pack (overpowered you vs. a much harder enemy). This zip bundles Rhyme's pack — full credit to Rhyme, source: [the GiantGrantGames CCM Discord](https://discord.com/invite/ywvCz7CN).
 
+**The two are interchangeable.** Both import as the *same campaign* (`title=WoL Unbalanced`, same WoL missions + campaign banks), so they share one save slot: play the standard build, and from a **Hyperion (between-mission) save** you can import the Nightmare zip and continue the same campaign with the harder enemies — and back. You only ever have one installed at a time; importing one swaps the other. (Caveat: a *mid-mission* `.SC2Save` won't carry across a swap — those bind to the exact catalog — so reload from the Hyperion between missions, then start the next mission fresh.)
+
 **CI vs. manual:** pushing a `v*` tag auto-builds + publishes the **standard** zip ([release workflow](.github/workflows/release.yml)) — that's our own content, zero-effort. The **Nightmare** zip can't go through CI (CI has none of the third-party inputs, and we don't commit them), so it's built locally once and uploaded to the same release with `gh release upload <tag> dist/WoL-Unbalanced-Nightmare-v*.zip`.
 
 ## Building (contributors)
