@@ -48,7 +48,7 @@
         <Icon value="Assets\Textures\btn-unit-terran-liberator.dds"/>
     </CButton>
     <CButton id="HireMercSeniorGhost">
-        <Icon value="Assets\Textures\btn-unit-terran-nova-ghost.dds"/>
+        <Icon value="Assets\Textures\btn-unit-terran-ghost.dds"/>
     </CButton>
     <CButton id="HireMercValkyrie">
         <Icon value="Assets\Textures\btn-unit-terran-wraith.dds"/>
