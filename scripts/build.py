@@ -25,15 +25,34 @@ DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
 VERSION = "0.3.4"
 
+# --- Optional Nightmare-difficulty base (LOCAL-ONLY) -------------------------------
+# `python3 scripts/build.py build nightmare` (or `package nightmare`) layers our mod on
+# top of Rhyme's "Nightmare Difficulty" pack instead of the vanilla Tactical Arsenal
+# maps. Those maps ARE the real WoL maps + the NightmareMod difficulty lib (harder
+# enemies); we KEEP their NightmareMod dependency and append ours AFTER it (so our
+# per-player edits win catalog conflicts), and bundle NightmareMod.SC2Mod alongside ours.
+# This is LOCAL-ONLY: the Nightmare maps (~67 MB) + mod are third-party (gitignored, no
+# upstream git repo), so it can't be a submodule or a CI build — build it locally and
+# `gh release upload <tag> dist/WoL-Unbalanced-Nightmare-v*.zip` to add it to a release.
+NIGHTMARE_MAPS_SRC = os.path.join(ROOT, "mods", "Nightmare", "extracted")
+NIGHTMARE_MOD = os.path.join(ROOT, "mods", "Nightmare", "extracted", "NightmareMod.SC2Mod")
+NIGHTMARE_DEP = r"file:Mods\NightmareMod.SC2Mod"
+NIGHTMARE_BASE = False  # set True by the CLI `nightmare` arg
+
 
 def patch_document_info(map_path: str) -> None:
-    """Make our mod the only custom (file:Mods\\...) dependency. Idempotent."""
+    """Make our mod the last custom (file:Mods\\...) dependency. Idempotent.
+    Default: ours is the ONLY custom dep (strip the source campaign's). Nightmare base:
+    KEEP the existing custom dep (NightmareMod) and append ours after it."""
     archive = mpyq.MPQArchive(map_path)
     doc = archive.read_file(b"DocumentInfo").decode("utf-8")
-    cleaned = re.sub(r"\s*<Value>file:Mods\\[^<]*</Value>", "", doc)
-    patched = cleaned.replace(
-        "</Dependencies>", f"    <Value>{DEP_LINE}</Value>\n    </Dependencies>"
-    )
+    cleaned = doc if NIGHTMARE_BASE else re.sub(r"\s*<Value>file:Mods\\[^<]*</Value>", "", doc)
+    if DEP_LINE in cleaned:
+        patched = cleaned
+    else:
+        patched = cleaned.replace(
+            "</Dependencies>", f"    <Value>{DEP_LINE}</Value>\n    </Dependencies>"
+        )
     if patched == doc:
         return
     assert DEP_LINE in patched, f"no </Dependencies> in {map_path}"
@@ -119,10 +138,19 @@ def patch_document_header(map_path: str) -> None:
         end = h.index(b"\x00", pos)
         deps.append(h[pos:end])
         pos = end + 1
-    new_deps = [DEP_LINE.encode() if d.startswith(b"file:Mods\\") else d for d in deps]
-    if new_deps == deps:
-        return
-    out = h[:i] + b"".join(d + b"\x00" for d in new_deps) + h[pos:]
+    if NIGHTMARE_BASE:
+        # Keep every existing dep (incl. NightmareMod) and APPEND ours, bumping the count.
+        if DEP_LINE.encode() in deps:
+            return
+        new_deps = deps + [DEP_LINE.encode()]
+        out = (h[: i - 4] + len(new_deps).to_bytes(4, "little")
+               + b"".join(d + b"\x00" for d in new_deps) + h[pos:])
+    else:
+        # Default: replace the source campaign's custom dep with ours (1:1, count unchanged).
+        new_deps = [DEP_LINE.encode() if d.startswith(b"file:Mods\\") else d for d in deps]
+        if new_deps == deps:
+            return
+        out = h[:i] + b"".join(d + b"\x00" for d in new_deps) + h[pos:]
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
         tmp.write(out)
     try:
@@ -186,8 +214,11 @@ def build() -> None:
     os.makedirs(maps_out)
     os.makedirs(mods_out)
 
-    for name in sorted(os.listdir(MAPS_SRC)):
-        src = os.path.join(MAPS_SRC, name)
+    maps_src = NIGHTMARE_MAPS_SRC if NIGHTMARE_BASE else MAPS_SRC
+    if NIGHTMARE_BASE and not os.path.isfile(NIGHTMARE_MOD):
+        raise SystemExit(f"nightmare base requires {NIGHTMARE_MOD} (third-party, local-only) — not found")
+    for name in sorted(os.listdir(maps_src)):
+        src = os.path.join(maps_src, name)
         if name.endswith(".SC2Map") and os.path.isfile(src):
             dst = os.path.join(maps_out, name)
             shutil.copy2(src, dst)
@@ -199,13 +230,20 @@ def build() -> None:
 
     shutil.copytree(MOD_SRC, os.path.join(mods_out, MOD_NAME))
     write_version_files(os.path.join(mods_out, MOD_NAME))
+    if NIGHTMARE_BASE:
+        # Bundle Rhyme's difficulty mod alongside ours (it's a 132 KB MPQ file).
+        shutil.copy2(NIGHTMARE_MOD, os.path.join(mods_out, "NightmareMod.SC2Mod"))
+    title = f"{TITLE} (Nightmare)" if NIGHTMARE_BASE else TITLE
+    desc = ("Funnily overpowered Wings of Liberty on Nightmare difficulty: your units OP, "
+            "enemies on Rhyme's Nightmare pack." if NIGHTMARE_BASE else
+            "Funnily overpowered Wings of Liberty: your units only, enemies stay vanilla. Not to be taken seriously.")
     with open(os.path.join(BUILD, "metadata.txt"), "w") as f:
-        f.write(f"title={TITLE}\n"
-                "desc=Funnily overpowered Wings of Liberty: your units only, enemies stay vanilla. Not to be taken seriously.\n"
+        f.write(f"title={title}\n"
+                f"desc={desc}\n"
                 "author=Philip (vibe coded with Claude)\n"
                 "campaign=WoL\n"
                 f"version={VERSION}\n")
-    print(f"built -> {BUILD}")
+    print(f"built -> {BUILD}" + (" [NIGHTMARE base]" if NIGHTMARE_BASE else ""))
 
 
 def package() -> None:
@@ -216,17 +254,26 @@ def package() -> None:
     build()
     dist = os.path.join(ROOT, "dist")
     os.makedirs(dist, exist_ok=True)
-    zpath = os.path.join(dist, f"WoL-Unbalanced-v{VERSION}.zip")
+    folder = f"{TITLE} (Nightmare)" if NIGHTMARE_BASE else TITLE
+    zname = (f"WoL-Unbalanced-Nightmare-v{VERSION}.zip" if NIGHTMARE_BASE
+             else f"WoL-Unbalanced-v{VERSION}.zip")
+    zpath = os.path.join(dist, zname)
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
-        z.write(os.path.join(BUILD, "metadata.txt"), f"{TITLE}/metadata.txt")
+        z.write(os.path.join(BUILD, "metadata.txt"), f"{folder}/metadata.txt")
         for name in sorted(os.listdir(os.path.join(BUILD, "Campaign"))):
-            z.write(os.path.join(BUILD, "Campaign", name), f"{TITLE}/{name}")
-        modroot = os.path.join(BUILD, "Mods", MOD_NAME)
-        for dirpath, _, files in os.walk(modroot):
-            for fn in sorted(files):
-                full = os.path.join(dirpath, fn)
-                rel = os.path.relpath(full, modroot)
-                z.write(full, f"{TITLE}/{MOD_NAME}/{rel}")
+            z.write(os.path.join(BUILD, "Campaign", name), f"{folder}/{name}")
+        # every Mods/ entry: our component folder + (nightmare) the NightmareMod MPQ file
+        mods_root = os.path.join(BUILD, "Mods")
+        for entry in sorted(os.listdir(mods_root)):
+            full = os.path.join(mods_root, entry)
+            if os.path.isfile(full):
+                z.write(full, f"{folder}/{entry}")
+            else:
+                for dirpath, _, files in os.walk(full):
+                    for fn in sorted(files):
+                        ffull = os.path.join(dirpath, fn)
+                        rel = os.path.relpath(ffull, mods_root)
+                        z.write(ffull, f"{folder}/{rel}")
     print(f"packaged -> {zpath}")
 
 
@@ -263,5 +310,9 @@ def uninstall() -> None:
 
 
 if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "build"
+    args = [a for a in sys.argv[1:]]
+    if "nightmare" in args:
+        NIGHTMARE_BASE = True  # noqa: F811 — module-global toggle read by the patch/build fns
+        args = [a for a in args if a != "nightmare"]
+    cmd = args[0] if args else "build"
     {"build": build, "install": install, "package": package, "clean": lambda: shutil.rmtree(BUILD, ignore_errors=True), "uninstall": uninstall}[cmd]()
