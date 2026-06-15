@@ -554,18 +554,24 @@
          throughout (dependency-mod array entries need them). Row 1 of the submenu is left
          open for the deferred Liberator/Valkyrie mercs. FLAG: a dependency adding a whole
          new CardLayouts page is unverified — confirm the submenu opens + lists the mercs. -->
+    <!-- Elite mercs on the ROOT card, NOT a submenu (issue: submenu collapsed to root after
+         every purchase — a confirmed SC2 limitation: the card always returns to root after any
+         issued command, and there's no data flag to keep a submenu open). The root card never
+         collapses, so the vanilla 8 mercs (already on root) work fine; putting the 6 elite mercs
+         on root too lets you buy any merc repeatedly. The vanilla root card is full (15 cells:
+         8 mercs + DukesRevenge + SelectBuilder/Rally + Halt/Cancel), so reclaim the 3 low-value
+         buttons SelectBuilder (1,3), Rally (1,4) and Halt (2,3) — a merc-calldown building needs
+         none of them; Cancel (2,4) stays for construction refunds. Result: all 14 mercs visible
+         on one persistent card. Indices: vanilla buttons are 0-20, our previous submenu button
+         was 21 -> override 21 + the reclaimed slots; append the rest. -->
     <CUnit id="MercCompound">
         <CardLayouts index="0">
-            <LayoutButtons index="21" Face="WoLUEliteMercs" Type="Submenu" SubmenuCardId="EMrc" Row="0" Column="4"/>
-        </CardLayouts>
-        <CardLayouts index="1" CardId="EMrc">
-            <LayoutButtons index="0" Face="HireMercMedic" Type="AbilCmd" AbilCmd="SummonMercenaries,Train9" Row="0" Column="0"/>
-            <LayoutButtons index="1" Face="HireMercReaper" Type="AbilCmd" AbilCmd="SummonMercenaries,Train10" Row="0" Column="1"/>
-            <LayoutButtons index="2" Face="HireMercHellion" Type="AbilCmd" AbilCmd="SummonMercenaries,Train11" Row="0" Column="2"/>
-            <LayoutButtons index="3" Face="HireMercThor" Type="AbilCmd" AbilCmd="SummonMercenaries,Train12" Row="0" Column="3"/>
-            <LayoutButtons index="4" Face="HireMercWraith" Type="AbilCmd" AbilCmd="SummonMercenaries,Train13" Row="0" Column="4"/>
-            <LayoutButtons index="7" Face="HireMercSeniorGhost" Type="AbilCmd" AbilCmd="SummonMercenaries,Train15" Row="1" Column="0"/>
-            <LayoutButtons index="5" Face="Cancel" Type="CancelSubmenu" Row="2" Column="4"/>
+            <LayoutButtons index="14" Face="HireMercReaper" Type="AbilCmd" AbilCmd="SummonMercenaries,Train10" Row="1" Column="3"/>
+            <LayoutButtons index="15" Face="HireMercHellion" Type="AbilCmd" AbilCmd="SummonMercenaries,Train11" Row="1" Column="4"/>
+            <LayoutButtons index="19" Face="HireMercSeniorGhost" Type="AbilCmd" AbilCmd="SummonMercenaries,Train15" Row="2" Column="3"/>
+            <LayoutButtons index="21" Face="HireMercMedic" Type="AbilCmd" AbilCmd="SummonMercenaries,Train9" Row="0" Column="4"/>
+            <LayoutButtons index="22" Face="HireMercThor" Type="AbilCmd" AbilCmd="SummonMercenaries,Train12" Row="2" Column="1"/>
+            <LayoutButtons index="23" Face="HireMercWraith" Type="AbilCmd" AbilCmd="SummonMercenaries,Train13" Row="2" Column="2"/>
         </CardLayouts>
     </CUnit>
 </Catalog>

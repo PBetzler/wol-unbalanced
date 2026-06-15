@@ -21,7 +21,7 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 
 ## UX
 
-- [ ] **The elite-merc submenu collapses after buying a merc** (can't buy a second without re-opening). v0.2.4 INVESTIGATED to ground truth: SC2 returns the command card to its root after *any* issued command — there is **no data flag** to keep a native submenu open (the full flag list has no such option). The only fix is a trigger-built dialog that re-implements the card, which `plan.md` explicitly rules out (loses native autocast circles/hotkeys). **Accepted SC2 limitation** unless the owner wants the dialog route. (Mitigation available if desired: make the elite-merc page the *root* card so it persists, demoting the vanilla 8 to a submenu.)
+- [x] **The elite-merc submenu collapses after buying a merc** — RESOLVED v0.3.6: dropped the submenu and put ALL 14 mercs (8 vanilla + 6 elite) on the Merc Compound **root** card, which never collapses (the card returns to root after every command, so root-card buttons persist — that's why the vanilla 8 always worked). Reclaimed 3 low-value buttons (SelectBuilder, Rally, Halt — a calldown building needs none; Cancel stays) to fit the 6 elite mercs. Verified with the card-merge simulator: 14 merc buttons on one persistent card, no real collisions.
 
 ## Flagged mechanisms — implemented but unverified (harden by static investigation)
 

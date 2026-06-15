@@ -157,6 +157,10 @@
          table wants Yamato on Spine/turrets but not supply depots) is NOT solved —
          autocast skips ALL structures; manual Yamato still hits anything. -->
     <CAbilEffectTarget id="YamatoWoLU" parent="Yamato">
+        <!-- Base Yamato has NO explicit <Effect> (it defaults to the "Yamato" effect via its
+             own id). A clone re-defaults to ITS own id ("YamatoWoLU", nonexistent) and fires
+             nothing — so pin the effect explicitly. (Caught by audit CHECK4.) -->
+        <Effect index="0" value="Yamato"/>
         <Flags index="AutoCast" value="1"/>
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="10"/>

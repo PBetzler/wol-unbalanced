@@ -47,11 +47,6 @@
     <CButton id="HireMercSeniorGhost">
         <Icon value="Assets\Textures\btn-unit-terran-ghost.dds"/>
     </CButton>
-    <!-- Submenu button that opens the elite-merc page on the Merc Compound. -->
-    <CButton id="WoLUEliteMercs">
-        <Icon value="Assets\Textures\btn-building-terran-merccompound.dds"/>
-    </CButton>
-
     <!-- Tactical Jump — the real Hercules Tactical Jump icon (base-CASC path). -->
     <CButton id="TacticalJumpWoLU">
         <Icon value="Assets\Textures\btn-ability-terran-hercules-tacticaljump.dds"/>

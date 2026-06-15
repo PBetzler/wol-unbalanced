@@ -10,10 +10,14 @@ python3 scripts/audit.py         # catalog/actor consistency (see below)
 python3 scripts/build.py build   # patch maps + assemble
 ```
 
-`audit.py` catches, with a pointed diagnosis, the classes that have actually bitten us:
-- **CHECK1** — a `parent=` clone unit with no proper `CActorUnit` (missing `parent="GenericUnitBase"` / `unitName=`) → the v0.2.0 sphere-no-model bug.
-- **CHECK2** — a `SummonMercenaries` calldown whose unit isn't defined / actored / `TechTreeUnitAllow`'d → a dead calldown.
-- **INFO** — model/portrait/parent tokens that are base-CASC (not in our XML or the reference dump). These are the references we **cannot verify locally**; if a unit is a sphere or its portrait is a heart, the culprit is in this list.
+`audit.py` catches, with a pointed diagnosis, the classes that have actually bitten us. It is a
+**FAIL gate** (non-zero exit) for the high-confidence classes and prints WARN/INFO for the rest:
+- **CHECK1 (FAIL)** — a `parent=` clone unit with no proper `CActorUnit` (missing `parent="GenericUnitBase"` / `unitName=`) → the v0.2.0 sphere-no-model bug.
+- **CHECK2 (FAIL)** — a `SummonMercenaries` calldown whose unit isn't defined / actored / `TechTreeUnitAllow`'d → a dead calldown.
+- **CHECK3 (FAIL)** — a `parent=` on one of our data clones that resolves to **no real id** (ours or the reference catalogs). Catches invented/typo'd parents — e.g. the "Valkyrie"/"Liberator" models that don't exist in WoL. (Genuine core.sc2mod templates like `DU_WEAP` live in `CORE_TEMPLATE_PARENTS` — add deliberately, never blanket-skip.)
+- **CHECK4 (FAIL)** — the clone-Effect trap: a `CAbilEffect*`/`CWeapon*` clone with **no `<Effect>` and no parent that supplies one** re-defaults to its own (nonexistent) id and silently does nothing (the `HealWoLU`/`YamatoWoLU` bug). Also fails on an explicit `<Effect value=>` that resolves nowhere.
+- **CHECK5 (WARN)** — merge-aware command-card sanity on **our** buttons: an action `AbilCmd` on a `Type=Passive` button (never fires — the Marauder bug); an `AbilCmd` whose ability isn't on the unit's merged AbilArray (drives nothing); two of our buttons colliding in one cell. It simulates the base→campaign→story→our-mod array merge, so the reported indices/cells match in-game.
+- **INFO** — base-CASC model/portrait/`.m3`/`.dds` references we **cannot verify locally**, printed as `UNVERIFIED — confirm in game`. These are NOT proof of correctness: a fix that depends on one is "pending owner confirmation", never "done". If a unit is a sphere or its portrait is a heart, the culprit is in this list.
 
 ## Runtime (manual) — the in-game diagnostic
 
