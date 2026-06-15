@@ -194,27 +194,63 @@ def main():
     actors = our_catalog("ActorData.xml")
     abils = our_catalog("AbilData.xml")
 
+    # Collect our unit-body actors. A merc body actor is usually a CActorUnit, but it may be
+    # a CActorMissile when it inherits a base unit whose own body actor is one (the Reaper's
+    # jetpack body is a CActorMissile, so MercReaper parent="Reaper" must match that class).
     our_actors = {}
     actor_models = {}
+    actor_has_body_model = {}  # id -> True if it declares an explicit <Model> (not just PortraitModel)
     for a in actors:
-        if a.tag == "CActorUnit" and a.get("id"):
+        if a.tag in ("CActorUnit", "CActorMissile") and a.get("id"):
             our_actors[a.get("id")] = (a.get("parent"), a.get("unitName"))
             actor_models[a.get("id")] = {sub.get("value") for sub in a
                                          if sub.tag in ("Model", "PortraitModel") and sub.get("value")}
+            actor_has_body_model[a.get("id")] = any(
+                sub.tag == "Model" and sub.get("value") for sub in a)
+
+    our_model_ids = {m.get("id") for m in our_catalog("ModelData.xml") if m.tag == "CModel" and m.get("id")}
 
     our_clone_units = {u.get("id"): u for u in units
                        if u.tag == "CUnit" and u.get("id") and u.get("parent") is not None}
 
-    # CHECK 1 — actor consistency.
+    # Base-unit actor ids defined in the reference dump (e.g. Medic/Reaper/Thor) — a valid
+    # parent for a merc clone actor, since those are themselves GenericUnit*-derived and bring
+    # the base unit's full working model + portrait + attack-anim wiring. ActorData.xml only
+    # lives at the SHORT ref paths (mods/_reference/liberty.sc2mod/ActorData.xml etc., not the
+    # mods/mods/... duplicate that holds UnitData), so search every ActorData.xml under REF.
+    ref_actor_ids = set()
+    for f in glob.glob(os.path.join(REF, "**", "ActorData.xml"), recursive=True):
+        try:
+            r = ET.parse(f).getroot()
+        except ET.ParseError:
+            continue
+        for el in r:
+            if el.tag in ("CActorUnit", "CActorMissile") and el.get("id"):
+                ref_actor_ids.add(el.get("id"))
+
+    # CHECK 1 — actor consistency. The clone actor must either inherit a GenericUnit* base
+    # OR a real base-unit actor from the reference dump (which is GenericUnit*-derived and
+    # carries the base's portrait/model — the heart-portrait fix), and declare unitName=<id>.
     for uid in sorted(our_clone_units):
         if uid not in our_actors:
             fails.append(f"CHECK1 actor-missing: clone unit '{uid}' has no CActorUnit -> sphere, no model.")
             continue
         parent, unitname = our_actors[uid]
-        if not parent or "GenericUnit" not in parent:
-            fails.append(f"CHECK1 actor-parent: CActorUnit '{uid}' must inherit a GenericUnit* base (got {parent!r}).")
+        parent_ok = parent and ("GenericUnit" in parent or parent in ref_actor_ids)
+        if not parent_ok:
+            fails.append(f"CHECK1 actor-parent: CActorUnit '{uid}' must inherit a GenericUnit* base or a "
+                         f"known base-unit actor (got {parent!r}).")
         if unitname != uid:
             fails.append(f"CHECK1 actor-unitname: CActorUnit '{uid}' needs unitName=\"{uid}\" (got {unitname!r}).")
+        # Body model MUST resolve: either an explicit <Model>, OR a CModel whose id == unitName
+        # (the GenericUnit ##unitName## convention). Inheriting a base-unit actor (parent="Medic")
+        # does NOT supply a body — the clone's own unitName token (e.g. "MercMedic") still drives
+        # model lookup, so without one of these it renders a SPHERE (the v0.2.0 / v0.3.7 regression).
+        body_ok = actor_has_body_model.get(uid) or (unitname in our_model_ids)
+        if not body_ok:
+            fails.append(f"CHECK1 actor-body-model: CActorUnit '{uid}' has no explicit <Model> and no "
+                         f"CModel id=\"{unitname}\" -> body resolves via the unitName token to nothing -> "
+                         f"sphere. Add <Model value=\"<base>\"/> (or a matching CModel).")
 
     # CHECK 2 — every SummonMercenaries-trained Merc* unit is defined, actored, allowed.
     galaxy = open(GALAXY).read() if os.path.exists(GALAXY) else ""
@@ -234,7 +270,8 @@ def main():
                 if f'"{mu}"' not in galaxy:
                     fails.append(f"CHECK2 calldown-allow: '{mu}' is never TechTreeUnitAllow'd -> uncallable.")
 
-    known = ref_ids() | our_ids()
+    reference_ids = ref_ids()
+    known = reference_ids | our_ids()
 
     # CHECK 3/4/5 resolve ids against the gitignored reference dump (mods/_reference/).
     # That dump is present locally (so the pre-commit gate runs the full audit) but ABSENT
@@ -268,6 +305,11 @@ def main():
                 ev = eff.get("value")
                 if ev and ev not in known:
                     fails.append(f"CHECK4 effect-missing: {el.tag} '{el.get('id')}' Effect='{ev}' resolves nowhere.")
+                continue
+            # A same-id PARTIAL OVERRIDE of a vanilla entry (the id exists in the reference
+            # dump) merges onto the base, which already supplies the Effect — not a new clone.
+            # (e.g. we add only Options[] to the vanilla JavelinMissileLaunchers/Odin weapons.)
+            if el.get("id") in reference_ids:
                 continue
             # No own <Effect>: walk the parent chain for one.
             par, seen, supplied = el.get("parent"), set(), False
@@ -334,7 +376,6 @@ def main():
 
     # INFO — base-CASC asset tokens we can't verify locally.
     refs = ref_ids()
-    our_model_ids = {m.get("id") for m in our_catalog("ModelData.xml") if m.tag == "CModel" and m.get("id")}
     resolvable = defined_unit_ids | set(our_actors) | our_model_ids | refs
     casc = sorted({t for toks in actor_models.values() for t in toks if t not in resolvable})
     for t in casc:

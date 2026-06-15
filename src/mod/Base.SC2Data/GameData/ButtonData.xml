@@ -8,6 +8,18 @@
         <Icon value="Assets\Textures\btn-upgrade-terran-magrailmunitions.dds"/>
     </CButton>
 
+    <!-- #10 fix: a dedicated Spider Mine button with our OWN hotkey, so it stops colliding
+         with Enter Siege. The vanilla SpiderMine button has no Hotkey field, so it inherits
+         the base-CASC Button/Hotkey/SpiderMine = E — the SAME key as SiegeMode's "Enter
+         Siege". Same spider-mine icon; hotkey Y (Button/Hotkey/SpiderMineWoLU in
+         GameHotkeys.txt). Every spider-mine card button (SiegeTank/SiegeTankSieged/
+         SiegeBreaker/SiegeBreakerSieged) uses this Face; the SpiderMineWoLU ability's
+         DefaultButtonFace points here too. Enter Siege keeps E. -->
+    <CButton id="SpiderMineWoLU">
+        <Icon value="Assets\Textures\btn-ability-terran-spidermine.dds"/>
+        <AlertIcon value="Assets\Textures\btn-ability-terran-spidermine.dds"/>
+    </CButton>
+
     <!-- Passive upgrade-display buttons: shown on a unit's command card (Type=Passive)
          so the player can see the WoL Unbalanced buffs each unit carries — matching the
          campaign's own pattern (Firebat shows Incinerator Nozzles / Juggernaut Plating).

@@ -401,21 +401,28 @@
     </CAbilEffectTarget>
 
     <!-- Siege Tank Spider Mines (AP): lay a cloaked Vulture spider mine. Modeled on the
-         vanilla VultureSpiderMines ability — uses its SpawnSpiderMineSet effect (the raw
-         SpawnSpiderMine create alone skips the burrow-order set), Range 3, Placeholder.
-         IgnoreFacing is REQUIRED: a SIEGED tank cannot turn, so without it the deploy fails
-         with "Can't turn towards target" (the user's bug). Effectively unlimited (1 s
-         cooldown). Button gated WoLUHaveFlag, appended to the tanks (enemy-invisible). -->
+         vanilla VultureSpiderMines ability. IgnoreFacing is REQUIRED: a SIEGED tank cannot
+         turn, so without it the deploy fails with "Can't turn towards target".
+         #11 fix: the effect was SpawnSpiderMineSet = [SpawnSpiderMine,
+         ReplenishNanoConstructor]. ReplenishNanoConstructor is a CEffectModifyUnit with
+         Cost Abil="MakeVultureSpiderMines,Specialize1" ChargeCountUse="-1" — it tries to
+         refund a charge on the Vulture-only MakeVultureSpiderMines ability, which a tank /
+         siege breaker doesn't have. On the SIEGED form that broken refund aborts the set so
+         no mine spawns (mobile mode tolerated it). Our ability uses a 1 s cooldown, not the
+         Vulture charge system, so the replenish is unnecessary: point Effect at the raw
+         SpawnSpiderMine create alone. The mine still spawns + burrows (CEffectCreateUnit
+         spawns the SpiderMine unit, whose own AI burrows on idle). Button gated WoLUHaveFlag,
+         appended to the tanks (enemy-invisible); SpiderMineWoLU face = own hotkey (#10). -->
     <CAbilEffectTarget id="SpiderMineWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <Effect index="0" value="SpawnSpiderMineSet"/>
+        <Effect index="0" value="SpawnSpiderMine"/>
         <Placeholder value="SpiderMine"/>
         <Range value="4"/>
         <Flags index="IgnoreFacing" value="1"/>
         <Cost>
             <Cooldown TimeUse="1"/>
         </Cost>
-        <CmdButtonArray index="Execute" DefaultButtonFace="SpiderMine" Requirements="WoLUHaveFlag"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="SpiderMineWoLU" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
 
     <!-- Science Vessel EMP Shockwave (BW SV): manual targeted AoE energy/shield drain. Effect
@@ -471,12 +478,17 @@
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
     </CAbilEffectTarget>
+    <!-- #6 fix: DukesRevengeMissilePods + DukesRevengeDefensiveMatrix ship their
+         CmdButtonArray with State="Restricted" (DukesRevengeYamato does NOT — that's why
+         only Yamato autocast). A parent= clone inherits the whole CmdButtonArray, including
+         State, and overriding the same index="Execute" element MERGES field-by-field, so
+         State stayed Restricted. Explicitly set State="Normal" to clear it. -->
     <CAbilEffectTarget id="DukesRevengeMissilePodsWoLU" parent="DukesRevengeMissilePods">
         <Flags index="AutoCast" value="1"/>
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="7"/>
         <AutoCastFilters value="Air,Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
-        <CmdButtonArray index="Execute" DefaultButtonFace="MissilePods" Requirements="WoLUHaveFlag">
+        <CmdButtonArray index="Execute" DefaultButtonFace="MissilePods" State="Normal" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
     </CAbilEffectTarget>
@@ -485,10 +497,24 @@
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="5"/>
         <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
-        <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" Requirements="WoLUHaveFlag">
+        <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" State="Normal" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
     </CAbilEffectInstant>
+
+    <!-- #3: let ALL ground units (including mechanical) load into bunkers, each taking one
+         slot. The vanilla BunkerTransport TargetFilters requires Biological ("Biological,
+         Visible;Ally,Neutral,Enemy,Dead,Hidden") — a STRING field, so a per-player runtime
+         edit is a silent no-op. Edit it in STATIC XML (global): drop Biological, keep it
+         ground-only (add Air to the exclude list so it never loads air units). The
+         MaxCargoCount / MaxCargoSize / TotalCargoSpace numbers that make every unit cost one
+         slot are scalar fields that DO apply per player — set in genlib (MaxCargoCount=4,
+         MaxCargoSize=8 to admit the size-8 Thor, TotalCargoSpace=32 so the unit COUNT binds
+         before the size sum → 4 of anything fits, each = 1 slot). Global TargetFilters edit
+         affects enemy bunkers too (negligible — enemies don't load mechanical). -->
+    <CAbilTransport id="BunkerTransport">
+        <TargetFilters value="Visible;Air,Ally,Neutral,Enemy,Dead,Hidden"/>
+    </CAbilTransport>
 
     <!-- Medic Adaptive Medpacks (AP): heal MECHANICAL + air, not just biological ground.
          The vanilla `heal` gates on TargetFilters "Ground,Biological,..." — a STRING field,

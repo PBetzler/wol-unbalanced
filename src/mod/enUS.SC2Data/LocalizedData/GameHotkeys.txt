@@ -1,1 +1,2 @@
 Button/Hotkey/MagrailWoLU=U
+Button/Hotkey/SpiderMineWoLU=Y

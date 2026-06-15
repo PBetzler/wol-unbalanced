@@ -308,9 +308,12 @@
         <CardLayouts index="0">
             <LayoutButtons index="9" Face="RestorationWoLU" Type="AbilCmd" AbilCmd="RestorationWoLU,Execute" Row="2" Column="3"/>
             <LayoutButtons index="10" Face="OpticalFlareWoLU" Type="AbilCmd" AbilCmd="OpticalFlareWoLU,Execute" Row="2" Column="4"/>
-            <!-- Adaptive Medpacks: mechanical+air heal (autocast). Vanilla heal button stays
-                 at 2,0; this one (1,0) covers mechanical/air. -->
-            <LayoutButtons index="11" Face="MedicHeal" Type="AbilCmd" AbilCmd="HealWoLU,Execute" Row="1" Column="0"/>
+            <!-- #5 fix: ONE heal button. The merged Medic card's heal button is index 6
+                 (vanilla `heal,Execute` at 2,0). Re-point it to the mechanical-capable
+                 HealWoLU clone (Adaptive Medpacks) so the single visible heal works on
+                 mech+air. The vanilla `heal` ability stays on the unit (enemy autocast).
+                 The old separate HealWoLU button (index 11, cell 1,0) is REMOVED. -->
+            <LayoutButtons index="6" AbilCmd="HealWoLU,Execute"/>
         </CardLayouts>
     </CUnit>
     <!-- Rule 10 hero parity: Stetmann (=Medic) gets the same kit. Stetmann has a different
@@ -323,7 +326,14 @@
         <CardLayouts index="0">
             <LayoutButtons index="8" Face="RestorationWoLU" Type="AbilCmd" AbilCmd="RestorationWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="9" Face="OpticalFlareWoLU" Type="AbilCmd" AbilCmd="OpticalFlareWoLU,Execute" Row="2" Column="3"/>
-            <LayoutButtons index="10" Face="MedicHeal" Type="AbilCmd" AbilCmd="HealWoLU,Execute" Row="1" Column="0"/>
+            <!-- #5 fix (Stetmann variant): unlike the Medic, Stetmann's heal is `BonesHeal`
+                 (its own ability, distinct name/icon) at merged index 6 — NOT a literal
+                 "heal + heal (Level 1)" duplicate. To keep ONE mechanical-capable heal
+                 button (matching the Medic intent), re-point the BonesHeal button to the
+                 HealWoLU clone (Adaptive Medpacks) and REMOVE the separate HealWoLU button
+                 (was index 10). The BonesHeal ability itself stays on the unit.
+                 OWNER-VERIFY: confirm Stetmann shows one heal button and heals mech/air. -->
+            <LayoutButtons index="6" AbilCmd="HealWoLU,Execute"/>
         </CardLayouts>
     </CUnit>
 
@@ -338,7 +348,13 @@
         <AbilArray index="10" Link="CalldownMULEWoLU"/>
         <AbilArray index="11" Link="SupplyDropWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="14" Face="CalldownMULE" Type="AbilCmd" AbilCmd="CalldownMULEWoLU,Execute" Row="0" Column="1"/>
+            <!-- #1 fix: ONE MULE button. The merged CC card already has the campaign's
+                 CalldownMULE button at index 1 (cell 1,2, from libertystory) — re-point it
+                 to the free CalldownMULEWoLU clone (vanilla CalldownMULE costs 50 energy
+                 the campaign CC lacks). Keep its Face/cell. The old separate
+                 CalldownMULEWoLU button (was index 14, cell 0,1) is REMOVED to avoid the
+                 "mule" + "mule (Level 1)" duplicate. Extra Supplies stays at index 15. -->
+            <LayoutButtons index="1" AbilCmd="CalldownMULEWoLU,Execute"/>
             <LayoutButtons index="15" Face="SupplyDrop" Type="AbilCmd" AbilCmd="SupplyDropWoLU,Execute" Row="0" Column="2"/>
         </CardLayouts>
     </CUnit>
@@ -373,7 +389,7 @@
             <LayoutButtons index="6"><Face value="MaelstromRounds"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
             <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
             <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
-            <LayoutButtons index="9" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="9" Face="SpiderMineWoLU" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <!-- Spider Mines on the sieged form + the Siege Breaker merc (rule 4). New blocks; vanilla
@@ -383,19 +399,19 @@
     <CUnit id="SiegeTankSieged">
         <AbilArray index="3" Link="SpiderMineWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
+            <LayoutButtons index="8" Face="SpiderMineWoLU" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="SiegeBreaker">
         <AbilArray index="4" Link="SpiderMineWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="8" Face="SpiderMineWoLU" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="SiegeBreakerSieged">
         <AbilArray index="3" Link="SpiderMineWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="8" Face="SpiderMine" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
+            <LayoutButtons index="8" Face="SpiderMineWoLU" Type="AbilCmd" AbilCmd="SpiderMineWoLU,Execute" Row="2" Column="0"/>
         </CardLayouts>
     </CUnit>
     <!-- Thor: the vanilla card has 10 buttons (0-9); index 7 is the 250mm Cancel button and
@@ -461,6 +477,12 @@
          check is affected (these ids never appear in WoL maps; rule-9 safe). Actors +
          buttons + calldown wiring live in ActorData/ButtonData/AbilData; names in
          GameStrings. FLAG: clone stat/visual fidelity unverified in game. ============= -->
+    <!-- #4 (b): each elite merc gets passive-display cards (Type=Passive, AbilCmd=255,
+         WoLUHaveFlag-gated) so its buffs are visible like the base units' — shields (+50/100
+         Defensive Matrix), armor (Shaped Hull), and an attack upgrade (Laser Targeting).
+         Reuse existing faces (DefensiveMatrix / ShapedHull / WoLUUpgLaserTargeting); placed
+         in free cells of the inherited card (computed via the card-merge simulator). Indices
+         continue from each merc's merged max index (parent= card resolved). -->
     <CUnit id="MercMedic" parent="Medic">
         <Name value="Unit/Name/MercMedic"/>
         <LifeMax value="150"/>
@@ -471,6 +493,11 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="11"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="12"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="13"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+        </CardLayouts>
     </CUnit>
     <CUnit id="MercReaper" parent="Reaper">
         <Name value="Unit/Name/MercReaper"/>
@@ -482,6 +509,10 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="9"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+        </CardLayouts>
     </CUnit>
     <CUnit id="MercHellion" parent="Hellion">
         <Name value="Unit/Name/MercHellion"/>
@@ -493,6 +524,11 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="8"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+            <LayoutButtons index="9"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="3"/></LayoutButtons>
+            <LayoutButtons index="10"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
+        </CardLayouts>
     </CUnit>
 
     <!-- "Jotun" — the Thor merc. No data source defines a Jotun unit ("Jotun" exists
@@ -508,6 +544,24 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
+        <CardLayouts index="0">
+            <!-- #4(b): shields display. Laser Targeting + Shaped Hull already show via the
+                 inherited Thor card; add the +100-shield Defensive Matrix in a free cell. -->
+            <LayoutButtons index="12"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="3"/></LayoutButtons>
+        </CardLayouts>
+        <!-- #9 fix: strip the Thor's Immortality Protocol / Mechanical Rebirth from the Jotun.
+             The Thor's death-response behavior `ThorDontDie` (CBehaviorBuff, DamageResponse
+             Fatal=1 Handled=ThorWreckage, gated on the UseMechanicalRebirth upgrade we
+             auto-grant) makes a fatal hit morph the unit into ThorWreckage, which ThorReborn
+             rebuilds — but it rebuilds a *base Thor* (the morph's InfoArray Unit="Thor"), not
+             a MercThor, and the morph charges Thor's gas cost. On a Jotun clone that produced
+             the "costs gas" tooltip and a TWO-HP-bar rebuilt unit (base-Thor identity over the
+             merc actor). The campaign Thor carries this behavior at BehaviorArray index 1
+             ([0]=ScavengingSystemsMechDeath, [1]=ThorDontDie, from libertystory); MercThor
+             inherits it via parent="Thor". Tombstone index 1 so the Jotun simply dies like the
+             other elite mercs (it has unlimited calldown charges — just drop another). Removes
+             the gas cost AND the double-HP-bar in one move. -->
+        <BehaviorArray index="1" removed="1"/>
     </CUnit>
 
     <!-- Winged Nightmares = AP "Mercenary Wraiths". Clone of the WoL Wraith (cloaked).
@@ -523,6 +577,11 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="9"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="10"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <LayoutButtons index="11"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
+        </CardLayouts>
     </CUnit>
 
     <!-- (Midnight Riders / Brynhilds removed per owner: their intended Liberator and Valkyrie
@@ -543,6 +602,12 @@
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
         <BehaviorArray Link="WoLUSeniorGhostBoost"/>
+        <CardLayouts index="0">
+            <!-- #4(b): the Ghost card is nearly full (Snipe/EMP/Stim/cloak + Laser Targeting
+                 at 1,4); only cell 1,0 is free. Show the +75 shields (Defensive Matrix) there
+                 — the +50% damage / 1.5x stats are reflected in the unit values + tooltip. -->
+            <LayoutButtons index="15"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+        </CardLayouts>
     </CUnit>
 
     <!-- Merc Compound: the extra elite mercs live on a SECOND card page (a submenu), so

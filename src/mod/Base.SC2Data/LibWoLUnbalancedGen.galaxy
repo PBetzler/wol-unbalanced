@@ -193,8 +193,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CargoSize", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "8", c_upgradeOperationSet);  // Bunker holds 4 of any infantry (size-2 units no longer eat 2 slots)
-    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "8", c_upgradeOperationSet);  // match unit-count cap to TotalCargoSpace (no confusing empty slots)
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "4", c_upgradeOperationSet);  // Bunker holds 4 units (the binding cap)
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoSize", p, "8", c_upgradeOperationSet);  // admit large ground units (Thor=8) — vanilla 2 rejected them
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "32", c_upgradeOperationSet);  // 4 x max CargoSize 8 → count binds before size, every unit = 1 slot
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: 10(+10 light) -> 20 flat
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: 15(+5 armored) -> 20 flat

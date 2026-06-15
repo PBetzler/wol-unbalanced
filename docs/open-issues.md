@@ -99,6 +99,74 @@ verifiable.
   works fine; no second source exists in any catalog layer (merge simulator confirmed). If it
   persists after v0.3.5, need a screenshot — possibly a multi-select / AbilSetId UI artifact.
 
+## In-game playtest batch (v0.3.7 — root-caused statically, pending re-test)
+
+11 issues from a playthrough. Root causes traced against `mods/_reference` (xmlq + the
+card-merge simulator). Items marked ⚠ are best-effort / owner-verify-in-game only.
+
+- [x] **#1 Command Center has two MULE buttons** — the merged CC card already carries the
+  campaign's `CalldownMULE` button at index 1 (cell 1,2, from libertystory); our added
+  `CalldownMULEWoLU` button sat at index 14 = a duplicate. Re-pointed index 1's `AbilCmd` to
+  the free `CalldownMULEWoLU` and removed index 14. One free MULE button; Extra Supplies stays.
+- [x] **#5 Medic / Stetmann have two heals** — Medic's merged heal button is index 6
+  (`heal,Execute`); our `HealWoLU` (Adaptive Medpacks) was a 2nd button at index 11. Re-pointed
+  index 6 → `HealWoLU,Execute`, removed index 11 (vanilla `heal` ability stays for enemy
+  autocast). Stetmann differs (its heal is `BonesHeal`, not a heal/heal-L1 dup) — mirrored the
+  same single-button result by re-pointing its BonesHeal button → HealWoLU. ⚠ verify Stetmann.
+- [x] **#6 Jackson's Revenge: only Yamato autocasts** — `DukesRevengeMissilePods` +
+  `DukesRevengeDefensiveMatrix` ship `CmdButtonArray State="Restricted"` (Yamato doesn't); the
+  `parent=` clones inherited it. Added `State="Normal"` to both clones' `CmdButtonArray` +
+  `TechTreeAbilityAllow` for all three DR clones in the lib.
+- [x] **#10 Spider Mine shares hotkey E with Enter Siege** — the vanilla `SpiderMine` button
+  has no Hotkey field → inherits base-CASC `Button/Hotkey/SpiderMine=E` = SiegeMode's E. Added
+  a `CButton SpiderMineWoLU` (same icon) with `Button/Hotkey/SpiderMineWoLU=Y`; every
+  spider-mine card button + the ability's DefaultButtonFace now use it. Enter Siege keeps E.
+- [x] **#11 ⚠ Spider mines fail when SIEGED** — `SpawnSpiderMineSet` includes
+  `ReplenishNanoConstructor`, which refunds a charge on the **Vulture-only**
+  `MakeVultureSpiderMines` ability → aborts the set on a tank caster (sieged fails hardest).
+  Pointed `SpiderMineWoLU.Effect` at the raw `SpawnSpiderMine` create (we use a cooldown, not
+  the Vulture charge system). ⚠ verify a SIEGED Siege Breaker/Tank deploys + mobile still works.
+- [x] **#2 ⚠ Jotun/Thor doesn't fire air + ground at once** — base Thor weapons have no
+  `Options` block → `LinkedCooldown` defaults to 1 (weapons share one cooldown). The Goliath
+  Multi-Lock upgrade swaps to *Upgraded weapons with `LinkedCooldown=0` +
+  `OnlyFireWhileInAttackOrder=0` + `OnlyFireAtAttackOrderTarget=0`. Set those three Options on
+  Thor's two weapons + Odin's (static WeaponData — `Options[]` is indexed = per-player no-op;
+  GLOBAL, so enemy Thors also fire both: accepted tradeoff). ⚠ owner confirms simultaneous fire.
+- [x] **#8 ⚠ Jotun AA splash too small** — `JavelinMissileLaunchersDamage` AreaArray radius 0.5
+  < ground 1.6/2.5; AreaArray is indexed (per-player no-op). Used the Shaped-Blast clone pattern
+  (like `ThorsHammerWoLUSet`): the AA missile's `ImpactEffect` → a `CEffectSet` with vanilla
+  (`WoLUNoFlag`) + player-only buffed (`WoLUHasFlag`) branches; the buffed branch = 35 flat, no
+  light bonus, AreaArray 1.6/2.5, air enemy-only SearchFilters. ⚠ owner confirms splash radius.
+- [x] **#9 ⚠ Jotun Immortality Protocol (gas cost + two HP bars)** — the Thor death-response
+  `ThorDontDie` (DamageResponse Fatal=1 → morph to `ThorWreckage`, gated on the auto-granted
+  `MechanicalRebirth` upgrade) is inherited by MercThor; `ThorReborn` rebuilds a *base Thor*
+  (not a MercThor) and charges Thor's gas → the "costs gas" tooltip + a double-HP-bar rebuilt
+  unit. Stripped the reconstruction from the Jotun (`<BehaviorArray index="1" removed="1"/>` —
+  it has unlimited calldown charges, so it just dies and you drop another). ⚠ confirm no rebuild.
+- [x] **#3 Bunkers reject mechanical / size>1** — `BunkerTransport.TargetFilters` requires
+  `Biological` (string = per-player no-op) → edited in STATIC XML (drop Biological, keep
+  ground-only, exclude Air). Per-player (genlib): `MaxCargoCount=4`, `MaxCargoSize=8` (admit the
+  size-8 Thor), `TotalCargoSpace=32` (count binds before size → 4 of anything, each = 1 slot).
+  ⚠ verify a Goliath/Hellion loads, each = one slot.
+- [x] **#7 ⚠ Cloaked-on-spawn units don't show the decloak button** — we cloak via
+  `PersonalCloakingFree`, so the toggle cloak ability stays OFF → shows CloakOn. The lib now
+  issues each toggle's On command on the periodic (`Order(AbilityCommand(cloak,0))` +
+  `AddToFront`, guarded to idle units — the liberty AI pattern) for Ghost/Banshee/Wraith/Spectre
+  + Nova/Tosh/DuskWing/MercWraith/MercSeniorGhost. Reaper/Medivac/Predator (no toggle) unchanged.
+  ⚠ confirm CloakOff shows and units stay cloaked + commandable.
+- [~] **#4 Elite mercs: heart portrait + missing upgrade cards** — PARTIAL. (a) **Upgrade
+  cards DONE**: Type=Passive shields/armor/attack display cards (DefensiveMatrix / ShapedHull /
+  Laser Targeting faces, WoLUHaveFlag-gated) added to all six elite mercs. (b) **Portrait STILL
+  OPEN**: an attempted fix (switch each merc actor to `parent="Medic"`/`"Thor"`/… inheriting the
+  base unit's actor) was **REVERTED** — independent review showed it dropped the explicit
+  `<Model>`, so the body would resolve via the `unitName` token (`MercMedic` → no `CModel`) and
+  render a **sphere** (the v0.2.0 bug), and it didn't reliably fix the portrait anyway (e.g. the
+  base Wraith actor has no `<PortraitModel>`). Restored the known-good body (`parent=GenericUnitBase`
+  + explicit `<Model>`); bodies render, **portrait remains a heart**. The ref dump DOES contain
+  `ActorData.xml`, but the portrait still isn't locally verifiable (preload-dependent) — needs an
+  in-game-confirmed approach. `audit.py` CHECK1 now FAILs if a clone actor's body model can't
+  resolve (explicit `<Model>` or a matching `CModel`), so the sphere class can't ship green again.
+
 ## Resolved (most recent first)
 
 - [x] **BC "ignore armor" was BACKWARDS** — RESOLVED v0.2.5: `ArmorReduction` is a MULTIPLIER on how much the target's armor applies (reference values are only 0 / 0.334 / 1; `SnipeDamage` ignores armor via `ArmorReduction=0`). The shipped `ArmorReduction=500` would have made armor reduce BC damage 500× (≈0 damage to any armored target). Corrected to `0` on `ATSLaserBatteryU`/`ATALaserBatteryU`.

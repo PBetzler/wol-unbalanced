@@ -241,18 +241,18 @@ def emit():
         ("Unit", "Marauder", "CargoSize", "1", "Set", ""),
         ("Unit", "Ghost", "CargoSize", "1", "Set", ""),
         ("Unit", "Spectre", "CargoSize", "1", "Set", ""),
-        # CargoSize per-player is read at bunker LOAD time and the runtime edit doesn't
-        # reach it (confirmed in game — Ghost still took 2 slots; see learnings/open-issues).
-        # Achieve the rule's INTENT (a bunker holds 4 of ANY infantry, including the size-2
-        # Ghost/Marauder/Firebat/Spectre) by bumping the bunker's TotalCargoSpace to
-        # MaxCargoCount(4) x MaxCargoSize(2) = 8. TotalCargoSpace is a scalar field (same
-        # class as the MedivacTransport edit that works), so it DOES apply per player.
-        ("Abil", "BunkerTransport", "TotalCargoSpace", "8", "Set", "Bunker holds 4 of any infantry (size-2 units no longer eat 2 slots)"),
-        # MaxCargoCount limits the NUMBER of units (vanilla 4); with TotalCargoSpace=8 but
-        # MaxCargoCount=4 a bunker of size-1 marines fills at 4 units while the capacity bar
-        # still shows 4 empty space => "full but slots free" (user report). Match the count
-        # to the space so size-1 units fill all 8 (and 4 size-2 units still cap at 8 space).
-        ("Abil", "BunkerTransport", "MaxCargoCount", "8", "Set", "match unit-count cap to TotalCargoSpace (no confusing empty slots)"),
+        # #3: a bunker holds 4 of ANY ground unit (incl. large mechanical), each = 1 slot.
+        # CargoSize per-player is read at bunker LOAD time and the runtime edit doesn't reach
+        # it (confirmed in game — Ghost still took 2 slots), so we don't try to set CargoSize=1.
+        # Instead make the unit COUNT bind before the size sum: MaxCargoCount=4 (the real cap),
+        # MaxCargoSize=8 (admit the size-8 Thor — vanilla 2 rejected anything bigger than a
+        # Goliath), TotalCargoSpace=32 (= 4 x max CargoSize 8, so 4 of ANYTHING always fits and
+        # the count is the binding limit → every unit effectively costs one slot). The
+        # ground-only gate is the static TargetFilters edit (AbilData; Air excluded). These are
+        # scalar fields (same class as the working MedivacTransport edit) → apply per player.
+        ("Abil", "BunkerTransport", "MaxCargoCount", "4", "Set", "Bunker holds 4 units (the binding cap)"),
+        ("Abil", "BunkerTransport", "MaxCargoSize", "8", "Set", "admit large ground units (Thor=8) — vanilla 2 rejected them"),
+        ("Abil", "BunkerTransport", "TotalCargoSpace", "32", "Set", "4 x max CargoSize 8 → count binds before size, every unit = 1 slot"),
         # damage flattening: base damage = old total vs bonus attribute
         ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: 10(+10 light) -> 20 flat"),
         ("Effect", "C10CanisterRifle", "AttributeBonus[Light]", "0", "Set", ""),

@@ -10,6 +10,43 @@
          Per-player windup cap stays on the vanilla ThorsHammer id in genlib. -->
     <CWeaponLegacy id="ThorsHammer">
         <Effect value="ThorsHammerWoLUSet"/>
+        <!-- #2: simultaneous air + ground fire (Goliath Multi-Lock pattern). A Thor with
+             two weapons (JavelinMissileLaunchers AA + ThorsHammer AG) fires only one at a
+             time because, with no Options block, LinkedCooldown defaults to 1 (the weapons
+             share one cooldown clock). The proven WoL pattern is the Goliath's *Upgraded
+             weapons (GoliathGUpgraded / GoliathAUpgraded), which carry LinkedCooldown=0 +
+             OnlyFireWhileInAttackOrder=0 + OnlyFireAtAttackOrderTarget=0 — exactly the
+             independent-fire flags (the MultilockTargetingSystems upgrade only un-hides
+             them; the flags live on the weapon defs, verified in the reference). Replicate
+             them on both Thor weapons (and Odin's below)
+             so each weapon acquires + fires its own target type independently.
+             Options[] is an INDEXED array (a per-player CatalogFieldValueModify on it is a
+             silent no-op), so this must live in STATIC XML — it is therefore GLOBAL and
+             also enables enemy Thors to fire both weapons. Accepted tradeoff (negligible:
+             few/zero enemy Thors in WoL; same precedent as the global bunker TargetFilters
+             edit). Owner verifies the Jotun/Thor fires air + ground at once. -->
+        <Options index="LinkedCooldown" value="0"/>
+        <Options index="OnlyFireWhileInAttackOrder" value="0"/>
+        <Options index="OnlyFireAtAttackOrderTarget" value="0"/>
+    </CWeaponLegacy>
+    <!-- #2: the Thor AA weapon needs the same independent-fire Options so it fires alongside
+         ThorsHammer. (#8 splash is wired below via the JavelinMissileLaunchersLM impact set.) -->
+    <CWeaponLegacy id="JavelinMissileLaunchers">
+        <Options index="LinkedCooldown" value="0"/>
+        <Options index="OnlyFireWhileInAttackOrder" value="0"/>
+        <Options index="OnlyFireAtAttackOrderTarget" value="0"/>
+    </CWeaponLegacy>
+    <!-- #2 parity (rule 10): Odin (= hero Thor) gets the same simultaneous air+ground fire.
+         Odin's weapons are OdinAntiAir (AA) + Odin (AG). -->
+    <CWeaponLegacy id="Odin">
+        <Options index="LinkedCooldown" value="0"/>
+        <Options index="OnlyFireWhileInAttackOrder" value="0"/>
+        <Options index="OnlyFireAtAttackOrderTarget" value="0"/>
+    </CWeaponLegacy>
+    <CWeaponLegacy id="OdinAntiAir">
+        <Options index="LinkedCooldown" value="0"/>
+        <Options index="OnlyFireWhileInAttackOrder" value="0"/>
+        <Options index="OnlyFireAtAttackOrderTarget" value="0"/>
     </CWeaponLegacy>
 
     <!-- Viking ground (Assault) attack: Shredder Rounds (splash) + Anti-Mechanical Munition

@@ -114,6 +114,20 @@ gotcha; authoritative details live in the code/plan, not here.
   drain. `UnitBehaviorAdd`-ing one makes the unit cloaked from that instant and stay cloaked
   for free — the way to make any cloak-capable unit "spawn cloaked." (It's generic; works on
   Ghost/Banshee/Wraith/Reaper/etc., not just the spectre/personal originals.)
+- **Cloaking via the buff leaves the TOGGLE ability OFF → the card shows "Cloak On" not
+  "Cloak Off".** The unit IS cloaked (by the buff) but its `CAbilBehavior` cloak toggle
+  (`GhostCloak`/`BansheeCloak`/`WraithCloak`/`RogueGhostCloak`/
+  `DuskWingBansheeCloakingField`; On = command index 0, Off = index 1) stays off, so the UI
+  offers the decloak button only after you flip the toggle. Issue the On command from the
+  trigger lib: **`UnitIssueOrder(u, Order(AbilityCommand("GhostCloak", 0)),
+  c_orderQueueAddToFront)`** — `Order(...)` (no-target form, NOT `OrderTargetingNone`),
+  and `AddToFront` (NOT `Replace`, which clobbers the unit's move/attack queue and freezes
+  it). Pattern lifted verbatim from liberty's own AI cloak triggers. Guard with
+  `if UnitOrderCount(u) == 0` so the periodic only toggles idle units (never interrupts a
+  busy one; freshly-spawned units get it the first idle tick). Units with no toggle ability
+  (Reaper/Medivac/Predator) just keep the permanent buff. Map: Ghost=GhostCloak,
+  Banshee=BansheeCloak, Wraith=WraithCloak, Spectre=RogueGhostCloak,
+  DuskWing=DuskWingBansheeCloakingField; heroes/mercs inherit the base's id.
 - **`ShieldArmorName` (and `LifeArmorName`) must be a string-table KEY, not a literal** —
   vanilla uses `Unit/ShieldArmorName/ProtossPlasmaShields`. A raw value like
   `"Defensive Matrix"` shows **"unknown"** in the inspect panel. Add a `Unit/ShieldArmorName/<id>`
@@ -124,7 +138,21 @@ gotcha; authoritative details live in the code/plan, not here.
   `<AbilArray index="3" removed="1"/>`). A later layer that sets the same index with a real
   `Link` re-occupies the slot (verified by merge). To re-point a button the campaign turned
   into a *passive*, you must APPEND a fresh full button — overriding only its `AbilCmd` leaves
-  `Type=Passive`/the old `Face`, so it never works as the action.
+  `Type=Passive`/the old `Face`, so it never works as the action. **Same tombstone works on
+  any inherited array on a `parent=` clone**: to drop an inherited BEHAVIOR from a clone, set
+  its index `removed="1"` (e.g. the Jotun merc strips the Thor's `ThorDontDie` reconstruction
+  with `<BehaviorArray index="1" removed="1"/>` — the campaign Thor's behaviors are
+  `[0]=ScavengingSystemsMechDeath, [1]=ThorDontDie`, index-less appends in libertystory).
+- **Reusing a vanilla EFFECT SET can drag in a CASTER-SPECIFIC effect that errors on a new
+  caster.** `SpawnSpiderMineSet` = `[SpawnSpiderMine, ReplenishNanoConstructor]`;
+  `ReplenishNanoConstructor` is a `CEffectModifyUnit` with
+  `Cost Abil="MakeVultureSpiderMines,Specialize1" ChargeCountUse="-1"` — it refunds a charge
+  on the **Vulture-only** `MakeVultureSpiderMines` ability. Fire that set from a non-Vulture
+  caster (Siege Tank/Breaker) and the missing-ability cost aborts the whole set → nothing
+  spawns (and an immobile/sieged caster fails hardest). Lesson: before pointing a new
+  ability/weapon at a vanilla `CEffectSet`, expand its members and check each for a
+  caster-bound `Cost Abil=`/validator; if present, point at just the core effect
+  (`SpawnSpiderMine`) instead of the set.
 - **Mid-mission saves do NOT survive mod changes — and `.version` files do NOT fix
   this** (two attempts proved it: constant counter, then monotonic counter; the error
   recurred both times). A `.SC2Save` serializes live game state *against the mod's
