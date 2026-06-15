@@ -109,6 +109,22 @@ gotcha; authoritative details live in the code/plan, not here.
   `CValidatorCombine` (Or/And) — the toolkit for autocast gates.
 - **Attack-while-moving** is the weapon's `AllowedMovement` enum (`Slowing` default,
   `Moving` = fire on the move) — a vanilla field, no custom work.
+- **`PersonalCloakingFree` / `SpectreCloakingFree` are permanent-cloak BUFFS**, not
+  cost-reducers: `CBehaviorBuff` with `Modification > StateFlags[Cloak]=1` and no energy
+  drain. `UnitBehaviorAdd`-ing one makes the unit cloaked from that instant and stay cloaked
+  for free — the way to make any cloak-capable unit "spawn cloaked." (It's generic; works on
+  Ghost/Banshee/Wraith/Reaper/etc., not just the spectre/personal originals.)
+- **`ShieldArmorName` (and `LifeArmorName`) must be a string-table KEY, not a literal** —
+  vanilla uses `Unit/ShieldArmorName/ProtossPlasmaShields`. A raw value like
+  `"Defensive Matrix"` shows **"unknown"** in the inspect panel. Add a `Unit/ShieldArmorName/<id>`
+  GameStrings entry and reference that key. (Terran units have no vanilla shields, so added-shield
+  clones must supply this themselves.)
+- **`removed="1"` on an array index is a tombstone the campaign uses to delete inherited
+  entries** (e.g. libertystory strips the Marauder's `StimpackMarauder` via
+  `<AbilArray index="3" removed="1"/>`). A later layer that sets the same index with a real
+  `Link` re-occupies the slot (verified by merge). To re-point a button the campaign turned
+  into a *passive*, you must APPEND a fresh full button — overriding only its `AbilCmd` leaves
+  `Type=Passive`/the old `Face`, so it never works as the action.
 - **Mid-mission saves do NOT survive mod changes — and `.version` files do NOT fix
   this** (two attempts proved it: constant counter, then monotonic counter; the error
   recurred both times). A `.SC2Save` serializes live game state *against the mod's
