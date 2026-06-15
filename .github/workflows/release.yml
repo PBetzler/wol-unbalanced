@@ -22,9 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch latest release zip as map carrier
+        # Match ONLY the standard zip (WoL-Unbalanced-v*.zip). Releases that also carry the
+        # Nightmare zip (WoL-Unbalanced-Nightmare-v*.zip) would otherwise return 2 assets and
+        # `--output` cannot write more than one.
         run: |
           gh release download --repo "$GITHUB_REPOSITORY" \
-            --pattern "WoL-Unbalanced-*.zip" --output base.zip \
+            --pattern "WoL-Unbalanced-v*.zip" --output base.zip \
             $(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName')
       - name: Repack with current mod
         run: python3 scripts/repack.py base.zip "$GITHUB_REF_NAME"
