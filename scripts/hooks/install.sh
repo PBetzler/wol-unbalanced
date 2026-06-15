@@ -14,5 +14,12 @@ for h in pre-commit; do
   echo "installed: .git/hooks/$h -> scripts/hooks/$h"
 done
 
-# The Stop hook (engram summary) is wired via .claude/settings.json, not git.
-echo "done. Bypass a hook with: git commit --no-verify"
+chmod +x "$root/scripts/hooks/agent-pretool-brief-check.sh" 2>/dev/null || true
+
+# Claude Code hooks (NOT git hooks) are wired via .claude/settings.json (local — .claude/
+# is gitignored, so this isn't auto-installed on a fresh clone):
+#   * Stop            -> scripts/hooks/stop-engram-summary-check.sh  (engram-summary tripwire)
+#   * PreToolUse/Task -> scripts/hooks/agent-pretool-brief-check.sh  (dispatch-brief gate:
+#                        FIRST ACTION + ROLE + ## Result + Opus model tier; see CLAUDE.md
+#                        §"Agent Dispatch Brief Template"). Re-add the block on a fresh clone.
+echo "done. Bypass a git hook with: git commit --no-verify"

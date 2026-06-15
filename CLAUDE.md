@@ -27,6 +27,19 @@ python3 scripts/build.py install # copy into /Applications/StarCraft II
 - **Load canary**: the subtitle message "WoL Unbalanced: data applied …" at ~1 s/10 s into a mission. Absent ⇒ our library didn't run. Black map with no error ⇒ Galaxy compile failure (see learnings).
 - Reference data (vanilla catalogs, CampaignLib sources, reference mods) lives under `mods/_reference/` and `mods/` — gitignored, never committed.
 
+## PM Orchestration & Delegation (how the top-level agent works)
+
+The top-level / open-chat agent is the **Product Manager / orchestrator by default**. It plans, delegates the leaf work to **Opus engineers**, and reviews — it does not hand-write the bulk of the implementation itself. Quality compounds when judgment work runs on the strongest model and the rules are *enforced*, not just described.
+
+- **The dispatch triad — research → implement → validate.** Every non-trivial change goes through up to three dispatch kinds, each at the right model tier:
+  1. **Research** (when investigation is needed first) — a read-only `Explore` agent on a **lighter** model maps the area (reference catalogs, merged card layouts, id resolution) and returns findings. Don't pre-read whole subsystems in the PM context; dispatch the look.
+  2. **Implement** — an **Opus** engineer (`model: "opus"`) makes the change against the PM's brief.
+  3. **Validate** — an **independent Opus reviewer** (`subagent_type: "Code Reviewer"`, `model: "opus"`) reads the diff **before build/commit**, separate from the PM's own review. The author never validates their own work. (This session's audit gate caught a shipped `YamatoWoLU` bug exactly this way — static review finds what the owner's playtest shouldn't have to.)
+- **The validation chain for this project.** independent Opus review (static) → `galaxy_lint.py` + `audit.py` + `build.py build` green → **the owner verifies in game** (the ultimate gate — there is no SC2 MCP, the PM cannot run the game). Static review + the gate exist to catch everything catchable *before* the owner's playtest, never to replace it.
+- **Hard boundary, with a solo-project carve-out.** The PM delegates substantive implementation (XML/galaxy/genlib edits, new tooling) and reserves its context for sequencing, briefs, review, commits, builds, and releases. **Trivial mechanical edits** (a one-line value, a rename, a doc tweak) and quick fixes the PM may do in-place — name the triviality when you do. When in doubt, dispatch.
+- **Model tier (the rule the hook enforces):** implement + validate dispatches use `model: "opus"`; only a read-only research dispatch (`subagent_type: "Explore"`) may run on a lighter model.
+- **Enforced, not just described.** The dispatch hook ([scripts/hooks/agent-pretool-brief-check.sh](scripts/hooks/agent-pretool-brief-check.sh)) **blocks (exit 2)** a Task whose brief is missing the required headers or the `## Result` block, or an implement/validate dispatch that isn't Opus. `scripts/check_dispatch_doctrine.py` (pre-commit + CI) keeps this doctrine and the hook in sync, so the rules can't silently drift out of the prose.
+
 ## Design Rules (the contract)
 
 All changes affect **only the player** (rule 9) — enemies stay vanilla. (1) No new units. (2) Armory upgrades auto-unlocked from each unit's unlock mission. (3) Mercs unlock with their counterpart. (4) Mercs keep their % advantage and inherit counterpart upgrades. (5) Build-time cap 60 s. (6) Merc calldowns: unlimited charges, ready at mission start (Compound still required). (7) Attack windup ≤ 0.1 s. (8) Cloak is always free. (10) Heroes inherit base-unit changes & abilities (Raynor=Marine, Tychus=Firebat, Swann=Marauder, Stetmann=Medic, Nova=Ghost, Tosh=Spectre, Odin=Thor). Every either/or choice grants **both** sides. Full details + per-unit spec: [unit-table.md](unit-table.md).
@@ -63,6 +76,24 @@ Engram (MCP server `engram`, project `wol-unbalanced`) is the cross-session memo
 - Before the session ends, save a `mem_session_summary` (goal, done, verified vs pending, open items). A Stop hook ([scripts/hooks/stop-engram-summary-check.sh](scripts/hooks/stop-engram-summary-check.sh)) fires a reminder if no engram write happened recently — tripwire, not a gate.
 - [docs/learnings.md](docs/learnings.md) is **curated public documentation**, not a memory mirror: promote a fact there only when it's stable, repo-relevant, and useful to anyone modding WoL — no per-session bookkeeping duty.
 
-## Subagent Briefs
+## Agent Dispatch Brief Template
 
-Any dispatched subagent brief must start with: **FIRST ACTION: read `CLAUDE.md` and `docs/learnings.md`** and follow both throughout — especially the Hard Rules and the learnings contribute-back rule.
+Dispatched subagents do NOT auto-load `CLAUDE.md` — they get only the brief plus their `subagent_type` definition. The brief is the only way to bind them to the project's rules and role. Every dispatch brief MUST contain, in this order:
+
+1. A **FIRST ACTION** header (within the first ~500 characters), e.g.:
+   > **FIRST ACTION:** Read `CLAUDE.md` and `docs/learnings.md` end to end before anything else, and follow both throughout — especially the Hard Rules, the Don't-guess discipline, and the learnings contribute-back rule.
+2. A **ROLE** header (within the first ~1000 characters) naming the role and its conventions, e.g.:
+   > **ROLE:** You are taking the role of [Senior SC2-data engineer / Code Reviewer / Explore researcher / …]. Apply that role's conventions throughout.
+3. The **`## Result` block** instruction (in the brief body, after the headers) — every brief tells the subagent to end its final report with exactly:
+   ```
+   ## Result
+   - STATUS: success | partial | blocked
+   - ARTIFACTS: files created/modified, or none
+   - RISKS: known risks/uncertainties, or none
+   - LEARNINGS: docs/learnings.md entry contributed, or "none re-derived"
+   - NEXT: recommended follow-up, or none
+   ```
+   A report without this block is treated as `STATUS: partial` — verify the work directly before accepting it.
+4. The right **model tier** (see [§PM Orchestration & Delegation](#pm-orchestration--delegation)): `model: "opus"` for implement/validate; `subagent_type: "Explore"` (lighter) for read-only research.
+
+These are enforced mechanically by [scripts/hooks/agent-pretool-brief-check.sh](scripts/hooks/agent-pretool-brief-check.sh) (a Claude Code `PreToolUse(Task)` hook, wired in `.claude/settings.json`): a brief missing FIRST ACTION / `CLAUDE.md` / ROLE / `## Result`, or a non-`Explore` dispatch with an explicit non-Opus `model`, is **rejected at the harness (exit 2)** before the subagent runs. Run `scripts/hooks/install.sh` notes; the hook itself needs the `.claude/settings.json` wiring (local, since `.claude/` is gitignored).
