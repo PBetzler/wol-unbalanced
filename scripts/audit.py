@@ -241,7 +241,11 @@ def main():
             continue
         parent, unitname = our_actors[uid]
         parent_ok = parent and ("GenericUnit" in parent or parent in ref_actor_ids)
-        if not parent_ok:
+        # When the ref dump is absent (CI), ref_actor_ids is empty and we cannot confirm a
+        # non-GenericUnit parent (e.g. a base-unit wreck actor like ThorWreckage) is a real
+        # base actor — defer to the local pre-commit gate where the dump exists, matching
+        # CHECK3/4/5/6/7's ref-absent skip. GenericUnit* parents still validate everywhere.
+        if not parent_ok and ref_actor_ids:
             fails.append(f"CHECK1 actor-parent: CActorUnit '{uid}' must inherit a GenericUnit* base or a "
                          f"known base-unit actor (got {parent!r}).")
         if unitname != uid:
