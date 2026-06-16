@@ -99,6 +99,53 @@ verifiable.
   works fine; no second source exists in any catalog layer (merge simulator confirmed). If it
   persists after v0.3.5, need a screenshot — possibly a multi-select / AbilSetId UI artifact.
 
+## In-game playtest batch (v0.3.9 — implemented against docs/implementation-patterns.md)
+
+4 bugs from a playthrough, implemented against the VERIFIED `docs/implementation-patterns.md`
+(its root-cause analysis was independently double-checked). "[STATIC]" = statically settled here;
+"[GAME]" = the mechanism is statically correct/complete and the *effect* awaits the owner's
+in-game playthrough (no SC2 MCP). The verified-vs-needs-in-game split is deliberate.
+
+- [~] **Bug 1 — Hammer Securities (Marauder merc) has no super stim** — [STATIC fix]. Root cause
+  (ref §3.1): `HammerSecurity` is a STANDALONE unit (not a `parent="Marauder"` clone), so the base
+  Marauder's stim CARD button doesn't reach it. The ability was already swapped (`AbilArray index 3`
+  = `StimpackMarauderWoLU`) but the merged card had NO stim button at all (confirmed via the
+  card-merge simulator: buttons 0-4 = move/stop/attack row, 5 = JackhammerConcussionGrenade passive
+  @2,0, 6 = AblativeScales passive @2,1; max index 6, no AbilCmd stim). FIX: APPENDED a fresh
+  `Type=AbilCmd` stim button at the next free index (7) in a verified-free action cell (2,2),
+  `Face="Stim" AbilCmd="StimpackMarauderWoLU,Execute"` (Marauder #3 pattern). Button is
+  `WoLUHaveFlag`-gated; the merc is player-exclusive so the gate is always satisfied. ⚠ [GAME]
+  owner confirms the stim button shows on Hammer Securities and autocasts in combat.
+- [~] **Bug 4a — Jotun Immortality Protocol now WORKS** — see the REOPENED v0.3.7 #9 item above
+  (parallel `MercThor{DontDie,Wreckage,Reborn}` chain; [STATIC] design, [GAME] death-response).
+- [x] **Bug 4b — Jotun "time to first shot" windup** — STATICALLY SETTLED, no change needed. The
+  rule-7 `DamagePoint`≤0.1 cap is applied per-player to BOTH Thor weapons: `ThorsHammer` (AG,
+  was 0.831) AND `JavelinMissileLaunchers` (AA, was default 0.167) — confirmed in the generated
+  `LibWoLUnbalancedGen.galaxy` rule-7 block. `MercThor` (parent="Thor", no `WeaponArray` override)
+  inherits both. ⚠ [GAME]: if a "windup"/sluggishness complaint persists after DamagePoint is
+  confirmed capped, the remaining suspect is the AA weapon's `Period` (3.0 s, NOT capped — a
+  cadence, not a first-shot delay) or acquisition/turn-to-face — read `MercThor`'s
+  `ThorsHammer`/`JavelinMissileLaunchers` `DamagePoint`+`Period` to disambiguate (ref §6).
+- [x] **Bug 4c — Jotun simultaneous air+ground fire** — STATICALLY SETTLED, no change needed. The
+  three independent-fire `Options[]` flags (`LinkedCooldown=0`, `OnlyFireWhileInAttackOrder=0`,
+  `OnlyFireAtAttackOrderTarget=0`) are present + correct in STATIC `WeaponData.xml` on `ThorsHammer`
+  AND `JavelinMissileLaunchers` (Goliath Multi-Lock pattern); `MercThor` reaches them via
+  `parent="Thor"`. ⚠ [GAME]: the static checker can't observe "fires both at once" — owner confirms.
+- [x] **Bug 2 — Medic/Stetmann heal mechanical** — STATICALLY SETTLED, no change (ref §4 — do NOT
+  add a filter; the heal mechanism is verified complete). Card simulator confirms BOTH units show
+  exactly ONE visible heal button at the correct cell pointing at the mechanical-capable clone:
+  Medic button[6] cell (2,0) `Type=AbilCmd AbilCmd=HealWoLU,Execute`; Stetmann button[6] cell (2,0)
+  re-pointed `BonesHeal` → `HealWoLU,Execute`. The button index/cell is the visible action cell.
+  ⚠ [GAME]: owner manually heals a Marauder/Viking (or harness `RequestQueryAvailableAbilities` on
+  Medic/MercMedic with a mechanical target).
+- [x] **Bug 3 — shielded-unit normal armor sign** — STATICALLY SETTLED, no change. Each of the 6
+  elite mercs' `LifeArmorName` exactly matches its base unit's vanilla value (verified against the
+  reference catalogs): MercMedic/MercReaper/MercSeniorGhost = `TerranInfantryArmor` (Medic/Reaper/
+  Ghost), MercHellion/MercThor = `TerranVehiclePlating` (Hellion/Thor), MercWraith =
+  `TerranShipPlating` (Wraith). `ShieldArmorName` (`WoLUDefensiveMatrix`) is kept on all. CHECK7
+  confirms every key resolves. ⚠ [GAME]: owner confirms the inspect panel renders BOTH the
+  life-armor icon AND the shield icon side-by-side (a UI/preload behavior, not statically provable).
+
 ## In-game playtest batch (v0.3.7 — root-caused statically, pending re-test)
 
 11 issues from a playthrough. Root causes traced against `mods/_reference` (xmlq + the
@@ -137,12 +184,26 @@ card-merge simulator). Items marked ⚠ are best-effort / owner-verify-in-game o
   (like `ThorsHammerWoLUSet`): the AA missile's `ImpactEffect` → a `CEffectSet` with vanilla
   (`WoLUNoFlag`) + player-only buffed (`WoLUHasFlag`) branches; the buffed branch = 35 flat, no
   light bonus, AreaArray 1.6/2.5, air enemy-only SearchFilters. ⚠ owner confirms splash radius.
-- [x] **#9 ⚠ Jotun Immortality Protocol (gas cost + two HP bars)** — the Thor death-response
-  `ThorDontDie` (DamageResponse Fatal=1 → morph to `ThorWreckage`, gated on the auto-granted
-  `MechanicalRebirth` upgrade) is inherited by MercThor; `ThorReborn` rebuilds a *base Thor*
-  (not a MercThor) and charges Thor's gas → the "costs gas" tooltip + a double-HP-bar rebuilt
-  unit. Stripped the reconstruction from the Jotun (`<BehaviorArray index="1" removed="1"/>` —
-  it has unlimited calldown charges, so it just dies and you drop another). ⚠ confirm no rebuild.
+- [~] **#9 Jotun Immortality Protocol — REOPENED v0.3.9 under a NEW design (owner reversed the
+  v0.3.7 strip): make it WORK, resurrecting AS A JOTUN with no gas + a single HP bar.** The Thor
+  death-response `ThorDontDie` (DamageResponse Fatal=1 → morph into the `ThorWreckage` UNIT, gated
+  on the auto-granted `MechanicalRebirth` upgrade) was inherited by MercThor; the wreck's
+  `ThorReborn` morph rebuilds a *base Thor* (its `InfoArray Unit="Thor"`) and charges/shows the base
+  Thor's 200 gas → wrong identity + "costs gas" tooltip + a double HP bar. v0.3.7 STRIPPED it
+  (`<BehaviorArray index="1" removed="1"/>`). **v0.3.9 builds a PARALLEL merc-exclusive chain so the
+  Jotun revives as itself** (statically proven; the death-response EFFECT is [GAME]):
+  `MercThorDontDie` (parent `ThorDontDie`, `Handled="MercThorWreckage"`, full DamageResponse re-stated,
+  `Requirements="UseMechanicalRebirth"`) → `MercThorWreckage` (parent `ThorWreckage` CUnit;
+  elite-merc unit-type carve-out — id never appears in any WoL map; `AbilArray index 0` overridden to
+  `MercThorReborn`, ImmortalityProtocol card button re-pointed) → `MercThorReborn` (parent `ThorReborn`
+  CAbilMorph, `InfoArray Unit="MercThor"`, 12 s rebuild re-stated verbatim). `MercThor`'s inherited
+  `BehaviorArray index 1` is now an OVERRIDE (`Link="MercThorDontDie"`, not the old tombstone), and
+  `MercThor`'s `CostResource` Minerals+Vespene are zeroed so the rebuild charges/shows nothing. Added a
+  `MercThorWreckage` CActorUnit (parent `ThorWreckage`, `unitName="MercThorWreckage"`, Thor model,
+  morph-birth events re-bound to our id) so the wreck isn't a sphere (audit CHECK1). All ids resolve
+  (audit CHECK3 green; CHECK1 green for the new wreck actor). **⚠ [GAME] — owner confirms in game: a
+  fatal hit drops the Jotun to a wreck, it rebuilds AS A JOTUN (merc actor/name), no gas in the
+  tooltip, and a single HP bar.** Death-response chains can't be fully statically proven.
 - [x] **#3 Bunkers reject mechanical / size>1** — `BunkerTransport.TargetFilters` requires
   `Biological` (string = per-player no-op) → edited in STATIC XML (drop Biological, keep
   ground-only, exclude Air). Per-player (genlib): `MaxCargoSize=8` (admit the size-8 Thor),

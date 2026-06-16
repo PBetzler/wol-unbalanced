@@ -163,9 +163,34 @@ gotcha; authoritative details live in the code/plan, not here.
   into a *passive*, you must APPEND a fresh full button — overriding only its `AbilCmd` leaves
   `Type=Passive`/the old `Face`, so it never works as the action. **Same tombstone works on
   any inherited array on a `parent=` clone**: to drop an inherited BEHAVIOR from a clone, set
-  its index `removed="1"` (e.g. the Jotun merc strips the Thor's `ThorDontDie` reconstruction
-  with `<BehaviorArray index="1" removed="1"/>` — the campaign Thor's behaviors are
-  `[0]=ScavengingSystemsMechDeath, [1]=ThorDontDie`, index-less appends in libertystory).
+  its index `removed="1"` (e.g. one could strip the Thor's `ThorDontDie` reconstruction from the
+  Jotun with `<BehaviorArray index="1" removed="1"/>` — the campaign Thor's behaviors are
+  `[0]=ScavengingSystemsMechDeath, [1]=ThorDontDie`, index-less appends in libertystory). To
+  re-point it to a different behavior, OVERRIDE the same index with a `Link` instead of the
+  tombstone (`<BehaviorArray index="1" Link="MercThorDontDie"/>`).
+- **A death-response RESURRECT chain has THREE links to clone for a merc clone to revive AS
+  ITSELF, and the rebuild's gas cost lives on the REBUILT UNIT, not the morph ability.** The Thor
+  Immortality Protocol is: `ThorDontDie` (`CBehaviorBuff`, `DamageResponse Fatal=1
+  Handled="ThorWreckage"`) → morphs the dying unit into the **`ThorWreckage` UNIT** (a
+  `CUnit parent="Thor"`, immobile wreck) whose `AbilArray[0]` = the `ThorReborn` **morph**
+  (`CAbilMorph`, `InfoArray Unit="Thor"`) which rebuilds a *base Thor*. So `Handled=` points at a
+  **unit id** (the wreck to become), and the reborn identity is set by the morph's
+  `InfoArray Unit=`. A `parent="Thor"` merc inherits the whole chain and revives as a *base Thor*.
+  To revive as the merc, clone all three with merc-targeted links: `MercThorDontDie`
+  (`Handled="MercThorWreckage"`, re-state the full `DamageResponse` struct — a partial override on
+  a struct field doesn't reliably merge) → `MercThorWreckage` (`parent="ThorWreckage"`,
+  `AbilArray[0]` overridden to the merc morph + ImmortalityProtocol card button re-pointed) →
+  `MercThorReborn` (`parent="ThorReborn"`, `InfoArray Unit="MercThor"`, re-state the InfoArray
+  verbatim — the nested `SectionArray` timing children don't merge under a partial override). The
+  "**costs gas**" tooltip + double-HP-bar came NOT from the morph (both `ThorReborn`/`ThorWreckage`
+  morphs have **no `<Cost>`**; `RefundFraction`=0) but from the **rebuilt unit's `CostResource`**
+  being displayed/charged during the `ShowProgress` rebuild — base Thor is 300/200. Fix: zero the
+  merc unit's `CostResource` (a calldown unit should be free anyway). And: the **wreck is a NEW
+  unit id → it needs its OWN `CActorUnit`** (clone the vanilla wreck actor, set
+  `unitName="MercThorWreckage"`, re-bind the `MorphTo`/`UnitBirth` morph-birth `On` terms to the
+  new id, explicit `<Model>`) or it renders as a sphere (audit CHECK1). The wreck-unit clone is
+  safe under "never clone unit TYPES" via the elite-merc carve-out (the id never appears in a WoL
+  map). [STATIC chain; death-response EFFECT is GAME-only.]
 - **Reusing a vanilla EFFECT SET can drag in a CASTER-SPECIFIC effect that errors on a new
   caster.** `SpawnSpiderMineSet` = `[SpawnSpiderMine, ReplenishNanoConstructor]`;
   `ReplenishNanoConstructor` is a `CEffectModifyUnit` with
@@ -273,3 +298,15 @@ gotcha; authoritative details live in the code/plan, not here.
   `PersonalCloakingFree`, `SpectreCloakingFree`.
 - Merc calldown: `SummonMercenaries` `InfoArray[Train1..8]` with `Charge.CountMax/
   CountStart` and `Cooldown.TimeStart` (vanilla 300 = 5 min wait at mission start).
+
+## Verification tooling
+
+- **SC2 client API live reads are a HARD BLOCK on retail 5.x** (this Mac). `scripts/verify_api.py`
+  can `RequestPing` + `RequestCreateGame` (campaign map loads, mod deps resolve — a "mod loads via
+  the engine" sanity check), but `RequestJoinGame` ALWAYS fails `"Unable to validate game license"`.
+  NOT bypassable by Battle.net SSO/`-sso`, reaching the main menu, `Play Offline`, `--attach` to a
+  BNet-launched instance, or timing — confirmed against Blizzard's `s2client-proto` repo + community.
+  The only API binary for live reads is the Linux headless **4.10** (no 5.x). So live HP/armor/cargo
+  reads are impossible here; verification = static analysis (`audit.py` + merge sim +
+  `implementation-patterns.md`) + the owner's in-game playtest. **Don't re-attempt the API for live
+  verification on this Mac.**

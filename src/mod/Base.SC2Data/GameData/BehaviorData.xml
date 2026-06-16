@@ -99,6 +99,28 @@
         <Modification AttackSpeedMultiplier="1.1"/>
     </CBehaviorBuff>
 
+    <!-- Jotun (MercThor) Immortality Protocol — make it RESURRECT AS ITSELF (owner reversed the
+         v0.3.7 strip). The base Thor's death-response `ThorDontDie` (DamageResponse Fatal=1 ->
+         Handled="ThorWreckage", gated on the auto-granted UseMechanicalRebirth upgrade) morphs the
+         dying unit into the `ThorWreckage` UNIT, whose `ThorReborn` morph rebuilds a *base Thor*
+         (its InfoArray Unit="Thor") AND charges the base Thor's 200-gas cost -> the "costs gas"
+         tooltip + a two-HP-bar base-Thor identity over the merc actor. To revive as the Jotun
+         instead, build a PARALLEL merc-exclusive chain (this behavior + MercThorWreckage unit +
+         MercThorReborn morph) that points at MercThor with no gas. This clone overrides only the
+         wreck target (Handled). DamageResponse is a struct, so re-state the full block (a partial
+         override on a struct field doesn't reliably merge) — verbatim from ThorDontDie except
+         Handled. MercThor is player-exclusive, so no flag gate is needed; UseMechanicalRebirth is
+         already auto-granted by the lib. -->
+    <CBehaviorBuff id="MercThorDontDie" parent="ThorDontDie">
+        <DamageResponse>
+            <Chance value="1"/>
+            <Fatal value="1"/>
+            <Handled value="MercThorWreckage"/>
+            <ModifyFraction value="0"/>
+        </DamageResponse>
+        <Requirements value="UseMechanicalRebirth"/>
+    </CBehaviorBuff>
+
     <!-- Predator Charge (AP): a permanent +120% move-speed buff (the Zealot-charge feel
          without the engine-coupled CAbilAugment, which doesn't link to its buff in data and
          is untested on Terran units). Adapted from Protoss Charging (MoveSpeedMultiplier 2.2);

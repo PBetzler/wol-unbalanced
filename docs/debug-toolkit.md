@@ -49,3 +49,42 @@ Absent canary ⇒ the lib didn't run (dependency/MapScript injection) or a black
 
 ## When you can't repro locally
 Add a targeted `diag` subtitle line reporting the exact field value (`CatalogFieldValueGet`), build, install, and have the owner read it back from the mission. That round-trip is the substitute for runtime inspection.
+
+## SC2 client-API self-verification (`scripts/verify_api.py`)
+
+A second, *automated* runtime probe alongside the in-game diag line. It drives the s2client-proto websocket, loads one of our **built campaign maps** (so the trigger lib runs), spawns/reads player-1 units, and asserts the data-level values the mod should produce — no human needed for the read-out (once the owner's instance is up — see attach setup below).
+
+```sh
+# one-time setup (venv is gitignored; only the script is tracked)
+python3 -m venv tools/sc2api/.venv
+tools/sc2api/.venv/bin/pip install s2clientprotocol websocket-client 'protobuf<3.21'
+```
+
+### Live unit reads are BLOCKED on retail (both spawn AND `--attach`)
+
+**Confirmed — sourced research + empirical (do not re-chase this).** `RequestJoinGame` is a hard Blizzard license/mode gate on the retail 5.x binary that NO local setup bypasses: not spawn mode, not `--attach` to a Battle.net-PLAY-launched `-sso` instance (it fails identically, status=`launched`), not reaching the main menu, not `Play Offline`, not timing. The only API binary that allows live reads is the **Linux headless 4.10** (offline; Blizzard never shipped a 5.x equivalent). So `health_max`/`armor`/`cargo` live reads are **not achievable on this macOS retail install**. What still works: `RequestPing` + `RequestCreateGame` (the campaign map LOADS, mod deps resolve) — a useful "the mod loads via the engine" sanity check, nothing more. **Verification reverts to static analysis (`audit.py` + the merge simulator + `implementation-patterns.md`) + the owner's in-game playtest.** `--attach`/`verify_api.py` are kept only for that sanity check, and as a base if a Linux-4.10 headless setup is ever pursued on the Ubuntu box (caveat: 4.10 ≠ 5.0.15, may verify the wrong data).
+
+### (Historical) attach setup — only loads the map; cannot read units
+
+**One-time owner setup (do this once):** in the **Battle.net app** → StarCraft II → the **gear/Settings** next to PLAY → **"Additional command line arguments"**, set exactly:
+
+```
+-listen 127.0.0.1 -port 8765 -displaymode 0
+```
+
+Then click the Battle.net **PLAY** button and let SC2 reach the main menu. That instance is now **both** license-authenticated **and** API-listening on `127.0.0.1:8765`. Then run:
+
+```sh
+# attach to the owner's BNet-launched instance (MUST use the venv python — protos import only under protobuf<3.21)
+tools/sc2api/.venv/bin/python scripts/verify_api.py --attach --port 8765 -v
+```
+
+`--attach` does **not** launch SC2 and **never kills it** (implies `--keep-open`; on exit it only closes our websocket — the owner's instance keeps running). If nothing is listening on the port it prints the Battle.net-arg setup guide and exits **2**. If the attached instance is already in a game, it surfaces the live `in_game` status and proceeds to Observation rather than crashing.
+
+**What it CAN verify (data-level, machine-checkable):** `health_max`, `shield_max`, `energy_max`, per-unit `armor`/`cargo_size` (from `RequestData`), live `cargo_space_max` (bunker load cap), and the **available-ability list** per unit (`RequestQueryAvailableAbilities`). Its linchpin output is the **merc/hero-vs-base side-by-side table** (`MERC_PAIRS`/`HERO_PAIRS`): spawn `Thor` and `MercThor` (Jotun) together and compare — this empirically answers "do our per-player edits reach MERC/HERO unit types, or only the base id?". All observed unit data is written to the gitignored `tools/sc2api/observed_units.json` for analysis.
+
+**What it CANNOT verify (render/UI-only — still the owner's eyes in game):** portraits, inspect-panel icons & armor signs, tooltips, button faces, displayed damage/upgrade numbers, visual cloak/animations. It reads the *merged per-player catalog* the engine computes, not the UI that renders it.
+
+### Why spawn mode is blocked (kept for diagnostics only)
+
+Default (no `--attach`) spawn mode launches its own headless SC2 with `-listen`/`-port`. It is mechanically complete — SC2 binds the websocket (~11 s), `RequestPing` succeeds, and `RequestCreateGame` on `Campaign/traynor01.SC2Map` reaches `init_game` (a control test with a bogus path returns `InvalidMapPath`, proving our campaign map genuinely **LOADS** — mod deps resolve) — but `RequestJoinGame` is **permanently rejected**: `"Unable to validate game license. Please log in to Blizzard from the game or editor before proceeding."` Root cause (from the Battle.net log): an SC2 spawned directly with `-listen`/`-port` is seen by Battle.net as a *"Pre-existing game session detected without a pending launch"* — Battle.net does NOT hand it the per-session SSO/license token it only grants to instances **it** launches. `RequestData` (unit catalog) and `RequestObservation` are both also gated behind a successful join, so **everything downstream of JoinGame SKIPs** — not because the mod is wrong, but because of this Blizzard-side gate. The script detects this case and prints the attach-mode fix (`print_license_help`), exiting **2** (environment blocker, distinct from exit 1 = a real mod FAIL). The seed-the-session workarounds (launch-once, Play Offline) do **not** fix spawn mode — **and neither does `--attach`** to a BNet-launched instance: `RequestJoinGame` is a hard retail license gate with no local bypass (see the BLOCKED note above).

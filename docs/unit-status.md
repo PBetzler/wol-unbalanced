@@ -125,7 +125,7 @@ All 8 are on the Merc Compound **root** card (the submenu was dropped in v0.3.6 
 | --- | --- | --- | --- |
 | **War Pigs** | Marine | +65% HP, +35% dmg | ✅ HP ×1.4444; LTS range + sight mirrored (`KelmorianMinerGaussRifle`) |
 | **Devil Dogs** | Firebat | +60% HP, +25% dmg | ✅ HP ×2 + Kinetic Foam +100; flamer +2 range |
-| **Hammer Securities** | Marauder | +25% HP, +20% dmg | ✅ +2 armor; range + sight |
+| **Hammer Securities** | Marauder | +25% HP, +20% dmg | ✅ +2 armor; range + sight; **super-stim button added v0.3.9** (standalone unit, so the base Marauder's stim card button didn't reach it — appended a `Type=AbilCmd` stim button at idx 7 cell 2,2; 🟡 confirm it shows + autocasts) |
 | **Spartan Company** | Goliath | +33% HP, +33% dmg | 🟡 **HP re-tuned 165→198** (Shaped Hull parity: buffed Goliath 150 × 1.32) — confirm ~198 HP in game; Ares-Class range mirrored |
 | **Siege Breakers** | Siege Tank | +33% HP, +66% dmg | ✅ range/sight; +3 sieged armor; 🟡 spider-mine fixes (sieged deploy, own hotkey) |
 | **Hel's Angels** | Viking | +45% HP, +40% dmg | ✅ (inherits Viking buffs via shared ids) |
@@ -141,7 +141,7 @@ All 8 are on the Merc Compound **root** card (the submenu was dropped in v0.3.6 
 | **Skibi's Angels** (`MercMedic`) | Medic | Medic merc; +shields; inherits Medic upgrades | ✅ shows **only** Medic's real cards (no hull/weapon face — it's a healer); `LifeArmorName=TerranInfantryArmor` + `ShieldArmorName` both resolve (audit CHECK7) | 🟡 `MedicPortrait` |
 | **Death Heads** (`MercReaper`) | Reaper | Reaper merc; +HP/shields/armor | ✅ Reaper cards only; Infantry life-armor + shield signs resolve | 🟡 `ReaperPortrait` |
 | **Condor** (`MercHellion`) | Hellion | Hellion merc (non-AP, owner-added); +armor/shields | ✅ Hellion cards only; Vehicle life-armor + shield signs resolve | 🟡 `HellionPortrait`-class token |
-| **Jotun** (`MercThor`) | Thor | Thor merc; inherits Thor (Laser Targeting + Shaped Hull at idx 10/11) | ✅ shows inherited Thor cards; Vehicle life-armor + shield signs resolve; 🟡 AA splash, simultaneous fire, Immortality-Protocol-stripped (no rebuild/gas) | 🟡 `ThorPortrait` |
+| **Jotun** (`MercThor`) | Thor | Thor merc; inherits Thor (Laser Targeting + Shaped Hull at idx 10/11) | ✅ shows inherited Thor cards; Vehicle life-armor + shield signs resolve; ✅ windup capped (both weapons' `DamagePoint`≤0.1 inherited) + simultaneous-fire `Options[]` (inherited) — both [STATIC], 🟡 [GAME] confirm; **Immortality Protocol now WORKS v0.3.9** — parallel `MercThor{DontDie,Wreckage,Reborn}` chain revives AS A JOTUN, no gas, single HP bar (own wreck actor); 🟡 [GAME] confirm rebuild identity/no-gas; 🟡 AA splash | 🟡 `ThorPortrait` |
 | **Winged Nightmares** (`MercWraith`) | Wraith | Wraith merc; inherits Wraith Adv-Laser/Trigger-Override; +shields | ✅ Wraith cards only; Ship life-armor + shield signs resolve | 🟡 `WraithPortrait` |
 | **Senior Ghost** (`MercSeniorGhost`) | Ghost | Ghost clone on the **Ghost** model (not Nova); **1.5× life/energy/regen**; +50% dmg (`DamageDealtFraction`); flat armor | ✅ shows inherited Ghost card (Laser Targeting); Infantry life-armor + shield signs resolve; 🐞 #10 "two stim buttons" not statically reproducible (one stim button in merge sim) | 🟡 `GhostAlternate` model / `GhostPortrait` |
 

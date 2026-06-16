@@ -141,8 +141,20 @@
             <LayoutButtons index="9"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
+    <!-- Hammer Securities (Marauder merc) super stim. The merc is a STANDALONE unit (NOT a
+         parent="Marauder" clone), so the base Marauder's stim card button doesn't reach it.
+         We already swap its stim ability (AbilArray index 3 -> StimpackMarauderWoLU), but the
+         merged card has NO stim button at all (verified via the card-merge simulator: buttons
+         0-4 = move/stop/attack row, 5 = JackhammerConcussionGrenade passive @2,0, 6 =
+         AblativeScales passive @2,1; max index 6, no AbilCmd stim). So APPEND a fresh
+         Type=AbilCmd stim button (Marauder #3 fix pattern, UnitData.xml ~122-128) at the next
+         free index (7) in a verified-free action cell (2,2). Button is WoLUHaveFlag-gated;
+         the merc is player-exclusive so the gate is always satisfied. -->
     <CUnit id="HammerSecurity">
         <AbilArray index="3" Link="StimpackMarauderWoLU"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="7" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
+        </CardLayouts>
     </CUnit>
 
     <!-- Thor ground splash is now wired by overriding the vanilla ThorsHammer weapon's
@@ -534,19 +546,38 @@
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
         <LifeArmorName value="Unit/LifeArmorName/TerranVehiclePlating"/>
-        <!-- #9 fix: strip the Thor's Immortality Protocol / Mechanical Rebirth from the Jotun.
-             The Thor's death-response behavior `ThorDontDie` (CBehaviorBuff, DamageResponse
-             Fatal=1 Handled=ThorWreckage, gated on the UseMechanicalRebirth upgrade we
-             auto-grant) makes a fatal hit morph the unit into ThorWreckage, which ThorReborn
-             rebuilds — but it rebuilds a *base Thor* (the morph's InfoArray Unit="Thor"), not
-             a MercThor, and the morph charges Thor's gas cost. On a Jotun clone that produced
-             the "costs gas" tooltip and a TWO-HP-bar rebuilt unit (base-Thor identity over the
-             merc actor). The campaign Thor carries this behavior at BehaviorArray index 1
-             ([0]=ScavengingSystemsMechDeath, [1]=ThorDontDie, from libertystory); MercThor
-             inherits it via parent="Thor". Tombstone index 1 so the Jotun simply dies like the
-             other elite mercs (it has unlimited calldown charges — just drop another). Removes
-             the gas cost AND the double-HP-bar in one move. -->
-        <BehaviorArray index="1" removed="1"/>
+        <!-- #4a (v0.3.9, owner reversed the v0.3.7 strip): make Immortality Protocol WORK — the
+             Jotun resurrects AS A JOTUN, no gas, single HP bar. The campaign Thor carries
+             `ThorDontDie` at BehaviorArray index 1 ([0]=ScavengingSystemsMechDeath,
+             [1]=ThorDontDie, index-less appends from libertystory); MercThor inherits it via
+             parent="Thor". Its vanilla chain (ThorDontDie -> ThorWreckage unit -> ThorReborn
+             morph -> Unit="Thor" + Thor's 200 gas) rebuilt a *base Thor* and charged gas, giving
+             the wrong identity + the "costs gas" tooltip + a double HP bar. OVERRIDE (not the old
+             removed=1 tombstone) index 1 with MercThorDontDie, which heads a parallel
+             merc-exclusive chain (MercThorDontDie -> MercThorWreckage unit -> MercThorReborn morph
+             -> Unit="MercThor"). Gas is zeroed below so the rebuild charges/shows nothing. -->
+        <BehaviorArray index="1" Link="MercThorDontDie"/>
+        <!-- Zero the rebuild cost: the MercThorReborn morph charges/displays the rebuilt unit's
+             CostResource, and MercThor (parent="Thor") would otherwise inherit Thor's 300/200.
+             MercThor is a free, unlimited calldown unit, so a zero unit-cost is correct anyway
+             (it's never trained from a building) and removes the "costs gas" tooltip on rebuild. -->
+        <CostResource index="Minerals" value="0"/>
+        <CostResource index="Vespene" value="0"/>
+    </CUnit>
+
+    <!-- Jotun (MercThor) Immortality Protocol — the WRECK unit the Jotun morphs into on a fatal
+         hit (the parallel of ThorWreckage). Clone of the vanilla `ThorWreckage` CUnit
+         (parent="ThorWreckage", itself parent="Thor"; the elite-merc unit-type carve-out applies
+         — this id never appears in any WoL map). Inherits ThorWreckage's wreck stats incl.
+         CostResource[Vespene]=0 and the immobile/unkillable wreck flags. Override its rebuild
+         ability (AbilArray index 0: ThorReborn -> MercThorReborn) and re-point the
+         ImmortalityProtocol card button to the merc rebuild, so the wreck rebuilds a Jotun, not a
+         base Thor. -->
+    <CUnit id="MercThorWreckage" parent="ThorWreckage">
+        <AbilArray index="0" Link="MercThorReborn"/>
+        <CardLayouts index="0">
+            <LayoutButtons index="0" Face="ImmortalityProtocol" Type="AbilCmd" AbilCmd="MercThorReborn,Execute" Row="2" Column="0"/>
+        </CardLayouts>
     </CUnit>
 
     <!-- Winged Nightmares = AP "Mercenary Wraiths". Clone of the WoL Wraith (cloaked).

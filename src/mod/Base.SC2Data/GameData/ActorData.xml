@@ -80,5 +80,19 @@
         <Model value="GhostAlternate"/>
         <PortraitModel value="GhostPortrait"/>
     </CActorUnit>
+    <!-- Jotun (MercThorWreckage) wreck actor. The MercThor merc resurrects via a parallel
+         Immortality Protocol chain (MercThorDontDie -> MercThorWreckage unit -> MercThorReborn).
+         The wreck unit is a NEW id, so it needs its own CActorUnit or it renders as a sphere
+         (audit CHECK1). Clone the vanilla ThorWreckage actor (parent="ThorWreckage" inherits its
+         sounds/icons/wireframe/portrait) and re-bind the morph-birth events to OUR unit id
+         (MorphTo/UnitBirth MercThorWreckage). Wear the Thor model explicitly (the wreck is a
+         rebuilding Thor; explicit Model avoids any clone model-token resolution risk — same
+         pattern as the MercThor body actor). -->
+    <CActorUnit id="MercThorWreckage" parent="ThorWreckage" unitName="MercThorWreckage">
+        <Model value="Thor"/>
+        <On Terms="AbilMorph.*.Finish; MorphTo MercThorWreckage" Send="$Birth 0 1.000000 1.000000"/>
+        <On Terms="UnitBirth.MercThorWreckage.Suppressed" Send="$Stand PlayForever,NonLooping"/>
+    </CActorUnit>
+
     <!-- (MercLiberator/MercLiberatorAG/MercValkyrie actors removed with their units.) -->
 </Catalog>

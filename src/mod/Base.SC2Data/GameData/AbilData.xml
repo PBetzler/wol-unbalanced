@@ -502,6 +502,32 @@
         </CmdButtonArray>
     </CAbilEffectInstant>
 
+    <!-- Jotun (MercThor) Immortality Protocol — the rebuild morph that resurrects the wreck AS A
+         JOTUN (not a base Thor). Clone of the vanilla `ThorReborn` (CAbilMorph) with InfoArray
+         Unit retargeted to "MercThor". InfoArray is a struct whose nested SectionArray timing
+         children don't reliably merge under a partial override, so re-state the whole block
+         verbatim from ThorReborn (12 s rebuild) with only Unit changed. The "no gas" part is
+         handled by zeroing MercThor's CostResource (UnitData.xml) — the morph charges/displays
+         the *rebuilt unit's* cost, and MercThor (parent="Thor") would otherwise inherit Thor's
+         300/200. RefundFraction stays 0 (no refund, same as vanilla). Player-exclusive id, no
+         gate. Wired in as MercThorWreckage's rebuild ability (AbilArray index 0). -->
+    <CAbilMorph id="MercThorReborn" parent="ThorReborn">
+        <InfoArray Score="1" Unit="MercThor">
+            <SectionArray index="Abils">
+                <DurationArray index="Delay" value="12"/>
+            </SectionArray>
+            <SectionArray index="Actor">
+                <DurationArray index="Duration" value="12"/>
+            </SectionArray>
+            <SectionArray index="Collide">
+                <DurationArray index="Delay" value="12"/>
+            </SectionArray>
+            <SectionArray index="Stats">
+                <DurationArray index="Delay" value="12"/>
+            </SectionArray>
+        </InfoArray>
+    </CAbilMorph>
+
     <!-- #3: let ALL ground units (including mechanical) load into bunkers, each taking one
          slot. The vanilla BunkerTransport TargetFilters requires Biological ("Biological,
          Visible;Ally,Neutral,Enemy,Dead,Hidden") — a STRING field, so a per-player runtime
