@@ -493,11 +493,7 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
-        <CardLayouts index="0">
-            <LayoutButtons index="11"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
-            <LayoutButtons index="12"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
-            <LayoutButtons index="13"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
-        </CardLayouts>
+        <LifeArmorName value="Unit/LifeArmorName/TerranInfantryArmor"/>
     </CUnit>
     <CUnit id="MercReaper" parent="Reaper">
         <Name value="Unit/Name/MercReaper"/>
@@ -509,10 +505,7 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
-        <CardLayouts index="0">
-            <LayoutButtons index="8"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
-            <LayoutButtons index="9"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
-        </CardLayouts>
+        <LifeArmorName value="Unit/LifeArmorName/TerranInfantryArmor"/>
     </CUnit>
     <CUnit id="MercHellion" parent="Hellion">
         <Name value="Unit/Name/MercHellion"/>
@@ -524,11 +517,7 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
-        <CardLayouts index="0">
-            <LayoutButtons index="8"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
-            <LayoutButtons index="9"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="3"/></LayoutButtons>
-            <LayoutButtons index="10"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
-        </CardLayouts>
+        <LifeArmorName value="Unit/LifeArmorName/TerranVehiclePlating"/>
     </CUnit>
 
     <!-- "Jotun" — the Thor merc. No data source defines a Jotun unit ("Jotun" exists
@@ -544,11 +533,7 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
-        <CardLayouts index="0">
-            <!-- #4(b): shields display. Laser Targeting + Shaped Hull already show via the
-                 inherited Thor card; add the +100-shield Defensive Matrix in a free cell. -->
-            <LayoutButtons index="12"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="3"/></LayoutButtons>
-        </CardLayouts>
+        <LifeArmorName value="Unit/LifeArmorName/TerranVehiclePlating"/>
         <!-- #9 fix: strip the Thor's Immortality Protocol / Mechanical Rebirth from the Jotun.
              The Thor's death-response behavior `ThorDontDie` (CBehaviorBuff, DamageResponse
              Fatal=1 Handled=ThorWreckage, gated on the UseMechanicalRebirth upgrade we
@@ -577,11 +562,7 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
-        <CardLayouts index="0">
-            <LayoutButtons index="9"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
-            <LayoutButtons index="10"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
-            <LayoutButtons index="11"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="2"/></LayoutButtons>
-        </CardLayouts>
+        <LifeArmorName value="Unit/LifeArmorName/TerranShipPlating"/>
     </CUnit>
 
     <!-- (Midnight Riders / Brynhilds removed per owner: their intended Liberator and Valkyrie
@@ -601,13 +582,8 @@
         <ShieldRegenRate value="5"/>
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
+        <LifeArmorName value="Unit/LifeArmorName/TerranInfantryArmor"/>
         <BehaviorArray Link="WoLUSeniorGhostBoost"/>
-        <CardLayouts index="0">
-            <!-- #4(b): the Ghost card is nearly full (Snipe/EMP/Stim/cloak + Laser Targeting
-                 at 1,4); only cell 1,0 is free. Show the +75 shields (Defensive Matrix) there
-                 — the +50% damage / 1.5x stats are reflected in the unit values + tooltip. -->
-            <LayoutButtons index="15"><Face value="DefensiveMatrix"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
-        </CardLayouts>
     </CUnit>
 
     <!-- Merc Compound: the extra elite mercs live on a SECOND card page (a submenu), so

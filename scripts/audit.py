@@ -200,6 +200,7 @@ def main():
     our_actors = {}
     actor_models = {}
     actor_has_body_model = {}  # id -> True if it declares an explicit <Model> (not just PortraitModel)
+    our_portrait_tokens = {}   # token -> set(actor ids that reference it as a PortraitModel) (CHECK6)
     for a in actors:
         if a.tag in ("CActorUnit", "CActorMissile") and a.get("id"):
             our_actors[a.get("id")] = (a.get("parent"), a.get("unitName"))
@@ -207,6 +208,9 @@ def main():
                                          if sub.tag in ("Model", "PortraitModel") and sub.get("value")}
             actor_has_body_model[a.get("id")] = any(
                 sub.tag == "Model" and sub.get("value") for sub in a)
+            for sub in a:
+                if sub.tag == "PortraitModel" and sub.get("value"):
+                    our_portrait_tokens.setdefault(sub.get("value"), set()).add(a.get("id"))
 
     our_model_ids = {m.get("id") for m in our_catalog("ModelData.xml") if m.tag == "CModel" and m.get("id")}
 
@@ -374,12 +378,169 @@ def main():
                                      f"both at cell {cell[0]},{cell[1]}.")
                     our_cells[cell] = idx
 
-    # INFO — base-CASC asset tokens we can't verify locally.
+    # CHECK 6 — portrait cross-reference (needs the ref dump). For each PortraitModel token
+    # WE emit on an actor, confirm the SAME token is referenced as a PortraitModel on a real
+    # vanilla actor in mods/_reference/ (e.g. MedicPortrait/ThorPortrait are referenced by the
+    # base Medic/Thor actors → valid base-CASC portrait tokens the engine already loads). A
+    # confirmed token is reported INFO-OK (no longer "UNVERIFIED — heart portrait risk"); an
+    # unknown one stays UNVERIFIED so a guessed portrait path can't ship called "done".
+    portrait_confirmed = set()
+    if ref_present and our_portrait_tokens:
+        ref_portrait_tokens = set()
+        for f in glob.glob(os.path.join(REF, "**", "ActorData.xml"), recursive=True):
+            try:
+                r = ET.parse(f).getroot()
+            except ET.ParseError:
+                continue
+            for el in r.iter():
+                if el.tag == "PortraitModel" and el.get("value"):
+                    ref_portrait_tokens.add(el.get("value"))
+                if el.tag in ("CActorUnit", "CActorMissile", "CActorModel") and el.get("PortraitModel"):
+                    ref_portrait_tokens.add(el.get("PortraitModel"))
+        for tok, actor_ids in sorted(our_portrait_tokens.items()):
+            who = ", ".join(sorted(actor_ids))
+            if tok in ref_portrait_tokens:
+                portrait_confirmed.add(tok)
+                infos.append(f"CHECK6 portrait-ok: '{tok}' (on {who}) is a PortraitModel referenced by a "
+                             f"vanilla actor → valid base-CASC portrait token (engine loads it).")
+            else:
+                infos.append(f"CHECK6 portrait-UNVERIFIED: '{tok}' (on {who}) is NOT referenced as a "
+                             f"PortraitModel by any vanilla actor → confirm the portrait in game "
+                             f"(a heart portrait means this token doesn't resolve).")
+
+    # CHECK 7 — armor string-key resolution (needs the ref dump). For each ShieldArmorName /
+    # LifeArmorName value WE set on a CUnit, the value must be a string-table KEY that resolves
+    # (a raw literal shows "unknown" in the inspect panel — the v0.2.2 bug). A WoLU* key must
+    # exist in our enUS GameStrings.txt; a vanilla key (Unit/.../Terran*, etc.) is valid if the
+    # same key is referenced as an armor-name value by some unit in the reference dump.
+    if ref_present:
+        gs_path = os.path.join(ROOT, "src", "mod", "enUS.SC2Data", "LocalizedData", "GameStrings.txt")
+        gs_keys = set()
+        if os.path.exists(gs_path):
+            for line in open(gs_path, encoding="utf-8"):
+                if "=" in line:
+                    gs_keys.add(line.split("=", 1)[0].strip())
+        ref_armor_values = set()
+        for d in WOL_UNIT_LAYERS + ["mods/liberty.sc2mod/UnitData.xml"]:
+            p = os.path.join(REF, d)
+            if not os.path.exists(p):
+                continue
+            try:
+                r = ET.parse(p).getroot()
+            except ET.ParseError:
+                continue
+            for el in r.iter():
+                if el.tag in ("ShieldArmorName", "LifeArmorName") and el.get("value"):
+                    ref_armor_values.add(el.get("value"))
+        for u in units:
+            if u.tag != "CUnit" or not u.get("id"):
+                continue
+            for tag in ("ShieldArmorName", "LifeArmorName"):
+                el = u.find(tag)
+                if el is None or not el.get("value"):
+                    continue
+                key = el.get("value")
+                if "WoLU" in key:
+                    ok = key in gs_keys
+                else:
+                    ok = key in ref_armor_values
+                if not ok:
+                    warns.append(f"CHECK7 armor-key-missing: {u.get('id')} {tag}='{key}' resolves to no string key "
+                                 f"({'add it to enUS GameStrings.txt' if 'WoLU' in key else 'not a known vanilla armor-name key'}) "
+                                 f"→ the inspect panel shows 'unknown'.")
+
+    # #3-class check (FAIL) — blanket-decorative passive cards (the recurring elite-merc bug). For
+    # each passive LayoutButton (Type=Passive, AbilCmd=255) WE define on a CUnit, flag a Face that
+    # implies a capability the unit lacks: a vehicle/ship-HULL face (ShapedHull) on a non-vehicle/
+    # ship unit; a weapon-RANGE face (WoLUUpgLaserTargeting) on a unit with no weapon; or a
+    # DefensiveMatrix shield face used as a decorative card at all (shields belong in the
+    # ShieldArmorName sign, not a redundant passive). This is exactly "Shaped Hull on a Medic".
+    # Hardened from WARN to FAIL (error severity, same as CHECK3/CHECK4): this near-miss shipped
+    # past WARN once, so a re-introduced blanket/mismatched passive face must BLOCK the gate.
+    if ref_present:
+        VEHICLE_PLATING = {"Unit/LifeArmorName/TerranVehiclePlating",
+                           "Unit/LifeArmorName/TerranShipPlating"}
+        HULL_FACES = {"ShapedHull"}
+        WEAPON_FACES = {"WoLUUpgLaserTargeting"}
+        SHIELD_FACES = {"DefensiveMatrix"}
+
+        def unit_props(uid):
+            """(is_vehicle_or_ship, has_weapon) for a unit, resolving parent= across the
+            WoL layers + our mod. Vehicle/ship ⇔ LifeArmorName is Vehicle/Ship plating;
+            has_weapon ⇔ a non-removed WeaponArray link anywhere on the merged chain."""
+            layers = []
+            for rel in WOL_UNIT_LAYERS:
+                p = os.path.join(REF, rel)
+                layers.append(ET.parse(p).getroot() if os.path.exists(p) else ET.Element("Catalog"))
+            layers.append(units)
+
+            def find(u):
+                return [el for root in layers for el in root
+                        if el.tag == "CUnit" and el.get("id") == u]
+
+            armor, weapon, seen = None, False, set()
+
+            def walk(u):
+                nonlocal armor, weapon
+                if u in seen:
+                    return
+                seen.add(u)
+                elems = find(u)
+                parent = next((e.get("parent") for e in elems if e.get("parent")), None)
+                if parent:
+                    walk(parent)
+                for e in elems:
+                    la = e.find("LifeArmorName")
+                    if la is not None and la.get("value"):
+                        armor = la.get("value")
+                    for w in e.findall("WeaponArray"):
+                        if w.get("removed") == "1":
+                            weapon = False
+                        elif w.get("Link"):
+                            weapon = True
+            walk(uid)
+            return (armor in VEHICLE_PLATING), weapon
+
+        for u in units:
+            if u.tag != "CUnit" or not u.get("id"):
+                continue
+            passive_faces = []
+            for card in u.findall("CardLayouts"):
+                if (card.get("index") or "0") != "0":
+                    continue
+                for b in card.findall("LayoutButtons"):
+                    if b.get("removed") == "1":
+                        continue
+                    typ = fval(b, "Type")
+                    ac = fval(b, "AbilCmd")
+                    face = fval(b, "Face")
+                    if typ == "Passive" and (ac in ("255", "255,0", "255,3") or ac is None) and face:
+                        passive_faces.append((b.get("index"), face))
+            if not passive_faces:
+                continue
+            is_vehicle, has_weapon = unit_props(u.get("id"))
+            for idx, face in passive_faces:
+                if face in SHIELD_FACES:
+                    fails.append(f"#3-class decorative-shield-card: {u.get('id')} button[{idx}] is a passive "
+                                 f"'{face}' card — shields belong in the ShieldArmorName sign, not a redundant "
+                                 f"passive card. Remove it.")
+                elif face in HULL_FACES and not is_vehicle:
+                    fails.append(f"#3-class hull-on-non-vehicle: {u.get('id')} button[{idx}] shows a vehicle/ship "
+                                 f"hull face '{face}' but the unit isn't a ground vehicle / ship "
+                                 f"(LifeArmorName not Vehicle/Ship plating) — e.g. Shaped Hull on a Medic. Remove it.")
+                elif face in WEAPON_FACES and not has_weapon:
+                    fails.append(f"#3-class weapon-face-on-weaponless: {u.get('id')} button[{idx}] shows a weapon "
+                                 f"face '{face}' but the unit has no WeaponArray (no weapon). Remove it.")
+
+    # INFO — base-CASC asset tokens we can't verify locally (excluding portrait tokens already
+    # categorized by CHECK6 above — those are reported there as portrait-ok / portrait-UNVERIFIED).
     refs = ref_ids()
     resolvable = defined_unit_ids | set(our_actors) | our_model_ids | refs
-    casc = sorted({t for toks in actor_models.values() for t in toks if t not in resolvable})
+    portrait_toks = set(our_portrait_tokens)
+    casc = sorted({t for toks in actor_models.values() for t in toks
+                   if t not in resolvable and t not in portrait_toks})
     for t in casc:
-        infos.append(f"base-CASC model/portrait token (UNVERIFIED — confirm in game): {t}")
+        infos.append(f"base-CASC model token (UNVERIFIED — confirm in game): {t}")
 
     quiet = "--quiet" in sys.argv
     if not quiet:

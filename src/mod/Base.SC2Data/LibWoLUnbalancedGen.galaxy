@@ -193,9 +193,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CargoSize", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "4", c_upgradeOperationSet);  // Bunker holds 4 units (the binding cap)
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "32", c_upgradeOperationSet);  // high count cap so TotalCargoSpace (32) is the binding limit — displayed slots == real capacity
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoSize", p, "8", c_upgradeOperationSet);  // admit large ground units (Thor=8) — vanilla 2 rejected them
-    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "32", c_upgradeOperationSet);  // 4 x max CargoSize 8 → count binds before size, every unit = 1 slot
+    CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "32", c_upgradeOperationSet);  // 32-space bar fully usable: 32 marines, or 4 Thors, or any mix by space
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: 10(+10 light) -> 20 flat
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: 15(+5 armored) -> 20 flat
@@ -322,8 +322,8 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyG", "Range", p, "1", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyAUpgraded", "Range", p, "3", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyGUpgraded", "Range", p, "1", c_upgradeOperationAdd);
-    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeMax", p, "25", c_upgradeOperationAdd);  // Spartan Company: Shaped Hull +25
-    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeMax", p, "33", c_upgradeOperationAdd);  // Spartan Company: parity buff (165 -> 198 = buffed Goliath 150 × 1.32)
+    CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeStart", p, "33", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "SiegeBreaker", "Range", p, "1", c_upgradeOperationAdd);  // Siege Breakers: LTS mobile range
     CatalogFieldValueModify(c_gameCatalogWeapon, "ArcliteShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Breakers: LTS sieged range
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreaker", "Sight", p, "2", c_upgradeOperationAdd);

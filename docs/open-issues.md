@@ -8,7 +8,7 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 
 ## Clone metadata (the Merc* elite mercs)
 
-- [ ] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`); re-verify the life-armor category reads correctly on all elite mercs. (In-game check.)
+- [x] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`). **v0.3.8: the NORMAL life-armor sign was missing** — added an explicit `LifeArmorName` (= each merc's base-unit vanilla value, verified against `mods/_reference/`) so the life-armor category resolves on a shielded clone. Statically proven (audit CHECK7 confirms the keys resolve); the heart-portrait piece is the only remaining in-game item (see v0.3.7 #4 below).
 
 ## Damage display + values
 
@@ -145,29 +145,54 @@ card-merge simulator). Items marked ⚠ are best-effort / owner-verify-in-game o
   it has unlimited calldown charges, so it just dies and you drop another). ⚠ confirm no rebuild.
 - [x] **#3 Bunkers reject mechanical / size>1** — `BunkerTransport.TargetFilters` requires
   `Biological` (string = per-player no-op) → edited in STATIC XML (drop Biological, keep
-  ground-only, exclude Air). Per-player (genlib): `MaxCargoCount=4`, `MaxCargoSize=8` (admit the
-  size-8 Thor), `TotalCargoSpace=32` (count binds before size → 4 of anything, each = 1 slot).
-  ⚠ verify a Goliath/Hellion loads, each = one slot.
+  ground-only, exclude Air). Per-player (genlib): `MaxCargoSize=8` (admit the size-8 Thor),
+  `TotalCargoSpace=32`. **REGRESSION + REFIX v0.3.8** (owner decision: "Big — 32 space, Thors
+  allowed"): v0.3.7's `MaxCargoCount=4` was the UNIT-COUNT cap that bound BEFORE the 32-space bar
+  → the bar showed 32 but only 4 units loaded. Raised `MaxCargoCount` 4→32 so `TotalCargoSpace`
+  (32) is the binding limit: displayed slots == real capacity (32 marines, or 4 Thors, or any mix
+  by space; a Thor legitimately takes 8/32). Per-player `MaxCargoCount` IS runtime-editable here
+  (same class+ability-kind as the working `MedivacTransport.MaxCargoCount=12` Expanded Hull edit)
+  — no static fallback needed. ⚠ verify in game: the 32-bar is fully usable; a Goliath/Hellion/Thor
+  loads, each consumes its real size.
 - [x] **#7 ⚠ Cloaked-on-spawn units don't show the decloak button** — we cloak via
   `PersonalCloakingFree`, so the toggle cloak ability stays OFF → shows CloakOn. The lib now
   issues each toggle's On command on the periodic (`Order(AbilityCommand(cloak,0))` +
   `AddToFront`, guarded to idle units — the liberty AI pattern) for Ghost/Banshee/Wraith/Spectre
   + Nova/Tosh/DuskWing/MercWraith/MercSeniorGhost. Reaper/Medivac/Predator (no toggle) unchanged.
   ⚠ confirm CloakOff shows and units stay cloaked + commandable.
-- [~] **#4 Elite mercs: heart portrait + missing upgrade cards** — PARTIAL. (a) **Upgrade
-  cards DONE**: Type=Passive shields/armor/attack display cards (DefensiveMatrix / ShapedHull /
-  Laser Targeting faces, WoLUHaveFlag-gated) added to all six elite mercs. (b) **Portrait STILL
-  OPEN**: an attempted fix (switch each merc actor to `parent="Medic"`/`"Thor"`/… inheriting the
-  base unit's actor) was **REVERTED** — independent review showed it dropped the explicit
-  `<Model>`, so the body would resolve via the `unitName` token (`MercMedic` → no `CModel`) and
-  render a **sphere** (the v0.2.0 bug), and it didn't reliably fix the portrait anyway (e.g. the
-  base Wraith actor has no `<PortraitModel>`). Restored the known-good body (`parent=GenericUnitBase`
-  + explicit `<Model>`); bodies render, **portrait remains a heart**. The ref dump DOES contain
-  `ActorData.xml`, but the portrait still isn't locally verifiable (preload-dependent) — needs an
-  in-game-confirmed approach. `audit.py` CHECK1 now FAILs if a clone actor's body model can't
-  resolve (explicit `<Model>` or a matching `CModel`), so the sphere class can't ship green again.
+- [~] **#4 Elite mercs: heart portrait + WRONG upgrade cards** — REFIXED v0.3.8 (was the
+  recurring blanket-decorative-card bug). (a) **Upgrade cards — REGRESSION FIXED (statically
+  proven):** v0.3.7 BLANKET-added decorative `DefensiveMatrix` / `ShapedHull` /
+  `WoLUUpgLaserTargeting` passive faces to ALL six mercs regardless of fit → vehicle/weapon faces
+  on units that lack a hull/weapon (Shaped Hull + Laser Targeting on the healer `MercMedic` = the
+  owner's bug #3 report). **Removed all blanket faces**; each merc now shows ONLY its base unit's
+  real upgrade cards via `parent=` (verified with the card-merge simulator: MercThor still shows
+  Laser Targeting + Shaped Hull via the inherited Thor card; MercSeniorGhost still shows Laser
+  Targeting via the inherited Ghost card; MercMedic/Reaper/Hellion/Wraith are clean of any face
+  they can't justify — the Medic has zero vehicle/weapon faces). Shields are shown via the armor
+  sign, not a redundant passive card. New `audit.py` **#3-class check** WARNs if a passive face
+  implies a missing capability (hull-on-non-vehicle / weapon-on-weaponless / decorative-shield),
+  so this class can't silently return. (b) **Inspect-panel armor signs — DONE (statically proven):**
+  added an explicit `LifeArmorName` to each merc (= its base unit's vanilla value: Infantry for
+  Medic/Reaper/SeniorGhost, Vehicle for Hellion/Thor, Ship for Wraith) so the normal life-armor
+  category resolves on a shielded clone; the `ShieldArmorName` sign was already correct. New audit
+  **CHECK7** verifies every armor key resolves (WoLU* in our GameStrings, vanilla via the ref dump).
+  (c) **Portrait — awaiting in-game/API confirmation:** the six `PortraitModel` tokens
+  (`MedicPortrait`/`ThorPortrait`/…) are now cross-confirmed by new audit **CHECK6** as valid
+  base-CASC portrait tokens (each is referenced as a `PortraitModel` by a real vanilla actor in the
+  ref dump → the engine loads it). This is strong evidence they should render, but the actual
+  portrait is still preload-dependent and not locally observable — **owner confirms the heart is
+  gone in game.** `audit.py` CHECK1 still FAILs if a clone body model can't resolve (sphere guard).
 
 ## Resolved (most recent first)
+
+- [x] **Spartan Company HP didn't rise enough (parity)** — RESOLVED v0.3.8 (statically proven via
+  reference catalogs). The genlib added a flat `LifeMax/LifeStart +25` to `SpartanCompany`
+  (165→190), but that broke the merc's % advantage: SpartanCompany base 165, Goliath base 125
+  (libertystory wins) → pre-buff ratio 165/125 = 1.32; buffed Goliath = 125 + 25 (Shaped Hull) =
+  150, so parity needs 150 × 1.32 ≈ 198, not 190. Changed the Add 25→**33** (165 + 33 = 198). The
+  per-player edit was already applying (190 was visible in game), so +33 → 198 will take. ⚠ confirm
+  the merc reads ~198 HP in game.
 
 - [x] **BC "ignore armor" was BACKWARDS** — RESOLVED v0.2.5: `ArmorReduction` is a MULTIPLIER on how much the target's armor applies (reference values are only 0 / 0.334 / 1; `SnipeDamage` ignores armor via `ArmorReduction=0`). The shipped `ArmorReduction=500` would have made armor reduce BC damage 500× (≈0 damage to any armored target). Corrected to `0` on `ATSLaserBatteryU`/`ATALaserBatteryU`.
 - [x] **Defensive Matrix never autocast** — RESOLVED v0.2.5: it's a SELF-buff `CAbilEffectInstant`, but the autocast was configured with offensive `AutoCastFilters` that EXCLUDE Self/Ally → no valid target → never fired. Rewired to the verified self-buff pattern (`AutoCastValidatorArray=CasterIsFiringWeapon`, like StimpackWoLU) so the BC/SV auto-shields in combat.

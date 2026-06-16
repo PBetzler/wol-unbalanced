@@ -132,7 +132,30 @@ gotcha; authoritative details live in the code/plan, not here.
   vanilla uses `Unit/ShieldArmorName/ProtossPlasmaShields`. A raw value like
   `"Defensive Matrix"` shows **"unknown"** in the inspect panel. Add a `Unit/ShieldArmorName/<id>`
   GameStrings entry and reference that key. (Terran units have no vanilla shields, so added-shield
-  clones must supply this themselves.)
+  clones must supply this themselves.) **A `parent=` clone does NOT reliably surface the base
+  unit's `LifeArmorName` either** — make it explicit on the clone (= the base unit's vanilla value,
+  e.g. `Unit/LifeArmorName/TerranInfantryArmor` for infantry mercs) or the *normal* life-armor sign
+  can read "unknown" on a shielded clone. `audit.py` CHECK7 now verifies every armor key we set
+  resolves (WoLU* keys in our GameStrings, vanilla `Terran*` keys via the reference dump).
+- **Don't BLANKET-add decorative passive cards to clones — match the FACE to the unit's real
+  capability.** An elite-merc (`parent=<base unit>`) already INHERITS its base unit's correct
+  upgrade cards via `parent=`; adding the same decorative `Type=Passive` faces to *all* clones
+  regardless of fit puts a vehicle-hull face (`ShapedHull`) or a weapon-range face
+  (`WoLUUpgLaserTargeting`) on a unit that has neither — e.g. Shaped Hull + Laser Targeting on the
+  **Medic** (a weaponless, hull-less healer). The owner sees nonsense cards. Rule: a clone shows
+  ONLY its base unit's real cards (inherited); merc-exclusive **shields** go in the
+  `ShieldArmorName` sign, NOT a redundant passive card. `audit.py` **#3-class check** now WARNs on
+  a passive face whose capability the unit lacks (hull-on-non-vehicle, weapon-on-weaponless,
+  decorative-shield-card) — verify against the card-merge simulator before adding any passive face.
+- **Per-player `MaxCargoCount` on a `CAbilTransport` DOES apply at runtime** (unlike `CargoSize`,
+  which is read at bunker LOAD time and the runtime edit doesn't reach — see the Ghost-2-slots
+  note). Evidence: the per-player `MedivacTransport.MaxCargoCount=12` (Expanded Hull) edit works,
+  and the bunker's `TotalCargoSpace`/`MaxCargoSize` per-player edits visibly took (the slot bar
+  changed). So when a bunker shows N open slots but only loads fewer, the binding limit is the
+  **unit-count cap `MaxCargoCount`**, not the space bar — raise `MaxCargoCount` to ≥ `TotalCargoSpace`
+  so the space bar (and per-unit `CargoSize`) is what binds. Both `MaxCargoCount` and
+  `TotalCargoSpace`/`MaxCargoSize` are scalar `CAbilTransport` fields editable per player; only
+  the per-UNIT `CargoSize` is the load-time no-op.
 - **`removed="1"` on an array index is a tombstone the campaign uses to delete inherited
   entries** (e.g. libertystory strips the Marauder's `StimpackMarauder` via
   `<AbilArray index="3" removed="1"/>`). A later layer that sets the same index with a real

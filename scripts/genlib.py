@@ -241,18 +241,22 @@ def emit():
         ("Unit", "Marauder", "CargoSize", "1", "Set", ""),
         ("Unit", "Ghost", "CargoSize", "1", "Set", ""),
         ("Unit", "Spectre", "CargoSize", "1", "Set", ""),
-        # #3: a bunker holds 4 of ANY ground unit (incl. large mechanical), each = 1 slot.
-        # CargoSize per-player is read at bunker LOAD time and the runtime edit doesn't reach
-        # it (confirmed in game — Ghost still took 2 slots), so we don't try to set CargoSize=1.
-        # Instead make the unit COUNT bind before the size sum: MaxCargoCount=4 (the real cap),
-        # MaxCargoSize=8 (admit the size-8 Thor — vanilla 2 rejected anything bigger than a
-        # Goliath), TotalCargoSpace=32 (= 4 x max CargoSize 8, so 4 of ANYTHING always fits and
-        # the count is the binding limit → every unit effectively costs one slot). The
-        # ground-only gate is the static TargetFilters edit (AbilData; Air excluded). These are
-        # scalar fields (same class as the working MedivacTransport edit) → apply per player.
-        ("Abil", "BunkerTransport", "MaxCargoCount", "4", "Set", "Bunker holds 4 units (the binding cap)"),
+        # #3 (v0.3.8): BIG bunker — 32 space, Thors allowed (owner decision). The UI "open
+        # slots" bar is driven by TotalCargoSpace (=32); the previous MaxCargoCount=4 was the
+        # *unit-count* cap that bound FIRST → the bar showed 32 but only 4 units loaded (the
+        # regression). Raise MaxCargoCount to 32 so TotalCargoSpace becomes the binding limit:
+        # displayed slots == real capacity. 32 size-1 marines, OR 4 size-8 Thors, OR any mix by
+        # space (a Thor legitimately consumes 8/32). MaxCargoSize=8 admits the size-8 Thor
+        # (vanilla 2 rejected anything bigger than a Goliath). CargoSize per-player is read at
+        # bunker LOAD time and the runtime edit doesn't reach it (confirmed in game — Ghost still
+        # took 2 slots), so we DON'T try to force CargoSize=1; every unit costs its real size.
+        # The ground-only gate is the static TargetFilters edit (AbilData; Air excluded). These
+        # MaxCargoCount/Size/TotalCargoSpace are scalar fields of the SAME class+ability-kind as
+        # the working per-player MedivacTransport.MaxCargoCount=12 edit (Expanded Hull, treated as
+        # working) → they apply per player; in particular MaxCargoCount IS runtime-editable here.
+        ("Abil", "BunkerTransport", "MaxCargoCount", "32", "Set", "high count cap so TotalCargoSpace (32) is the binding limit — displayed slots == real capacity"),
         ("Abil", "BunkerTransport", "MaxCargoSize", "8", "Set", "admit large ground units (Thor=8) — vanilla 2 rejected them"),
-        ("Abil", "BunkerTransport", "TotalCargoSpace", "32", "Set", "4 x max CargoSize 8 → count binds before size, every unit = 1 slot"),
+        ("Abil", "BunkerTransport", "TotalCargoSpace", "32", "Set", "32-space bar fully usable: 32 marines, or 4 Thors, or any mix by space"),
         # damage flattening: base damage = old total vs bonus attribute
         ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: 10(+10 light) -> 20 flat"),
         ("Effect", "C10CanisterRifle", "AttributeBonus[Light]", "0", "Set", ""),
@@ -445,8 +449,13 @@ def emit():
         ("Weapon", "SpartanCompanyG", "Range", "1", "Add", ""),
         ("Weapon", "SpartanCompanyAUpgraded", "Range", "3", "Add", ""),
         ("Weapon", "SpartanCompanyGUpgraded", "Range", "1", "Add", ""),
-        ("Unit", "SpartanCompany", "LifeMax", "25", "Add", "Spartan Company: Shaped Hull +25"),
-        ("Unit", "SpartanCompany", "LifeStart", "25", "Add", ""),
+        # SpartanCompany (Goliath merc) parity (v0.3.8). Ground truth: SpartanCompany base
+        # LifeMax=165 (liberty.sc2campaign), Goliath base 125 (libertystory layer wins) →
+        # buffed Goliath = 125 + 25 (Shaped Hull) = 150. The merc's pre-buff advantage is
+        # 165/125 = 1.32; to keep that ratio post-buff the merc needs 150 × 1.32 ≈ 198. A flat
+        # +25 → 190 BROKE parity (the merc fell behind its own ratio). +33 → 165 + 33 = 198.
+        ("Unit", "SpartanCompany", "LifeMax", "33", "Add", "Spartan Company: parity buff (165 -> 198 = buffed Goliath 150 × 1.32)"),
+        ("Unit", "SpartanCompany", "LifeStart", "33", "Add", ""),
         # -- Siege Tank line: Siege Breakers (range, sight, +3 armor sieged) --
         ("Weapon", "SiegeBreaker", "Range", "1", "Add", "Siege Breakers: LTS mobile range"),
         ("Weapon", "ArcliteShockCannon", "Range", "1", "Add", "Siege Breakers: LTS sieged range"),
