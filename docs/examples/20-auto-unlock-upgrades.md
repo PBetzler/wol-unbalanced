@@ -99,6 +99,22 @@ same upgrade.
 </CUpgrade>
 ```
 
+## Variant — CHANGE an existing upgrade Value (not just append a hero)
+The same-id `<CUpgrade>` override above *appends* new `Reference=` keys (heroes the vanilla
+list omits). To instead **change an EXISTING entry's `Value`** (e.g. buff a rate the upgrade
+already sets for the base units), re-state the entry with its **explicit `index=`** — an
+indexed `EffectArray` entry overrides the same array slot in place (proven by libertystory's
+`TwinLinkedFlameThrowers`: `<EffectArray index="0" Operation="Set" Reference="..." Value="0.5"/>`).
+Index-*less* re-statements of an existing key are ambiguous (may append a fighting duplicate),
+so for a Value change re-state the **complete** EffectArray with explicit indices `0..N` in
+vanilla order — duplicates become impossible and your value wins. Real use:
+`RegenerativeBioSteel`'s `LifeRegenRate` 0.6015 → 20 (`UpgradeData.xml`), plus 4 mechanical
+player-exclusive units (Odin/MercThor/MercWraith/MercHellion) appended at the tail indices.
+**Ordering caveat:** an auto-granted upgrade's `Operation="Set"` is the *last writer* of its
+field (granted on the 1 s/10 s timers, after genlib's MapInit edits) — so a genlib per-player
+edit of the same field is silently overwritten. Buff the **upgrade's EffectArray**, not the
+per-player field, when a granted upgrade also sets it. (learnings.md §CampaignLib).
+
 ## Gotchas / no-op traps  → full list in [02](02-no-op-traps.md)
 - **`BuyAllTech` alone silently reverts** — `TS_UpdateTechStates` un-buys any tech whose group the
   story hasn't introduced, so during a unit's *own* unlock mission nothing applies. You MUST grant

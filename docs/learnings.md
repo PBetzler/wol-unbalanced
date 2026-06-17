@@ -303,6 +303,27 @@ gotcha; authoritative details live in the code/plan, not here.
 - Campaign upgrades already list **merc** units in their `EffectArray`s (e.g.
   `CombatShield` covers `WarPig`) but never heroes — extend via XML `CUpgrade`
   appends (`MarauderLifeBoost` = Kinetic Foam).
+- **You can also CHANGE a vanilla CUpgrade's existing `EffectArray` *Value* (not just
+  append new keys), and the safe way is by EXPLICIT `index=`.** A same-id `<CUpgrade>` in
+  our static XML merges onto the vanilla definition. New `Reference=` keys append (the
+  `CombatShield` hero pattern). To override an *existing* entry's Value, re-state it with
+  its vanilla `index=` — an indexed `EffectArray` entry overrides the same array slot
+  in place (proven: libertystory's `TwinLinkedFlameThrowers` does
+  `<EffectArray index="0" Operation="Set" Reference="..." Value="0.5"/>` to set an entry).
+  Index-less re-statements of an existing key are ambiguous (may append a duplicate
+  "fighting" entry), so for a Value change prefer **re-stating the COMPLETE EffectArray
+  with explicit indices 0..N in vanilla order** — duplicates are then impossible and your
+  value wins unambiguously. Done for `RegenerativeBioSteel` (life regen 0.6015 → 20).
+- **Ordering: an upgrade's `EffectArray Operation="Set"` is the LAST writer of the field
+  it sets, beating a genlib per-player edit.** Our genlib `CatalogFieldValueModify` runs
+  at MapInit; upgrades we auto-grant (e.g. `RegenerativeBioSteel`) are Set on the 1 s/10 s
+  `libWoLU_OnGrantTech` timers, *after* MapInit → the upgrade Set overwrites whatever
+  genlib wrote for the same field. So to buff a field that a granted upgrade also Sets,
+  edit the **upgrade's EffectArray** (above), not the per-player field — a genlib edit
+  there is silently overwritten (e.g. the genlib `Vulture LifeRegenRate=1` is overwritten
+  by bio-steel). Upgrades like `RegenerativeBioSteel` are granted ONLY to the human player
+  (the lab-research path our lib drives, never to AI), so editing the upgrade's Value in
+  static XML is effectively player-only → rule-9-safe.
 - State persists via ConversationState values and mission banks.
 
 ## Data sources

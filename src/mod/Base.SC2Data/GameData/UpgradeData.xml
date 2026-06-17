@@ -28,4 +28,90 @@
         <EffectArray Reference="Unit,Swann,LifeMax" Value="25"/>
         <EffectArray Reference="Unit,Swann,LifeStart" Value="25"/>
     </CUpgrade>
+
+    <!-- Regenerative Bio-Steel (Zerg-tree lab research): buff the life-regen rate to
+         20/sec = the NCO design (10) x2, per the owner spec. Mechanism notes:
+         * This CUpgrade is ONLY ever granted to the human player (our library marks the
+           research Purchased and re-runs libCamp_gf_TS_ApplyResearchesTech -> Sets
+           RegenerativeBioSteel level 1 for the player; enemies never get it). So editing
+           its EffectArray Value in static XML is effectively player-only -> rule-9-safe,
+           the same class of static CUpgrade extension as CombatShield/MarauderLifeBoost above.
+         * The upgrade grant fires on our 1s/10s timers (libWoLU_OnGrantTech), i.e. AFTER
+           genlib's MapInit edits, so the upgrade's Operation="Set" is the LAST writer of
+           LifeRegenRate for every unit it covers. A per-player genlib CatalogFieldValueModify
+           on LifeRegenRate would be overwritten by this Set -> that's why we edit the upgrade
+           itself, not the per-player field. (Side note: the existing genlib Vulture
+           LifeRegenRate=1 edit is silently overwritten by this upgrade to whatever we Set here
+           -> Vulture now lands at 20 too, which is fine. Out of scope to "fix" the genlib edit.)
+         * MERGE SEMANTICS: we re-state the COMPLETE vanilla EffectArray with EXPLICIT index=
+           on every entry, in vanilla's exact order (indices 0-47). An indexed EffectArray
+           entry overrides the SAME array slot in place (proven by libertystory's
+           TwinLinkedFlameThrowers <EffectArray index="0" Operation="Set" .../> override) ->
+           no duplicate "fighting" entries can exist, the 20 wins unambiguously. The 4
+           player-exclusive mechanical units the vanilla list omits (rules 4/10) are appended
+           at indices 48-55: Odin (Thor hero), MercThor (Jotun), MercWraith (Winged Nightmares),
+           MercHellion (Condor) - all mechanical (LifeArmorName=TerranVehiclePlating / parent of a
+           mechanical unit). Bio-steel is mechanical-only, so the bio heroes are correctly absent.
+         * LifeRegenDelay kept at vanilla 3.0 (the out-of-combat delay before regen kicks in).
+           DEFERRED OPTION: the NCO version regens only in-combat + below-max via DisableValidators;
+           we keep the simpler always-on-after-3s mechanism (fine for this OP mod). -->
+    <CUpgrade id="RegenerativeBioSteel">
+        <EffectArray index="0"  Operation="Set" Reference="Unit,Hellion,LifeRegenDelay"            Value="3.000000"/>
+        <EffectArray index="1"  Operation="Set" Reference="Unit,Hellion,LifeRegenRate"             Value="20"/>
+        <EffectArray index="2"  Operation="Set" Reference="Unit,SiegeTank,LifeRegenDelay"          Value="3.000000"/>
+        <EffectArray index="3"  Operation="Set" Reference="Unit,SiegeTank,LifeRegenRate"           Value="20"/>
+        <EffectArray index="4"  Operation="Set" Reference="Unit,SiegeTankSieged,LifeRegenDelay"    Value="3.000000"/>
+        <EffectArray index="5"  Operation="Set" Reference="Unit,SiegeTankSieged,LifeRegenRate"     Value="20"/>
+        <EffectArray index="6"  Operation="Set" Reference="Unit,Thor,LifeRegenDelay"               Value="3.000000"/>
+        <EffectArray index="7"  Operation="Set" Reference="Unit,Thor,LifeRegenRate"                Value="20"/>
+        <EffectArray index="8"  Operation="Set" Reference="Unit,Diamondback,LifeRegenDelay"        Value="3.000000"/>
+        <EffectArray index="9"  Operation="Set" Reference="Unit,Diamondback,LifeRegenRate"         Value="20"/>
+        <EffectArray index="10" Operation="Set" Reference="Unit,Vulture,LifeRegenDelay"            Value="3.000000"/>
+        <EffectArray index="11" Operation="Set" Reference="Unit,Vulture,LifeRegenRate"             Value="20"/>
+        <EffectArray index="12" Operation="Set" Reference="Unit,Goliath,LifeRegenDelay"            Value="3.000000"/>
+        <EffectArray index="13" Operation="Set" Reference="Unit,Goliath,LifeRegenRate"             Value="20"/>
+        <EffectArray index="14" Operation="Set" Reference="Unit,Predator,LifeRegenDelay"           Value="3.000000"/>
+        <EffectArray index="15" Operation="Set" Reference="Unit,Predator,LifeRegenRate"            Value="20"/>
+        <EffectArray index="16" Operation="Set" Reference="Unit,SiegeBreaker,LifeRegenDelay"       Value="3.000000"/>
+        <EffectArray index="17" Operation="Set" Reference="Unit,SiegeBreaker,LifeRegenRate"        Value="20"/>
+        <EffectArray index="18" Operation="Set" Reference="Unit,SiegeBreakerSieged,LifeRegenDelay" Value="3.000000"/>
+        <EffectArray index="19" Operation="Set" Reference="Unit,SiegeBreakerSieged,LifeRegenRate"  Value="20"/>
+        <EffectArray index="20" Operation="Set" Reference="Unit,VikingAssault,LifeRegenDelay"      Value="3.000000"/>
+        <EffectArray index="21" Operation="Set" Reference="Unit,VikingAssault,LifeRegenRate"       Value="20"/>
+        <EffectArray index="22" Operation="Set" Reference="Unit,VikingFighter,LifeRegenDelay"      Value="3.000000"/>
+        <EffectArray index="23" Operation="Set" Reference="Unit,VikingFighter,LifeRegenRate"       Value="20"/>
+        <EffectArray index="24" Operation="Set" Reference="Unit,Banshee,LifeRegenDelay"            Value="3.000000"/>
+        <EffectArray index="25" Operation="Set" Reference="Unit,Banshee,LifeRegenRate"             Value="20"/>
+        <EffectArray index="26" Operation="Set" Reference="Unit,Medivac,LifeRegenDelay"            Value="3.000000"/>
+        <EffectArray index="27" Operation="Set" Reference="Unit,Medivac,LifeRegenRate"             Value="20"/>
+        <EffectArray index="28" Operation="Set" Reference="Unit,Battlecruiser,LifeRegenDelay"      Value="3.000000"/>
+        <EffectArray index="29" Operation="Set" Reference="Unit,Battlecruiser,LifeRegenRate"       Value="20"/>
+        <EffectArray index="30" Operation="Set" Reference="Unit,Raven,LifeRegenDelay"              Value="3.000000"/>
+        <EffectArray index="31" Operation="Set" Reference="Unit,Raven,LifeRegenRate"               Value="20"/>
+        <EffectArray index="32" Operation="Set" Reference="Unit,ScienceVessel,LifeRegenDelay"      Value="3.000000"/>
+        <EffectArray index="33" Operation="Set" Reference="Unit,ScienceVessel,LifeRegenRate"       Value="20"/>
+        <EffectArray index="34" Operation="Set" Reference="Unit,Hercules,LifeRegenDelay"           Value="3.000000"/>
+        <EffectArray index="35" Operation="Set" Reference="Unit,Hercules,LifeRegenRate"            Value="20"/>
+        <EffectArray index="36" Operation="Set" Reference="Unit,SpartanCompany,LifeRegenDelay"     Value="3.000000"/>
+        <EffectArray index="37" Operation="Set" Reference="Unit,SpartanCompany,LifeRegenRate"      Value="20"/>
+        <EffectArray index="38" Operation="Set" Reference="Unit,HelsAngelAssault,LifeRegenDelay"   Value="3.000000"/>
+        <EffectArray index="39" Operation="Set" Reference="Unit,HelsAngelAssault,LifeRegenRate"    Value="20"/>
+        <EffectArray index="40" Operation="Set" Reference="Unit,HelsAngelFighter,LifeRegenDelay"   Value="3.000000"/>
+        <EffectArray index="41" Operation="Set" Reference="Unit,HelsAngelFighter,LifeRegenRate"    Value="20"/>
+        <EffectArray index="42" Operation="Set" Reference="Unit,DukesRevenge,LifeRegenDelay"       Value="3.000000"/>
+        <EffectArray index="43" Operation="Set" Reference="Unit,DukesRevenge,LifeRegenRate"        Value="20"/>
+        <EffectArray index="44" Operation="Set" Reference="Unit,DuskWing,LifeRegenDelay"           Value="3.000000"/>
+        <EffectArray index="45" Operation="Set" Reference="Unit,DuskWing,LifeRegenRate"            Value="20"/>
+        <EffectArray index="46" Operation="Set" Reference="Unit,Wraith,LifeRegenDelay"             Value="3.000000"/>
+        <EffectArray index="47" Operation="Set" Reference="Unit,Wraith,LifeRegenRate"              Value="20"/>
+        <!-- Reach (rules 4/10): player-exclusive mechanical units omitted by the vanilla list. -->
+        <EffectArray index="48" Operation="Set" Reference="Unit,Odin,LifeRegenDelay"               Value="3.000000"/>
+        <EffectArray index="49" Operation="Set" Reference="Unit,Odin,LifeRegenRate"                Value="20"/>
+        <EffectArray index="50" Operation="Set" Reference="Unit,MercThor,LifeRegenDelay"           Value="3.000000"/>
+        <EffectArray index="51" Operation="Set" Reference="Unit,MercThor,LifeRegenRate"            Value="20"/>
+        <EffectArray index="52" Operation="Set" Reference="Unit,MercWraith,LifeRegenDelay"         Value="3.000000"/>
+        <EffectArray index="53" Operation="Set" Reference="Unit,MercWraith,LifeRegenRate"          Value="20"/>
+        <EffectArray index="54" Operation="Set" Reference="Unit,MercHellion,LifeRegenDelay"        Value="3.000000"/>
+        <EffectArray index="55" Operation="Set" Reference="Unit,MercHellion,LifeRegenRate"         Value="20"/>
+    </CUpgrade>
 </Catalog>

@@ -160,6 +160,7 @@ All 8 are on the Merc Compound **root** card (the submenu was dropped in v0.3.6 
 | **Terran buildings** | — | Fire-Suppression; Orbital Command (Scanner + MULE); CC gets free unlimited **MULE + Extra Supplies** kit (`CalldownMULEWoLU`/`SupplyDropWoLU`, no Orbital requirement) — single MULE button (re-pointed index 1, duplicate removed) | 🟡 confirm one MULE button + Extra Supplies appear on the CC |
 | **Engineering Bay / Armory levels** | per-class 3-tier research | Replaced by **one combined Atk + one combined Def upgrade per tier**, infantry cost, 30 s each; applies to infantry/vehicles/ships (vehicle/ship levels follow infantry via periodic sync) | ✅ EngBay 30 s researches; 🟡 cross-class sync in game |
 | **Lab research pairs** | choose one side | **Both sides auto-granted** (Shrike/Fortified, Planetary/Perdition, Predator/Hercules, Cellular/Bio-Steel, Ultra-Cap/Vanadium, etc.) | ✅ |
+| **Regenerative Bio-Steel** (mechanical life regen) | vanilla 0.6015/sec | **20/sec** (NCO design 10 ×2) on all covered mechanical units — done by overriding the `RegenerativeBioSteel` CUpgrade's `EffectArray` `LifeRegenRate` Values in static XML (player-only grant path → rule-9-safe); reach: also covers **Odin / MercThor (Jotun) / MercWraith / MercHellion (Condor)**, which the vanilla list omits; 3 s out-of-combat delay kept | 🟡 [GAME] confirm a damaged Thor/Goliath regens ≈20/s after a 3 s pause |
 
 ---
 
