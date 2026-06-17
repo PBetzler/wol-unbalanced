@@ -25,14 +25,31 @@ The Windows local build now works end-to-end (portable MinGW+CMake → `mpqpatch
   the merged catalog. (The dual-icon *side-by-side render* remains a [GAME] in-game observation.)
 - [x] **MercThor resurrect cost zeroed — CONFIRMED.** Jotun `CostResource` reads 0/0/0 in the
   Editor (the Immortality-Protocol "no gas" piece; the death-response *firing* is still [GAME]).
-- [ ] **⚠ NEW — `MercWraith` (Winged Nightmares) did not appear in the standalone-mod Editor view.**
-  Of the 6 elite mercs, only MercWraith was absent from the Data editor unit list when the mod was
-  opened **standalone** (Liberty-Mod dependency only). It is statically well-formed and identical
-  to its siblings (`UnitData.xml:586` `parent="Wraith"`, valid actor `ActorData.xml:73`,
-  audit-clean), and is present in the built mod. Most likely a **missing-campaign-dependency
-  artifact** of the standalone-mod view (that view threw many reference warnings). **VERIFY:** open
-  a built campaign map (full dependency stack) or summon Winged Nightmares in-game and confirm it
-  appears + renders. If it's also absent with full deps, investigate as a real load failure.
+- [x] **`MercWraith` (Winged Nightmares) standalone-view absence — RESOLVED (was a
+  missing-dependency artifact, not a bug).** It was absent only when the mod was opened **standalone**
+  (Liberty-Mod dep only). **Re-checked with the full dependency stack** (opened the built
+  `traynor01.SC2Map` in the Editor): **Winged Nightmares appears and resolves correctly** — Wraith
+  weapons (Gemini Missiles + Burst Lasers), Wraith Cloaking Field, flying/air, Life 200 / Shields 50 /
+  Life Armor 1 (exactly the static XML values, `UnitData.xml:586-597`), Shield Armor Name =
+  "Defensive Matrix". All 6 elite mercs load + resolve with full deps. Lesson: **verify clones in a
+  loaded MAP (full deps), not the standalone-mod Editor view** — the latter lacks the campaign layer
+  and drops campaign-dependent entries.
+- [x] **Our edits ARE the top merged layer + clone families resolve — CONFIRMED across recipe
+  families.** In the full-deps map the units we modify show **Source = `WoLUnbalanced.SC2Mod`**
+  (Medic, Marauder, …) i.e. our layer wins the merge. Spot-checks: the **Marauder's** merged ability
+  list includes **"Super Stimpack"** (`StimpackMarauderWoLU` — recipe 08 / the Bug-1 ability side is
+  wired in); the **Medic's** merged abilities include **Optical Flare + Restoration** (the AP-port
+  clones — recipes 09/20 resolve). So the unit-clone, added-ability and autocast-ability recipe
+  families are confirmed present + resolved in the real merged catalog.
+- **[STATIC-vs-RUNTIME framing — what the Editor can and cannot confirm.]** The Editor shows the
+  **merged STATIC catalog**, so it confirms: clones resolve, models/portraits render, armor/name
+  strings resolve, cards merge, and our layer wins. It does **NOT** show **per-player runtime
+  `CatalogFieldValueModify` edits** (the buffs) — by design (rule 9): e.g. the Marauder's `CargoSize`
+  reads the un-modified **2** in the Editor (our per-player `=1` only applies when the lib runs
+  in-game), and Medic Life reads the base **60** (not the +HP buffs). So the recipes' **[STATIC]/
+  [EDITOR]** claims are Editor-verified here; the **[GAME]** claims (runtime numbers, autocast
+  firing, death-response, splash, simultaneous fire) are inherently NOT Editor-observable and remain
+  for the owner's in-game / CCM playtest. This is the correct, expected split — not a gap.
 
 ## Clone metadata (the Merc* elite mercs)
 
