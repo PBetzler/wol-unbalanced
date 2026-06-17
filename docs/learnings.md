@@ -310,3 +310,21 @@ gotcha; authoritative details live in the code/plan, not here.
   reads are impossible here; verification = static analysis (`audit.py` + merge sim +
   `implementation-patterns.md`) + the owner's in-game playtest. **Don't re-attempt the API for live
   verification on this Mac.**
+- **Account ban risk — SAFE for our workflow (sourced).** Galaxy Editor + CCM offline-campaign mods
+  carry ZERO ban risk (official Blizzard tools/file formats, no process injection, no multiplayer).
+  The s2client-proto API is covered by Blizzard's OWN "AI and Machine Learning License" which
+  explicitly overrides the EULA's anti-automation + matchmaking clauses (a Battle.net account is
+  "not required"); no documented ban exists for local/offline API use. Launching `-listen` idle (never
+  joining a game) = indistinguishable from launching SC2 and not playing. Real ban triggers are ONLY:
+  online/ladder maphacks/cheats, memory-injecting trainers, botting multiplayer, account sharing.
+  RULES: only official tooling; never automate ONLINE play; keep any API use localhost-only & never
+  enter an online game; never inject into the SC2 process.
+- **The SC2 Editor is a sanctioned VALIDATION path** the API/`audit.py` can't match. Its Previewer
+  (`ObjectViewInPreviewer` → portrait aspect) RENDERS a unit's model + portrait → answers the
+  heart-portrait / sphere questions locally. It shows the merged STATIC catalog (cards, armor-name
+  resolution, `parent=` wiring, a field-diff of our layer) but NOT per-player runtime
+  `CatalogFieldValueModify` numbers (those need the lib to run in a game). Its **Test Document**
+  (Ctrl+F9) launches via Battle.net's own mechanism → gets the SSO license token → should BYPASS the
+  API's `JoinGame` license block and run the mod in-game (lib applies per-player edits; canary + diag
+  lines show). Worth a 2-min trial on `build/maps/Campaign/traynor01.SC2Map` (a campaign-license guard
+  `EDSTR_ERROR_TESTDOC_NOCAMPAIGNLICENSE` may or may not fire).
