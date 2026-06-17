@@ -122,12 +122,37 @@ The Mac command (README §44, for reference):
 c++ tools/mpqpatch.c -o tools/mpqpatch -Ivendor/StormLib/src -Lvendor/StormLib/build -lstorm -lz -lbz2
 ```
 
-### Windows recipe (best-effort — VERIFY ON WINDOWS)
-> Not test-compiled on this Mac. Treat the exact flags as a starting point; if a step fails,
-> fall back to "skip local build; use CI + the release zip" (§5).
+### ✅ VERIFIED working recipe (Windows 11, portable MinGW + CMake, NO admin)
+> Test-compiled on Windows 2026-06-17. This is the confirmed path — `mpqpatch.exe` built and a
+> full `build.py build` (30 maps patched) succeeded. It needs **no admin/elevation** (the box was
+> a non-admin user), so it's the most reliable unattended option. Options A/B below are
+> alternatives.
 
-**Option A — MSVC + CMake (recommended on Windows).** Needs *Visual Studio Build Tools* (the
-"Desktop development with C++" workload) and CMake (`winget install Kitware.CMake`).
+1. **Get a portable toolchain into a user dir** (no installer, no elevation):
+   - **MinGW-w64 GCC** — WinLibs portable zip (latest UCRT x86_64, e.g. `winlibs-x86_64-posix-seh-gcc-*-mingw-w64ucrt-*.zip` from github.com/brechtsanders/winlibs_mingw/releases) → extract → gives `…\mingw64\bin\{g++,gcc,mingw32-make}.exe`.
+   - **CMake** — portable zip (`cmake-*-windows-x86_64.zip` from github.com/Kitware/CMake/releases) → extract → `…\cmake-*\bin\cmake.exe`.
+   - (A scripted download+extract of both lives at `C:\Users\philip\toolchain\setup.ps1` on this box.)
+   - **Clang is NOT a good standalone choice on Windows** — it has no Windows SDK/CRT/linker of its own; it needs an MSVC or MinGW toolchain underneath. Use MinGW (above) or MSVC (Option A).
+2. **Build StormLib (static)** with that toolchain on PATH:
+   ```bat
+   cmake -S vendor\StormLib -B vendor\StormLib\build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release
+   cmake --build vendor\StormLib\build -j
+   :: -> vendor\StormLib\build\libStormLib.a  (note the casing: libStormLib.a, link flag -lStormLib)
+   ```
+3. **Compile `mpqpatch.c`** against it (static-link so the .exe is portable):
+   ```bat
+   g++ tools\mpqpatch.c -o tools\mpqpatch.exe -Ivendor\StormLib\src -Lvendor\StormLib\build ^
+       -lStormLib -static -static-libgcc -static-libstdc++ -lwininet -lole32
+   ```
+   `tools\mpqpatch.exe` with no args prints its usage line. Then `python scripts\build.py build`
+   works (also needs `py -m pip install mpyq`). Benign at build time: `compact failed, err=1003
+   (archive still valid)` — StormLib just skips MPQ compaction; the patch still applies.
+
+### Windows recipe — alternatives (Option A/B; not the verified path above)
+
+**Option A — MSVC + CMake (canonical for StormLib, but needs admin + a multi-GB install).** Needs
+*Visual Studio Build Tools* (the "Desktop development with C++" workload) and CMake
+(`winget install Kitware.CMake`).
 
 ```bat
 :: 1. Build StormLib (static lib) from the vendored source, from the repo root
@@ -307,8 +332,22 @@ dead end** on retail 5.x (documented in both) — don't re-chase it.
   dispatch-doctrine) runs green; the dispatch brief-check hook correctly blocks a bad brief. Needs
   the `python3` shim (§1) and Git's `bin` on PATH so the harness can invoke `bash`.
 
+### Confirmed on Windows 2026-06-17
+- **`mpqpatch.exe` build recipe — CONFIRMED.** The portable MinGW + CMake path (now the verified
+  recipe in §3) built `tools/mpqpatch.exe` (880 KB, static) and `vendor/StormLib/build/libStormLib.a`
+  with **no admin**. The link flag is `-lStormLib` (lib is `libStormLib.a`) + `-lwininet -lole32`.
+- **`python scripts/build.py build` — CONFIRMED.** Patched all 30 campaign maps into `build/`
+  (`compact failed err=1003` warnings are benign — StormLib skips MPQ compaction, the patch still
+  applies). `py -m pip install mpyq` is required.
+- **Editor Previewer validation — CONFIRMED working** (loaded `build/Mods/WoLUnbalanced.SC2Mod`
+  via the user `Documents\StarCraft II\Mods\` folder; merc model/portrait/armor verified — see
+  [open-issues.md](open-issues.md) §"Editor verification pass").
+
 ### Still pending real Windows confirmation (local-build only — not needed to ship)
-- **`build.py install` on Windows** — the path logic (`C:\Program Files (x86)\StarCraft II`,
-  `WOLU_SC2_DIR` override, `mpqpatch.exe` selection) is correct by construction but not run here.
-- **`mpqpatch.exe` build recipe (§3)** — the exact MSVC/MinGW flags are best-effort; verify and
-  correct them on Windows (then update §3). Fallback: skip local build, use CI + the release zip.
+- **`build.py install` to `C:\Program Files (x86)\StarCraft II`** — not run (that dir needs admin;
+  a non-admin alternative is to copy `build/Mods` + `build/Campaign` into
+  `Documents\StarCraft II\{Mods,Maps\Campaign}`, which the Editor/game also read — done this round).
+- **Editor `Test Document` (Ctrl+F9) in-game run** — not attempted: our mod loads via a
+  hand-injected `MapScript.galaxy` include, and the Editor may recompile the map script on test and
+  drop it (false-negative risk), plus a possible campaign-license guard. The reliable in-game path
+  remains the **CCM release zip** (owner). Worth a careful trial, not assumed to work.

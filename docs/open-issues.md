@@ -6,6 +6,34 @@ Format: `- [ ]` open, `- [x]` resolved. Newest at the top of each section. When 
 
 Running gate: `python3 scripts/audit.py` catches the structural classes statically (missing/malformed actors, dead calldowns) before a build ships; the rest below need in-game observation.
 
+## Editor verification pass (2026-06-17) — SC2 Editor Previewer, local build working
+
+The Windows local build now works end-to-end (portable MinGW+CMake → `mpqpatch.exe` →
+`build.py build` patched 30 maps; see [SETUP.md §3](SETUP.md)). The mod was loaded into the SC2
+**Editor** (Data module + Previewer / Data Navigator) and these were confirmed:
+
+- [x] **Elite-merc PORTRAITS render (the long-standing "heart placeholder" question) — CONFIRMED
+  for the representative case.** `MercThor` (Jotun) resolves to body model **"Thor"** and portrait
+  model **"Portrait - Thor"** (the real Thor portrait, NOT a heart; the model renders in the
+  Previewer, NOT a sphere). `Condor` (Hellion merc) renders as a Hellion. The merc-clone
+  model/portrait mechanism is therefore proven in the Editor; combined with audit CHECK6 (all 6
+  `*Portrait` tokens are valid base-CASC tokens) this settles the heart-portrait item for the
+  loaded mercs. (Death Heads / Skibi's Angels / Senior Ghost are structurally identical and were
+  not individually previewed.)
+- [x] **Shielded-merc armor signs — CONFIRMED resolve (not "unknown").** Jotun & Condor both show
+  `ShieldArmorName` = **"Defensive Matrix"** and `LifeArmorName` = **"Terran Vehicle Plating"** in
+  the merged catalog. (The dual-icon *side-by-side render* remains a [GAME] in-game observation.)
+- [x] **MercThor resurrect cost zeroed — CONFIRMED.** Jotun `CostResource` reads 0/0/0 in the
+  Editor (the Immortality-Protocol "no gas" piece; the death-response *firing* is still [GAME]).
+- [ ] **⚠ NEW — `MercWraith` (Winged Nightmares) did not appear in the standalone-mod Editor view.**
+  Of the 6 elite mercs, only MercWraith was absent from the Data editor unit list when the mod was
+  opened **standalone** (Liberty-Mod dependency only). It is statically well-formed and identical
+  to its siblings (`UnitData.xml:586` `parent="Wraith"`, valid actor `ActorData.xml:73`,
+  audit-clean), and is present in the built mod. Most likely a **missing-campaign-dependency
+  artifact** of the standalone-mod view (that view threw many reference warnings). **VERIFY:** open
+  a built campaign map (full dependency stack) or summon Winged Nightmares in-game and confirm it
+  appears + renders. If it's also absent with full deps, investigate as a real load failure.
+
 ## Clone metadata (the Merc* elite mercs)
 
 - [x] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`). **v0.3.8: the NORMAL life-armor sign was missing** — added an explicit `LifeArmorName` (= each merc's base-unit vanilla value, verified against `mods/_reference/`) so the life-armor category resolves on a shielded clone. Statically proven (audit CHECK7 confirms the keys resolve); the heart-portrait piece is the only remaining in-game item (see v0.3.7 #4 below).

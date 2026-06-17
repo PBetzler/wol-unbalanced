@@ -229,23 +229,23 @@ player-exclusive so the gate is always satisfied — fine.
 **Mechanism:** `TargetFilters` is a **STRING field** → a per-player runtime edit is a **silent
 no-op** (the genlib attempt at `genlib.py:371` never took — owner report). The fix is a `parent=`
 clone of `heal` with a broadened `TargetFilters` + explicit `Effect=heal`. Reference:
-`HealWoLU` (`AbilData.xml:527-534`). The vanilla gate is `Ground,Biological,...` on `heal`
+`HealWoLU` (`AbilData.xml:553-560`). The vanilla gate is `Ground,Biological,...` on `heal`
 (verified `liberty.sc2campaign/AbilData.xml` `heal` block: `TargetFilters value="Ground,
 Biological,Visible;..."`); `HealWoLU` drops `Ground,Biological` to allow mech + air.
 **Verification — the mechanism looks statically CORRECT (a surprise):** I traced every gate
 that could still block mechanical and found NONE that survives the clone:
 1. The working BUTTON is pointed at `HealWoLU`: the Medic's merged heal button is **index 6**
    (vanilla `heal,Execute` at cell 2,0); v0.3.7 #5 re-points it `<LayoutButtons index="6"
-   AbilCmd="HealWoLU,Execute"/>` (`UnitData.xml:316`). [STATIC — confirm index 6 in the merged
-   card; Stetmann re-points its `BonesHeal` button similarly at `UnitData.xml:336`.]
+   AbilCmd="HealWoLU,Execute"/>` (`UnitData.xml:328`). [STATIC — confirm index 6 in the merged
+   card; Stetmann re-points its `BonesHeal` button similarly at `UnitData.xml:348`.]
 2. `HealWoLU` is on the `AbilArray` (`Medic AbilArray index 6`, `UnitData.xml:307`). [STATIC]
-3. The clone heals via `Effect index="0" value="heal"` (`AbilData.xml:531`) → the real
+3. The clone heals via `Effect index="0" value="heal"` (`AbilData.xml:557`) → the real
    `CEffectCreateHealer "heal"`, whose `ValidatorArray` is `noMarkers, NotWarpingIn,
    HiddenCompareAB/BA, NotVortexd` (`liberty.sc2campaign/EffectData.xml` heal block) — **NONE
    gate Biological/Mechanical**. [STATIC, CHECK4-clean]
 4. `HealWoLU`'s `TargetFilters` correctly drops `Ground,Biological`:
    `Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable`
-   (`AbilData.xml:532`) — no bio/ground requirement remains. [STATIC]
+   (`AbilData.xml:558`) — no bio/ground requirement remains. [STATIC]
 5. The inherited autocast/smart filters do NOT gate by attribute either: vanilla `heal`'s
    `SmartValidatorArray` is `healSmartTargetFilters` = `CValidatorUnitFilters Filters="-;Enemy"`
    (just excludes enemies — `liberty.sc2mod/ValidatorData.xml:1318`) + `NotWarpingIn`; its

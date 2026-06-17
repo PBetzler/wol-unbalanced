@@ -11,6 +11,13 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
+# Windows' default cp1252 console can't encode the Unicode our catalogs carry
+# (→ ✓ — × in comments); printing matched elements would raise UnicodeEncodeError.
+# Force UTF-8 stdout/stderr so `get`/`ids`/`refs` don't crash (mirrors audit.py).
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 
 def blocks(path):
     """Yield (classname, id, start_line, text) for every top-level catalog entry."""

@@ -34,6 +34,7 @@ proven but still `[GAME]`-pending the owner's playthrough.
 | [../CLAUDE.md](../CLAUDE.md) | **The contract** — design rules, hard rules, the don't-guess discipline, PM/dispatch doctrine, session protocol. Read end to end. |
 | [../plan.md](../plan.md) | Architecture + work packages (the *how*); **§7 Status** is the running changelog of what shipped; "Open next" at the very end. |
 | [implementation-patterns.md](implementation-patterns.md) | **VERIFIED "how to implement X"** with `file:line` cites + `[STATIC]`/`[GAME]`/`[ASSUMPTION]` confidence legend. Compare a change against it before writing. |
+| [examples/](examples/README.md) | **The worked-example cookbook** (NEW) — 30+ reusable, independently-reviewed "to get result X, make change Y" recipes covering every request that came into the mod, each statically verified with `file:line` cites. Includes the **SC2-Editor verification runbook** and the **[bunch-verify queue](examples/_QUEUE.md)** (the parked [EDITOR]/[GAME] checks). Add a recipe when a new request has none. |
 | [open-issues.md](open-issues.md) | **The bug tracker** — confirmed defects + root-cause notes, newest batch first. The `[GAME]` items are what's pending playtest. |
 | [unit-status.md](unit-status.md) | **LIVING per-unit status** — per unit, what changed and whether it's proven / awaiting-game / broken. Update it when a change alters the mod's effect. |
 | [learnings.md](learnings.md) | **Hard-won SC2 modding gotchas** — each cost a real debugging session. Read the relevant section before touching an area; contribute back when you re-derive something. |
@@ -73,10 +74,15 @@ mechanism can't be statically proven; the static checker can't observe "fires bo
 6. **Bug 3 — shielded-merc normal armor sign** — each elite merc's `LifeArmorName` matches its
    base unit's vanilla value; `ShieldArmorName` kept. CHECK7 green. ⚠ owner confirms the inspect
    panel renders BOTH the life-armor icon AND the shield icon side-by-side.
-7. **Long-standing — elite-merc portraits** (the 6 `Merc*` clones) — CHECK6 confirms each
-   `PortraitModel` token is a valid base-CASC portrait referenced by a real vanilla actor, but the
-   actual render is preload-dependent. ⚠ **now checkable in the Windows Editor Previewer** (no
-   playtest needed) — confirm the heart placeholder is gone.
+7. **Long-standing — elite-merc portraits** (the 6 `Merc*` clones) — **✅ EDITOR-CONFIRMED
+   2026-06-17 (representative case).** Loaded the mod in the SC2 Editor Previewer: `MercThor`
+   (Jotun) resolves to body model "Thor" + portrait "Portrait - Thor" (the real Thor portrait,
+   not a heart; renders, not a sphere); `Condor` renders as a Hellion; armor signs resolve
+   ("Defensive Matrix" + "Terran Vehicle Plating"). Mechanism proven + CHECK6 covers all 6 tokens.
+   ⚠ One flag: `MercWraith` (Winged Nightmares) did **not** appear in the *standalone-mod* Editor
+   view (statically identical to siblings; likely a missing-campaign-dep artifact) — see
+   [open-issues.md](open-issues.md) §"Editor verification pass". Build + Previewer details there
+   and in [SETUP.md §3](SETUP.md).
 
 > Earlier batches (v0.3.5–v0.3.8) also carry `[GAME]`/⚠ items in open-issues.md (bunker capacity,
 > cloak-on-spawn decloak button, Jackson's Revenge autocasts, etc.). The v0.3.9 list above is the

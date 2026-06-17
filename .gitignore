@@ -6,8 +6,9 @@ vendor/
 build/
 dist/
 
-# Compiled tools (source lives in tools/)
+# Compiled tools (source lives in tools/) — Mac binary + Windows .exe
 tools/mpqpatch
+tools/mpqpatch.exe
 
 # SC2 AI API self-verification venv (scripts/verify_api.py is tracked)
 tools/sc2api/.venv/
