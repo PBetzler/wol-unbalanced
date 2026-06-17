@@ -27,9 +27,13 @@ This ledger separates the surface into three layers and names exactly what's lef
 | Galaxy compiles (no black map) | `galaxy_lint.py` | ✅ auto |
 | **Buff VALUES** (every per-player field edit's final number) | **`preview.py` manifest** | ✅ BUILT — `build/preview/buff-manifest.md` lists every edit's `base → final` |
 | **Buff APPLICATION class** (each edit lands on a field class that actually applies) | **`preview.py --check` = CHECK8** | ✅ BUILT + in the gate (pre-commit + CI); 326 GOOD / 0 NOOP |
+| **Autocast / reactive TRIGGER intent** (each autocast + DamageResponse fires on the *intended* event) | **`check_autocast.py` = CHECK9** | ✅ BUILT + in the gate; a declared intent spec vs the actual wiring — catches "shield fires on attacking, not on damage" automatically, and forces any new autocast to declare its intent |
 
 > Lever 1+2 (below) are now LIVE: they moved the single biggest "trust me" chunk — the ~330
 > field edits — into this fully-verified layer, and lock it so no no-op runtime edit can return.
+> CHECK9 closes the autocast-trigger class the same way: the *intent* is machine-checked against the
+> *wiring*, so a mismatch (like the Defensive Matrix on-firing bug) fails the gate without anyone
+> eyeballing it — the self-service "look for such things yourself" capability.
 
 ## Layer 2 — application mechanisms (verify ONCE → covers ALL instances)
 

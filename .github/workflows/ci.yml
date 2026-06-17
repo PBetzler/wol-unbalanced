@@ -24,5 +24,7 @@ jobs:
         run: python scripts/audit.py --quiet
       - name: Preview lens CHECK8 (every runtime per-player edit sits on a verified-applying field class)
         run: python scripts/preview.py --check
+      - name: Autocast/trigger CHECK9 (every autocast + reactive trigger matches its declared intent)
+        run: python scripts/check_autocast.py
       - name: Dispatch-doctrine guard (CLAUDE.md PM/dispatch rules ↔ hook enforcement in sync)
         run: python scripts/check_dispatch_doctrine.py --quiet

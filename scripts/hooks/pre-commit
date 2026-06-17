@@ -12,6 +12,7 @@ fail=0
 python3 scripts/galaxy_lint.py >/dev/null 2>&1 || { echo "pre-commit: galaxy_lint FAILED:"; python3 scripts/galaxy_lint.py; fail=1; }
 python3 scripts/audit.py --quiet  || { echo "pre-commit: audit FAILED (run: python3 scripts/audit.py)"; fail=1; }
 python3 scripts/preview.py --check >/dev/null 2>&1 || { echo "pre-commit: preview CHECK8 FAILED (a runtime per-player edit on a known no-op field class, or a typo'd id — route it through a static clone):"; python3 scripts/preview.py --check; fail=1; }
+python3 scripts/check_autocast.py >/dev/null 2>&1 || { echo "pre-commit: CHECK9 FAILED (an autocast/reactive trigger doesn't match its declared intent, or a new autocast/DamageResponse has no declared intent — see scripts/check_autocast.py):"; python3 scripts/check_autocast.py; fail=1; }
 python3 scripts/check_dispatch_doctrine.py --quiet || { echo "pre-commit: dispatch-doctrine check FAILED (run: python3 scripts/check_dispatch_doctrine.py)"; fail=1; }
 
 untracked="$(git ls-files --others --exclude-standard 2>/dev/null || true)"
