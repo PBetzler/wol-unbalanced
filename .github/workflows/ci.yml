@@ -22,5 +22,7 @@ jobs:
         run: python scripts/galaxy_lint.py
       - name: Static catalog/actor audit (actor consistency, calldown wiring)
         run: python scripts/audit.py --quiet
+      - name: Preview lens CHECK8 (every runtime per-player edit sits on a verified-applying field class)
+        run: python scripts/preview.py --check
       - name: Dispatch-doctrine guard (CLAUDE.md PM/dispatch rules ↔ hook enforcement in sync)
         run: python scripts/check_dispatch_doctrine.py --quiet

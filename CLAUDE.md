@@ -21,6 +21,7 @@ What lives where: [docs/HANDOFF.md](docs/HANDOFF.md) (**START HERE on a new/fres
 python3 scripts/genlib.py        # regenerate the per-player apply script from reference XML
 python3 scripts/galaxy_lint.py   # MANDATORY before build — catches black-map compile bugs
 python3 scripts/audit.py         # static catalog/actor audit — catches sphere-no-model + dead calldowns
+python3 scripts/preview.py --check  # CHECK8: every per-player edit sits on a verified-applying field class (no no-op runtime edits). Plain `preview.py` writes build/preview/buff-manifest.md (every buff value)
 python3 scripts/build.py build   # patch maps + assemble campaign into build/
 python3 scripts/build.py install # copy into /Applications/StarCraft II
 ```

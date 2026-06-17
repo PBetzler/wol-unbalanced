@@ -48,7 +48,8 @@ BUILD_TIME_OVERRIDES = {
 # behaviors with an energy drain (negative regen). Extracted from the catalogs
 # below; listed explicitly so the output is reviewable.
 CLOAK_ABILS = ["GhostCloak", "BansheeCloak", "WraithCloak", "RogueGhostCloak",
-               "DuskWingBansheeCloakingField", "SpectreCloak"]
+               "DuskWingBansheeCloakingField"]  # no "SpectreCloak": dead id — Spectres cloak via
+#              RogueGhostCloak (already listed); the bogus id was a silent no-op (preview CHECK8)
 CLOAK_BEHAVIORS = ["GhostCloak", "BansheeCloak", "WraithCloak", "SpectreCloaking",
                    "PredatorCloaking", "BansheeCloakCrossSpectrumDampeners"]
 
@@ -237,10 +238,9 @@ def emit():
         ("Unit", "Medivac", "CostResource[Minerals]", "25", "Subtract", "AP Resource Efficiency (assumption)"),
         ("Unit", "Medivac", "CostResource[Vespene]", "25", "Subtract", ""),
         ("Unit", "Medivac", "Food", "1", "Add", ""),
-        ("Unit", "Firebat", "CargoSize", "1", "Set", "rule: all infantry take 1 bunker slot"),
-        ("Unit", "Marauder", "CargoSize", "1", "Set", ""),
-        ("Unit", "Ghost", "CargoSize", "1", "Set", ""),
-        ("Unit", "Spectre", "CargoSize", "1", "Set", ""),
+        # (Removed per-unit CargoSize=1 on Firebat/Marauder/Ghost/Spectre: CargoSize is a bunker
+        #  LOAD-time read, so the per-player runtime edit is a no-op [preview CHECK8 / learnings].
+        #  The working "infantry fit the bunker" lever is the BunkerTransport scalars below.)
         # #3 (v0.3.8): BIG bunker — 32 space, Thors allowed (owner decision). The UI "open
         # slots" bar is driven by TotalCargoSpace (=32); the previous MaxCargoCount=4 was the
         # *unit-count* cap that bound FIRST → the bar showed 32 but only 4 units loaded (the
@@ -257,14 +257,16 @@ def emit():
         ("Abil", "BunkerTransport", "MaxCargoCount", "32", "Set", "high count cap so TotalCargoSpace (32) is the binding limit — displayed slots == real capacity"),
         ("Abil", "BunkerTransport", "MaxCargoSize", "8", "Set", "admit large ground units (Thor=8) — vanilla 2 rejected them"),
         ("Abil", "BunkerTransport", "TotalCargoSpace", "32", "Set", "32-space bar fully usable: 32 marines, or 4 Thors, or any mix by space"),
-        # damage flattening: base damage = old total vs bonus attribute
-        ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: 10(+10 light) -> 20 flat"),
-        ("Effect", "C10CanisterRifle", "AttributeBonus[Light]", "0", "Set", ""),
-        ("Effect", "SpecterU", "Amount", "20", "Set", "Spectre rifle: 15(+5 armored) -> 20 flat"),
-        ("Effect", "SpecterU", "AttributeBonus[Armored]", "0", "Set", ""),
-        # Thor AA: flatten 8(+4 light)=12 < HIP 35 -> 35 per rocket; range = HIP 11 + 1
-        ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA: HIP floor 35/rocket (LotV Punisher)"),
-        ("Effect", "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", "0", "Set", ""),
+        # damage flattening: the Amount edit raises the base (GOOD, applies per player); the paired
+        # AttributeBonus[Light/Armored]=0 lines were REMOVED — they were no-ops (indexed-array element,
+        # preview CHECK8). Net: the rifles ship with the base raised but the +vs-light/armored bonus
+        # STILL PRESENT (Ghost 20 +10 vs light, Spectre 20 +5 vs armored). True flat-N needs a
+        # Shaped-Blast effect clone (recipe 13) — tracked in open-issues "X dmg + X vs light/armored".
+        ("Effect", "C10CanisterRifle", "Amount", "20", "Set", "Ghost rifle: base 10 -> 20"),
+        ("Effect", "SpecterU", "Amount", "20", "Set", "Spectre rifle: base 15 -> 20"),
+        # Thor AA: range = HIP 11 + 1. The flat-35 (no light bonus) for the PLAYER is delivered by the
+        # JavelinMissileLaunchersDamageBuffedWoLU effect clone (player branch), not this base edit.
+        ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA base -> 35 (player path uses the buffed clone)"),
         ("Weapon", "JavelinMissileLaunchers", "Range", "12", "Set", "Thor AA range = HIP range 11 + 1"),
         # Thor "Rapid Reload" (AP, unit-table) — the ground attack's slow Period (1.93 s)
         # + 0.25 s backswing read as a long "windup" even though DamagePoint is already
@@ -287,9 +289,11 @@ def emit():
         # the unit still needs the building, the field is a no-op and the only working lever
         # is TechTreeRestrictionsEnable(p,false), which is rejected here because it would also
         # strip the Merc Compound requirement (violates rule 6).
-        ("Abil", "StarportTrain", "InfoArray[Train6].Button.Requirements", "", "Set", "Hercules: no Fusion Core needed (drop requirement)"),
-        # Marauder "Internal Tech Module": build without a Tech Lab (BarracksTrain Train4).
-        ("Abil", "BarracksTrain", "InfoArray[Train4].Button.Requirements", "", "Set", "Marauder Internal Tech Module: no Tech Lab needed"),
+        # (Removed: Button.Requirements="" for Hercules (StarportTrain Train6) + Marauder
+        #  (BarracksTrain Train4) — a requirement-LINK field, confirmed no-op per-player
+        #  [preview CHECK8]. The feature is OWNER-BLOCKED: the only working lever
+        #  TechTreeRestrictionsEnable(p,false) also strips the Merc Compound requirement (rule 6).
+        #  Tracked in open-issues "Marauder Tech Lab / Hercules Fusion Core drop".)
         # --- Hero/merc parity (rules 4/10): keep % advantage over changed base units ---
         ("Unit", "Raynor01", "LifeMax", "1.4444", "Multiply", "Marine line: x65/45 (Raynor variants + War Pigs)"),
         ("Unit", "Raynor01", "LifeStart", "1.4444", "Multiply", ""),
@@ -348,7 +352,9 @@ def emit():
         ("Unit", "Marauder", "LifeArmor", "2", "Add", "Marauder Juggernaut Plating"),
         ("Weapon", "PunisherGrenades", "Range", "7", "Set", "Marauder LTS: +1 range (6->7)"),
         ("Unit", "Marauder", "Sight", "2", "Add", ""),
-        ("Effect", "FirebatUFull", "AttributeBonus[Light]", "4", "Add", "Firebat Infernal Pre-Igniter: +4 vs light (4->8)"),
+        # (Removed: FirebatUFull AttributeBonus[Light] +4 — indexed-array element, no-op per-player
+        #  [preview CHECK8]. So Firebat "Infernal Pre-Igniter +4 vs light" never applied. Minor real
+        #  gap: needs a Shaped-Blast effect clone (recipe 13) to grant it — tracked in open-issues.)
         ("Unit", "Firebat", "LifeMax", "100", "Add", "Firebat Kinetic Foam: +100 life (after x2)"),
         ("Unit", "Firebat", "LifeStart", "100", "Add", ""),
         ("Weapon", "Firebat", "Range", "4", "Set", "Firebat Nano Projectors: +2 range (2->4)"),
@@ -368,7 +374,9 @@ def emit():
         ("Abil", "NanoRepair", "Cost[0].Vital[Energy]", "0", "Set", "Science Vessel Improved Nano-Repair: free heal"),
         ("Effect", "OdinAADamage", "Amount", "35", "Set", "Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)"),
         ("Abil", "heal", "Range", "4", "Set", "Medic Nano Projector: +2 heal range (2->4)"),
-        ("Abil", "heal", "TargetFilters", "Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable", "Set", "Medic Adaptive Medpacks: heal mech + air (drops Ground,Biological requirement) — string-field edit, verify in game"),
+        # (Removed: heal TargetFilters — a string field, no-op per-player [preview CHECK8]. The
+        #  heal-mechanical/air feature is already delivered by the HealWoLU clone on the Medic +
+        #  Stetmann AbilArray (recipe 09); this runtime edit was dead-redundant.)
         ("Weapon", "Diamondback", "Period", "0.75", "Multiply", "Diamondback Hyperfluxor: faster attack (-25%, assumption)"),
         ("Unit", "Diamondback", "Speed", "1.25", "Multiply", "Diamondback Maglev Propulsion (+25%, assumption)"),
         # Raven (unit-table): "all spawned abilities have unlimited duration" —

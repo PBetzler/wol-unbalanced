@@ -13,7 +13,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "WraithCloak", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "RogueGhostCloak", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "DuskWingBansheeCloakingField", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "SpectreCloak", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogBehavior, "GhostCloak", "Modification.VitalRegenArray[Energy]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogBehavior, "BansheeCloak", "Modification.VitalRegenArray[Energy]", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogBehavior, "WraithCloak", "Modification.VitalRegenArray[Energy]", p, "0", c_upgradeOperationSet);
@@ -189,19 +188,12 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
     CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
     CatalogFieldValueModify(c_gameCatalogUnit, "Medivac", "Food", p, "1", c_upgradeOperationAdd);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "CargoSize", p, "1", c_upgradeOperationSet);  // rule: all infantry take 1 bunker slot
-    CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "CargoSize", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Ghost", "CargoSize", p, "1", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogUnit, "Spectre", "CargoSize", p, "1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "32", c_upgradeOperationSet);  // high count cap so TotalCargoSpace (32) is the binding limit — displayed slots == real capacity
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoSize", p, "8", c_upgradeOperationSet);  // admit large ground units (Thor=8) — vanilla 2 rejected them
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "32", c_upgradeOperationSet);  // 32-space bar fully usable: 32 marines, or 4 Thors, or any mix by space
-    CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: 10(+10 light) -> 20 flat
-    CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: 15(+5 armored) -> 20 flat
-    CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "AttributeBonus[Armored]", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "Amount", p, "35", c_upgradeOperationSet);  // Thor AA: HIP floor 35/rocket (LotV Punisher)
-    CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "AttributeBonus[Light]", p, "0", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: base 10 -> 20
+    CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: base 15 -> 20
+    CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "Amount", p, "35", c_upgradeOperationSet);  // Thor AA base -> 35 (player path uses the buffed clone)
     CatalogFieldValueModify(c_gameCatalogWeapon, "JavelinMissileLaunchers", "Range", p, "12", c_upgradeOperationSet);  // Thor AA range = HIP range 11 + 1
     CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Period", p, "1.0", c_upgradeOperationSet);  // Thor Rapid Reload: faster ground attack (1.93->1.0)
     CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Backswing", p, "0.1", c_upgradeOperationSet);  // Thor: minimal attack recovery
@@ -209,8 +201,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "Backswing", p, "0.1", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyDamage", "Amount", p, "0", c_upgradeOperationSet);  // tank sieged splash: no friendly fire
     CatalogFieldValueModify(c_gameCatalogEffect, "CrucioShockCannonFriendlyTargetDamage", "Amount", p, "0", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Button.Requirements", p, "", c_upgradeOperationSet);  // Hercules: no Fusion Core needed (drop requirement)
-    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksTrain", "InfoArray[Train4].Button.Requirements", p, "", c_upgradeOperationSet);  // Marauder Internal Tech Module: no Tech Lab needed
     CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);  // Marine line: x65/45 (Raynor variants + War Pigs)
     CatalogFieldValueModify(c_gameCatalogUnit, "Raynor01", "LifeStart", p, "1.4444", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "RaynorCommando", "LifeMax", p, "1.4444", c_upgradeOperationMultiply);
@@ -256,7 +246,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Marauder Juggernaut Plating
     CatalogFieldValueModify(c_gameCatalogWeapon, "PunisherGrenades", "Range", p, "7", c_upgradeOperationSet);  // Marauder LTS: +1 range (6->7)
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "Sight", p, "2", c_upgradeOperationAdd);
-    CatalogFieldValueModify(c_gameCatalogEffect, "FirebatUFull", "AttributeBonus[Light]", p, "4", c_upgradeOperationAdd);  // Firebat Infernal Pre-Igniter: +4 vs light (4->8)
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "100", c_upgradeOperationAdd);  // Firebat Kinetic Foam: +100 life (after x2)
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeStart", p, "100", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "Firebat", "Range", p, "4", c_upgradeOperationSet);  // Firebat Nano Projectors: +2 range (2->4)
@@ -276,7 +265,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "NanoRepair", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);  // Science Vessel Improved Nano-Repair: free heal
     CatalogFieldValueModify(c_gameCatalogEffect, "OdinAADamage", "Amount", p, "35", c_upgradeOperationSet);  // Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)
     CatalogFieldValueModify(c_gameCatalogAbil, "heal", "Range", p, "4", c_upgradeOperationSet);  // Medic Nano Projector: +2 heal range (2->4)
-    CatalogFieldValueModify(c_gameCatalogAbil, "heal", "TargetFilters", p, "Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable", c_upgradeOperationSet);  // Medic Adaptive Medpacks: heal mech + air (drops Ground,Biological requirement) — string-field edit, verify in game
     CatalogFieldValueModify(c_gameCatalogWeapon, "Diamondback", "Period", p, "0.75", c_upgradeOperationMultiply);  // Diamondback Hyperfluxor: faster attack (-25%, assumption)
     CatalogFieldValueModify(c_gameCatalogUnit, "Diamondback", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Diamondback Maglev Propulsion (+25%, assumption)
     CatalogFieldValueModify(c_gameCatalogBehavior, "AutoTurretTimedLife", "Duration", p, "3600", c_upgradeOperationSet);  // Raven: permanent Auto-Turrets (AP Durable Materials, maxed)

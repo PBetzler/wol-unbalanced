@@ -25,10 +25,11 @@ This ledger separates the surface into three layers and names exactly what's lef
 | Armor/name string keys resolve | `audit.py` CHECK7 + editor field view | ✅ auto + editor |
 | Models / portraits render (mercs) | SC2 Editor Previewer / Data Navigator | ✅ (2026-06-17) |
 | Galaxy compiles (no black map) | `galaxy_lint.py` | ✅ auto |
-| **Buff VALUES** (every per-player field edit's final number) | **preview lens + audit diff** | ⏳ *lever 1 below* |
+| **Buff VALUES** (every per-player field edit's final number) | **`preview.py` manifest** | ✅ BUILT — `build/preview/buff-manifest.md` lists every edit's `base → final` |
+| **Buff APPLICATION class** (each edit lands on a field class that actually applies) | **`preview.py --check` = CHECK8** | ✅ BUILT + in the gate (pre-commit + CI); 326 GOOD / 0 NOOP |
 
-> Lever 1 moves the single biggest "trust me" chunk — the ~150 field-edit *values* — into this
-> fully-verified layer.
+> Lever 1+2 (below) are now LIVE: they moved the single biggest "trust me" chunk — the ~330
+> field edits — into this fully-verified layer, and lock it so no no-op runtime edit can return.
 
 ## Layer 2 — application mechanisms (verify ONCE → covers ALL instances)
 
@@ -70,9 +71,11 @@ verified once, each a tiny per-unit variation on a proven pattern.
 
 ## The two levers that shrink the surface further
 
-### Lever 1 — Preview lens (auto-verifies every buff VALUE)
-`genlib --preview` emits the *same* edit list as a throwaway **static-global** `*-Preview.SC2Mod`
-with computed final values. Two payoffs:
+### Lever 1 — Preview lens (auto-verifies every buff VALUE) — ✅ BUILT (`scripts/preview.py`)
+`scripts/preview.py` **parses the generated lib** (no genlib change → shipped galaxy byte-identical),
+resolves each edit's vanilla base, computes the final, and writes `build/preview/buff-manifest.md` —
+every edit as `kind | id | field | op value | base → final`. (A loadable static-override
+`*-Preview.SC2Mod` for the editor is the planned next step.) Two payoffs:
 - **Editor**: load it → every buffed field shows its real number directly (`Marine LifeMax = 65`,
   `Predator Vespene = 0`, `ThorsHammer Range = 13`). You read the numbers, no playtest.
 - **Automated audit**: a check diffs preview-vs-vanilla and asserts **every intended delta landed
@@ -81,12 +84,14 @@ with computed final values. Two payoffs:
 It's global (leaks to enemies) but **never shipped/played** — purely a verification lens. The
 shipped per-player build is untouched. (Same source-of-truth edit list, two emit modes.)
 
-### Lever 2 — Field-class safety gate (locks the application to verified classes)
-A new `audit.py` **CHECK8** that **FAILS** if `genlib` emits a runtime per-player edit on a
-**known no-op field class** (indexed arrays, `*.Link`, string fields, load-time `CargoSize` —
-see [examples/02-no-op-traps.md](examples/02-no-op-traps.md)). Those must go through a static clone
-instead. Result: **every runtime edit is provably on a class we've verified applies** → Layer 2's
-"does it apply?" question is answered by construction, per edit, automatically.
+### Lever 2 — Field-class safety gate (locks the application to verified classes) — ✅ BUILT (`preview.py --check`)
+**CHECK8** (`scripts/preview.py --check`, now in the pre-commit hook + CI) **FAILS** if any runtime
+per-player edit lands on a **known no-op field class** (indexed arrays, `*.Link`, string fields,
+load-time `CargoSize` — see [examples/02-no-op-traps.md](examples/02-no-op-traps.md)) or on a typo'd
+id. Those must go through a static clone instead. It found + we removed 11 such dead edits + a dead
+`SpectreCloak` id (open-issues). Result: **every runtime edit is provably on a class we've verified
+applies** → Layer 2's "does it apply?" is answered by construction, per edit, automatically. The
+only items it leaves as WARN are the 6 free-cloak regen-array edits (UNCERTAIN, GAME-confirmed).
 
 ---
 

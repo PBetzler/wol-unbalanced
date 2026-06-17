@@ -51,6 +51,37 @@ The Windows local build now works end-to-end (portable MinGW+CMake → `mpqpatch
   firing, death-response, splash, simultaneous fire) are inherently NOT Editor-observable and remain
   for the owner's in-game / CCM playtest. This is the correct, expected split — not a gap.
 
+## Preview lens + CHECK8 cleanup (2026-06-17) — dead runtime edits removed, gaps surfaced
+
+Built `scripts/preview.py` (the buff manifest + **CHECK8**, now in the pre-commit gate + CI — see
+[verification-ledger.md](verification-ledger.md)). It parses the generated lib's 332 per-player
+edits and classifies each: **GOOD 326 / NOOP 0 / UNCERTAIN 6 / UNRESOLVED 0** after cleanup. CHECK8
+**fails** if any runtime edit ever lands on a known no-op field class again.
+
+- [x] **Removed 11 dead no-op runtime edits + 1 dead id (behavior-neutral — they did nothing).**
+  From `genlib.py`: per-unit `CargoSize=1` ×4 (load-time read), `AttributeBonus[Light/Armored]=0`
+  ×3 on the rifles (indexed-array element), `Button.Requirements=""` ×2 (link field), `FirebatUFull
+  AttributeBonus[Light]+4` (indexed-array), `heal TargetFilters` (string field), and the bogus
+  `SpectreCloak` id in `CLOAK_ABILS` (Spectres cloak via `RogueGhostCloak`, already listed). Each was
+  a silent no-op, so removal changes no in-game behavior — it just shrinks the dead surface and makes
+  CHECK8 green. The gen lib dropped 364 → 352 lines.
+- [ ] **⚠ NEW (minor) — Firebat "Infernal Pre-Igniter" +4 vs light never applied.** The
+  `FirebatUFull AttributeBonus[Light]+4` edit was an indexed-array no-op (now removed). To actually
+  grant it, needs a Shaped-Blast effect clone (recipe [13](examples/13-flatten-attribute-bonus.md)).
+  Low priority — the Firebat is already massively buffed (×2 HP +100). Decide: build the clone, or
+  drop the upgrade.
+- [x] **`heal TargetFilters` runtime edit was dead-redundant — confirmed.** The heal-mech/air feature
+  ships via the `HealWoLU` clone on the Medic (`AbilArray index 6`) + Stetmann (`index 5`); the
+  string-field runtime edit never did anything. Removed.
+- **UNCERTAIN (kept, flagged):** the 6 free-cloak `Modification.VitalRegenArray[Energy]=0` edits are
+  an indexed regen-array element (recipe-02 would call it a no-op) but free cloak is GAME-confirmed
+  working — kept, re-verify only if cloak energy-drain ever returns.
+
+> Cross-ref: the **rifle-flatten** item below (Ghost/Spectre still read +vs-light/armored) and the
+> **Marauder Tech Lab / Hercules Fusion Core** blocked item are the two real gaps these no-op
+> removals confirmed — both already tracked; the cleanup just stopped pretending the dead runtime
+> edits implemented them.
+
 ## Clone metadata (the Merc* elite mercs)
 
 - [x] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`). **v0.3.8: the NORMAL life-armor sign was missing** — added an explicit `LifeArmorName` (= each merc's base-unit vanilla value, verified against `mods/_reference/`) so the life-armor category resolves on a shielded clone. Statically proven (audit CHECK7 confirms the keys resolve); the heart-portrait piece is the only remaining in-game item (see v0.3.7 #4 below).
