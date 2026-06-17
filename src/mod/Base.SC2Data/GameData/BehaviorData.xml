@@ -121,6 +121,39 @@
         <Requirements value="UseMechanicalRebirth"/>
     </CBehaviorBuff>
 
+    <!-- Defensive Matrix ON-DAMAGE auto-trigger (BC / Science Vessel / Jackson's Revenge).
+         What:  a permanent hidden buff whose DamageResponse fires the DefensiveMatrixOnDamageSetWoLU
+                effect (apply the vanilla DefensiveMatrix shield buff + fill shields) on the DAMAGE
+                EVENT — "a cast immediately before/after we receive damage".
+         Why:   the OLD design autocast DefensiveMatrixWoLU on the WoLUCasterDamaged validator
+                (caster Life < 100% = a STATE), which re-cast every cooldown for as long as the unit
+                merely sat below full HP — wrong. A DamageResponse is event-driven: it fires once per
+                qualifying hit, not while idle-damaged.
+         Where: applied player-only to Battlecruiser + ScienceVessel + DukesRevenge via
+                libWoLU_AddBehaviorToType in LibWoLUnbalanced.galaxy (rule 9 — never static-edit the
+                shared BC/SV BehaviorArray, that would buff enemies too).
+         Pattern: liberty's RetributionField (CBehaviorBuff, Hidden, DamageResponse Chance=1
+                Handled=<effect> with <Cost><Cooldown TimeUse=N> and NO ModifyFraction) is the
+                CONFIRMED throttled, NON-FATAL damage-response pattern — Handled fires on every
+                non-fatal hit, rate-limited by the cooldown, and does NOT absorb (we want the SHIELD
+                to absorb, not the response). No Fatal flag (fires on ordinary hits, not just lethal).
+         THROTTLE: TimeUse="20" = the DefensiveMatrix buff's own Duration=20, so the shield is not
+                re-raised while one is already up; the next hit after it expires re-triggers it.
+         [STATIC] wiring (ids resolve, schema matches RetributionField + the repo's WoLUAdaptiveDefenses
+         / MercThorDontDie DamageResponses). [GAME] the actual on-damage FIRING and the
+         "no re-cast while idle-damaged" behavior — owner confirms in a mission with BC/SV/Jackson's. -->
+    <CBehaviorBuff id="WoLUDefMatrixOnDamage">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <DamageResponse Chance="1" Handled="DefensiveMatrixOnDamageSetWoLU">
+            <Cost>
+                <Cooldown TimeUse="20"/>
+            </Cost>
+        </DamageResponse>
+    </CBehaviorBuff>
+
     <!-- Predator Charge (AP): a permanent +120% move-speed buff (the Zealot-charge feel
          without the engine-coupled CAbilAugment, which doesn't link to its buff in data and
          is untested on Terran units). Adapted from Protoss Charging (MoveSpeedMultiplier 2.2);

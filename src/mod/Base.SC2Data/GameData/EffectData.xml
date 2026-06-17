@@ -181,6 +181,42 @@
         <SearchFilters value="-;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
     </CEffectEnumArea>
 
+    <!-- Defensive Matrix ON-DAMAGE trigger target (BC / Science Vessel / Jackson's Revenge).
+         The WoLUDefMatrixOnDamage behavior (BehaviorData.xml) fires THIS set as its DamageResponse
+         Handled effect — i.e. on the damage EVENT, not while merely below full HP. It mirrors the
+         vanilla cast (which does APPLY the DefensiveMatrix buff + FILL shields to max) so the shield
+         is actually up when the hit lands:
+           - DefensiveMatrixApplyBehaviorWoLU applies the vanilla `DefensiveMatrix` buff
+             (VitalMaxArray[Shields]=200, Duration=20, self-removes via RemoveValidatorArray=hasShields).
+           - DefensiveMatrixFillWoLU fills Shields to max (ChangeFraction=1), same as the vanilla
+             DefensiveMatrixModifyUnit.
+         CRITICAL: every member pins the target to Caster EXPLICITLY — the apply-behavior via
+         <WhichUnit Value="Caster"/>, the modify-unit via its own selector <ImpactUnit Value="Caster"/>.
+         In a DamageResponse context "Caster" = the unit that carries the behavior = the DAMAGED unit.
+         The bare campaign effects (DefensiveMatrixApplyBehavior / DefensiveMatrixModifyUnit) have NO
+         explicit selector and default ambiguously here, so we clone them with the target pinned. We
+         skip the vanilla
+         dummy-behavior pair (DefensiveMatrixApplyDummyBehavior/RemoveDummyBehavior) — that's a
+         cast-time gate artifact, irrelevant to a damage-response trigger. -->
+    <CEffectApplyBehavior id="DefensiveMatrixApplyBehaviorWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <Behavior value="DefensiveMatrix"/>
+        <WhichUnit Value="Caster"/>
+    </CEffectApplyBehavior>
+    <CEffectModifyUnit id="DefensiveMatrixFillWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <VitalArray index="Shields" ChangeFraction="1"/>
+        <!-- CEffectModifyUnit's unit selector is <ImpactUnit> (NOT <WhichUnit>, which is the
+             CEffectApplyBehavior form). Caster = the damaged unit in a DamageResponse context
+             (confirmed valid: liberty's own CEffectModifyUnit uses <ImpactUnit Value="Caster"/>). -->
+        <ImpactUnit Value="Caster"/>
+    </CEffectModifyUnit>
+    <CEffectSet id="DefensiveMatrixOnDamageSetWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="DefensiveMatrixApplyBehaviorWoLU"/>
+        <EffectArray value="DefensiveMatrixFillWoLU"/>
+    </CEffectSet>
+
     <!-- Wraith Trigger Override on-attack stack. Applies WoLUWraithTriggerOverride to the
          FIRING Wraith (WhichUnit=Source, the project convention for self-apply). Player-gated:
          WoLUHasFlag so enemy Wraiths fire the same weapon set but this apply no-ops for them. -->

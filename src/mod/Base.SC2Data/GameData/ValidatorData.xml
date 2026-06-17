@@ -44,17 +44,11 @@
         <Value value="300"/>
     </CValidatorUnitCompareField>
 
-    <!-- "Caster has taken any damage" = current Life below full (fraction < 1.0). Drives the
-         Defensive Matrix autocast so the shield goes up ONLY when the unit is actually being hurt,
-         not when it is merely firing. Type=Fraction is the percent-of-max compare confirmed from
-         vanilla `ShieldsFull` (liberty.sc2mod/ValidatorData.xml). -->
-    <CValidatorUnitCompareVital id="WoLUCasterDamaged">
-        <WhichUnit Value="Caster"/>
-        <Compare value="LT"/>
-        <Type value="Fraction"/>
-        <Value value="1"/>
-        <Vital value="Life"/>
-    </CValidatorUnitCompareVital>
+    <!-- (WoLUCasterDamaged removed in the Defensive-Matrix on-damage rework.) The old
+         "caster Life < 100%" validator gated a STATE-based autocast that re-cast the shield
+         every cooldown while the unit merely sat below full HP. Defensive Matrix is now
+         event-driven via the WoLUDefMatrixOnDamage DamageResponse behavior (BehaviorData.xml),
+         so this validator has no remaining reference and is deleted. -->
 
     <!-- Snipe autocast floor: don't waste a 45-dmg Snipe on a target with < 30
          current life (the table's "max 15 HP wasted" intent, as a floor). Current

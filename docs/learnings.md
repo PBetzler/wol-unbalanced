@@ -103,6 +103,27 @@ gotcha; authoritative details live in the code/plan, not here.
   `AdvancedShielding`; 0.5 = take half damage). `<Kind index="Ranged" value="1"/>`
   entries are meant to filter by damage kind, but the reference sets them all to 0 with
   no obvious effect — treat Kind-filtering as unverified and prefer halving all damage.
+- **An ON-DAMAGE auto-trigger ("cast a thing whenever the unit gets hit") is a
+  `DamageResponse Handled` behavior, NOT an autocast on a low-HP validator.** Autocasting
+  an ability on a `Life < 100%` (state) validator re-casts every cooldown for as long as
+  the unit merely *sits* below full HP — that's a STATE gate, not an EVENT. To fire once
+  per hit, put a hidden permanent `CBehaviorBuff` on the unit whose
+  `<DamageResponse Chance="1" Handled="<effect>"><Cost><Cooldown TimeUse="N"/></Cost></DamageResponse>`
+  fires `<effect>` on every NON-fatal hit, rate-limited by the cooldown (schema confirmed
+  verbatim from liberty's `RetributionField`). No `Fatal` needed (that's the death-response
+  variant, cf. `MercThorDontDie`); no `ModifyFraction` needed unless you want the *response*
+  to absorb — omit it when you want a real effect (e.g. raise a shield) to do the absorbing.
+  Throttle `TimeUse` to the effect's own duration so it doesn't re-fire while still active.
+  (Used for Defensive Matrix auto-raise on BC/SV/Jackson's Revenge — `WoLUDefMatrixOnDamage`.)
+- **In a `DamageResponse` `Handled` chain, pin every child effect's unit to `Caster`
+  EXPLICITLY — and the selector field name differs by effect class.** "Caster" in this
+  context = the unit carrying the DamageResponse behavior = the DAMAGED unit. Bare campaign
+  effects with no selector default ambiguously when re-fired from a damage response. The
+  selector element is class-specific: `CEffectApplyBehavior` uses `<WhichUnit Value="Caster"/>`,
+  but `CEffectModifyUnit` uses `<ImpactUnit Value="Caster"/>` (NOT `WhichUnit` — confirmed
+  against liberty's own `CEffectModifyUnit` entries; `<WhichUnit>` on a `CEffectModifyUnit`
+  is wrong). When cloning a vanilla cast's effects for a damage-response target, clone each
+  member and add the right selector — don't reuse the bare originals.
 - `CValidatorUnitCompareField` reads any unit field (e.g. `LifeMax`); default WhichUnit
   is the validated/target unit. `CValidatorUnitCompareVital` reads current Life/Energy/
   Shields with an explicit `<WhichUnit Value="Target"/>`. Both compose under

@@ -394,6 +394,16 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUAdaptiveDefenses");
         // Predator Charge (AP): permanent +120% move speed (player-only).
         libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUPredatorCharge");
+        // Defensive Matrix on-damage auto-trigger (player-only): a hidden DamageResponse
+        // buff (WoLUDefMatrixOnDamage) raises the Defensive Matrix shield on the DAMAGE
+        // EVENT, throttled to 20 s (the buff's own duration) so it never re-casts while a
+        // shield is already up. Applied to the shared BC + Science Vessel here (NOT a static
+        // BehaviorArray edit — that would buff enemy BCs/SVs too) and to the player-exclusive
+        // Jackson's Revenge (DukesRevenge), keeping all three uniform. Replaces the removed
+        // WoLUCasterDamaged state-gate autocast on DefensiveMatrixWoLU / DukesRevengeDefensiveMatrixWoLU.
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Battlecruiser", "WoLUDefMatrixOnDamage");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "ScienceVessel", "WoLUDefMatrixOnDamage");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "DukesRevenge", "WoLUDefMatrixOnDamage");
     }
     return true;
 }

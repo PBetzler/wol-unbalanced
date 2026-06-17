@@ -179,21 +179,16 @@
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
     </CAbilEffectTarget>
-    <!-- ASSUMPTION/UNVERIFIED: Defensive Matrix is an INSTANT self-buff; autocast on
-         a self-cast instant ability has no clean Blizzard blueprint (heal/snipe
-         autocast are target abilities). These flags + an "enemy in range" gate are a
-         best effort; the manual button always works. Flag for in-game check — if it
-         never auto-fires, fall back to manual-only. -->
-    <!-- Defensive Matrix is a SELF-buff instant (parent applies DefensiveMatrixSet to the
-         caster). The old AutoCastFilters EXCLUDED Self/Ally (offensive-target form) so the
-         autocast had no valid target and never fired. A self-buff autocasts off the caster's own
-         state, not a target filter. Gate it on `WoLUCasterDamaged` (Life below full) so the shield
-         goes up ONLY when the unit has TAKEN any damage — not merely when it is firing. -->
+    <!-- Defensive Matrix: MANUAL cast only here. The shield now AUTO-RAISES on the DAMAGE
+         EVENT via the WoLUDefMatrixOnDamage DamageResponse behavior (BehaviorData.xml), applied
+         player-only to the BC / Science Vessel / Jackson's Revenge in LibWoLUnbalanced.galaxy.
+         The OLD ability-level autocast (Flags AutoCast/AutoCastOn + AutoCastRange +
+         AutoCastValidatorArray=WoLUCasterDamaged) was a STATE gate — "caster Life < 100%" — so it
+         re-cast every cooldown for as long as the unit merely sat below full HP. That's wrong: the
+         spec is "a cast immediately before/after we RECEIVE damage", which is event-driven, not a
+         standing-low-HP state. The autocast block is removed; the DamageResponse behavior does the
+         on-hit firing. This clone now only keeps the gated MANUAL button (still castable by hand). -->
     <CAbilEffectInstant id="DefensiveMatrixWoLU" parent="DefensiveMatrix">
-        <Flags index="AutoCast" value="1"/>
-        <Flags index="AutoCastOn" value="1"/>
-        <AutoCastRange value="5"/>
-        <AutoCastValidatorArray value="WoLUCasterDamaged"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
@@ -492,11 +487,13 @@
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
     </CAbilEffectTarget>
+    <!-- Jackson's Revenge Defensive Matrix: MANUAL cast only, same as DefensiveMatrixWoLU above.
+         The shield AUTO-RAISES on the damage EVENT via the WoLUDefMatrixOnDamage DamageResponse
+         behavior, applied to DukesRevenge in LibWoLUnbalanced.galaxy. The old WoLUCasterDamaged
+         state-gate autocast (re-cast while idle-damaged) is removed. KEEP State="Normal" on the
+         button — the inherited DukesRevengeDefensiveMatrix ships its CmdButtonArray with
+         State="Restricted" (see the #6 fix above), so we must clear it to keep the manual cast live. -->
     <CAbilEffectInstant id="DukesRevengeDefensiveMatrixWoLU" parent="DukesRevengeDefensiveMatrix">
-        <Flags index="AutoCast" value="1"/>
-        <Flags index="AutoCastOn" value="1"/>
-        <AutoCastRange value="5"/>
-        <AutoCastValidatorArray value="WoLUCasterDamaged"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" State="Normal" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
