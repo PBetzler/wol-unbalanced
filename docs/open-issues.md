@@ -102,6 +102,70 @@ Owner asked to verify the Battlecruiser / Jackson's Revenge (`DukesRevenge`) kit
   reuses the same self-buff-autocast mechanism as the GAME-confirmed super-stim, just a different
   caster-state gate.]
 
+## Elite-merc clone ANIMATION-EVENT audit (2026-06-17) — full sweep of all units/mercs/heroes
+
+Owner asked: "check all the animations in the editor — are they all there for all units, mercs and
+heroes?" Done as a **reference-catalog comparison** (our `CActorUnit` actors vs each base unit's
+vanilla actor in `mods/_reference/liberty.sc2{mod,campaign}/ActorData.xml`) — more precise than GUI
+playback, which can only show a model renders (already editor-confirmed, see the 2026-06-17 pass
+above) but NOT which in-game anim EVENT fires. Findings:
+
+- **Heroes, base units, the 8 standard mercs (War Pigs … Jackson's Revenge): all animations intact.**
+  They use **vanilla actors** (untouched by the mod) → every Stand/Walk/Attack/Spell/Death animation
+  is present by definition. No clone risk.
+- **The 6 elite-merc clones bind MINIMAL `GenericUnitBase` actors** (only `<Model>`+`<PortraitModel>`),
+  because the vanilla actor binds to the base unit (`unitName="Thor"`), not the merc. So they get the
+  generic move/idle/death/**basic-attack** bracket — those work for all 6 — but the base unit's
+  **unit-specific** anim events were copied into **`MercThor` only** (the v0.2.4 Jotun fix). The other
+  5 lack theirs. **None are BROKEN** (unlike the Jotun was); all are **cosmetic pose/cast gaps** —
+  the models contain every animation, only the event wiring is absent:
+  - [x] **Winged Nightmares (`MercWraith`)** — dual-weapon: vanilla splits `WraithA→Attack,Superior`
+    (air) vs `WraithG→Attack` (ground). Ours plays the base ground pose for air too → **no upward-aim
+    variant on air attacks.** Same CLASS as the fixed Jotun bug, much milder (still fires + animates).
+    **FIXED (2026-06-17):** copied the vanilla Wraith actor's 5 weapon-anim events verbatim into
+    `CActorUnit id="MercWraith"` (WraithA→Superior / WraithG→base, Ready apply/remove, AttackStop).
+    [STATIC — pose fires in-game only; owner to confirm air units aim upward.]
+  - [x] **Skibi's Angels (`MercMedic`)** — no `Abil.heal` channel pose (vanilla Medic also parents the
+    richer `GenericUnitStandard`). **Medic stands still while healing** (beam/effect still shows).
+    NB: the player merc casts **`HealWoLU`**, not `heal` — a fix must key the event on the clone id.
+    **FIXED (2026-06-17):** added the `$Spell PlayForever` / `AnimClear Spell` channel pose keyed on
+    **`Abil.HealWoLU.SourceChannelStart/Stop`** (verified: Medic AbilArray[6]=HealWoLU + card button 6
+    re-pointed → the player merc casts HealWoLU; HealWoLU is `CAbilEffectTarget parent="heal"` so it
+    fires the same channel events). Also keyed on vanilla `Abil.heal.*` as a belt-and-braces autocast
+    fallback (harmless — the actor is worn only by the player-only merc). [STATIC — owner to confirm.]
+  - [x] **Senior Ghost (`MercSeniorGhost`)** — no Snipe/EMP/nuke **cast poses**, no elevation-aim
+    variants, no hold-fire cover. Effects fire; no animation. NB: it autocasts `SnipeWoLU`/`EMPWoLU`,
+    not vanilla `Snipe`/`EMP` — fix must key on the clone ids.
+    **FIXED (2026-06-17):** copied the `GhostAlternate` actor's combat + spell-cast events (the worn
+    model) into `CActorUnit id="MercSeniorGhost"`, RE-KEYED `Snipe`→`SnipeWoLU` (3 phases:
+    CastStart/Stop, ChannelStart/Stop, FinishStart + SpellC walk-cancel) and `EMP`→`EMPWoLU`
+    (`Abil.EMPWoLU.SourceCastStart`); kept `Abil.TacNukeStrike.*` and `Behavior.GhostHoldFireB.On/Off`
+    on their UNCHANGED vanilla ids (verified both inherited via parent="Ghost", not re-pointed); copied
+    the rifle WeaponStart Attack bracket with Superior/Inferior elevation variants verbatim. Skipped the
+    Ghost→GhostAlternate morph Destroy event (the merc is not a morphing unit). [STATIC — owner to
+    confirm cast poses + upward/downward aim.]
+  - [x] **Condor (`MercHellion`)** — no flame-beam **cleanup** timers → the `HellionAttackBeam` may
+    linger when the unit moves. Minor visual.
+    **FIXED (2026-06-17):** copied the vanilla Hellion actor's 3 `KillBeam` cleanup events verbatim
+    (Walk + ReadyStop → `TimerSet 0.25 KillBeam`; TimerExpired → `Destroy HellionAttackBeam`); ids
+    inherited unchanged. [STATIC — owner to confirm the flame beam no longer lingers on move.]
+  - [x] **Death Heads (`MercReaper`)** — Reaper's vanilla actor is a **core** unit (not in our ref
+    dump), so it couldn't be diffed; Reaper is single-weapon, so the generic bracket likely covers it.
+    Lowest risk; flagged as unconfirmed.
+    **LEFT AS-IS (2026-06-17), confirmed correct disposition:** searched all reference sources
+    (`mods/_reference/*`, `mods/*`) — there is **NO `CActorUnit id="Reaper"`** anywhere (only a
+    `CActorMissile id="Reaper"` and a `CActorUnit id="ReaperPlaceholder"`), confirming the Reaper unit
+    actor is a core unit absent from the dump. The Reaper's combat weapon is single (the pistols; the
+    `D8Charge` building-attack is a separate ability), so the generic `GenericUnitBase`
+    `WeaponStart.*.AttackStart` bracket already covers its basic attack. No events fabricated. No change
+    needed.
+
+  **All 5 implemented (2026-06-17).** 4 mercs got their vanilla actor's `<On Terms=…>` events copied
+  in (verbatim weapon-anim events; re-keyed to `HealWoLU`/`SnipeWoLU`/`EMPWoLU` where the mod re-points
+  the ability), following the proven MercThor pattern; Reaper left as-is (no vanilla unit actor exists
+  to copy and the generic bracket covers its single weapon). Every added event is in-game-only-
+  verifiable — gate (genlib/lint/audit/preview/check_autocast) green, owner to confirm the poses.
+
 ## Clone metadata (the Merc* elite mercs)
 
 - [x] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`). **v0.3.8: the NORMAL life-armor sign was missing** — added an explicit `LifeArmorName` (= each merc's base-unit vanilla value, verified against `mods/_reference/`) so the life-armor category resolves on a shielded clone. Statically proven (audit CHECK7 confirms the keys resolve); the heart-portrait piece is the only remaining in-game item (see v0.3.7 #4 below).

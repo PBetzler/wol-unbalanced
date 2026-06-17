@@ -275,6 +275,31 @@ gotcha; authoritative details live in the code/plan, not here.
   (`WeaponStart.<id>`) break. Prefer overriding the **vanilla weapon's `Effect`** to a
   player-gated effect set (Thor does this): the weapon id stays, so the attack
   animation fires, and per-player isolation lives in the validator-gated effect set.
+- **An elite-merc clone (`parent=<base unit>`) wears a bare `GenericUnitBase` actor that has
+  ONLY the generic move/idle/death/basic-attack bracket — it carries NONE of the base unit's
+  unit-specific anim events** (dual-weapon elevation poses, spell-cast poses, heal channel,
+  beam-cleanup timers), because the vanilla actor binds to the base unit via `unitName="<base>"`,
+  not to the merc. The merc's effects/projectiles still fire (effect-bound visuals), but the
+  *caster* pose is missing. Fix = copy the vanilla actor's `<On Terms=…>` events into the merc's
+  own `CActorUnit` (the MercThor/Jotun pattern). Two re-keying rules when you do:
+  - **Weapon-anim events copy VERBATIM** — the weapon ids (`WraithA`/`WraithG`, `ThorsHammer`,
+    the Ghost rifle, `HellionAttackBeam`/`KillBeam`) are inherited UNCHANGED via `parent=`, so the
+    `WeaponStart.<id>`/timer terms match as-is.
+  - **Cast-pose events for a re-pointed ability must key on the CLONE id, NOT the vanilla id.**
+    Where the mod re-points an enemy-used ability via append-not-override (vanilla slot kept,
+    only the card BUTTON re-pointed to the `*WoLU` clone — the Snipe/EMP/heal pattern), the
+    PLAYER only ever issues the clone, so `Abil.Snipe.*` never fires on the player's merc — use
+    `Abil.SnipeWoLU.*` / `Abil.EMPWoLU.*` / `Abil.HealWoLU.SourceChannelStart`. A `*WoLU` clone
+    with `parent="<vanilla abil>"` (or a same-class `CAbilEffectTarget`) inherits the same cast
+    phases, so the vanilla actor's `SourceCastStart/Stop`→`SourceChannelStart/Stop`→
+    `SourceFinishStart` structure copies 1:1 under the new id. Abilities the mod does NOT re-point
+    (TacNukeStrike, the `GhostHoldFireB` hold-fire behavior) keep their vanilla ids — key on those
+    directly. Keying the merc actor on BOTH the vanilla and clone id is harmless (the actor is worn
+    only by the player-only merc, never an enemy) and covers the case where the inherited vanilla
+    ability also autocasts. These are STATIC actor events, unit-bound via `unitName` → player-only
+    (rule-9 safe). Done for MercWraith/MercMedic/MercSeniorGhost/MercHellion (v0.3.10); MercReaper
+    needs none (single-weapon, and no `CActorUnit id="Reaper"` exists in the dump to copy — the
+    Reaper unit actor is a CORE unit; the generic bracket already covers its one weapon).
 
 ## Galaxy script
 

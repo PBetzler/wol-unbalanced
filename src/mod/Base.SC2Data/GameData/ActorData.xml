@@ -33,17 +33,42 @@
          unit's portrait via the ##unitName##Portrait token (Medic -> "MedicPortrait"), so
          "MedicPortrait" etc. are loaded, correct base-CASC portraits. (Body models already
          render via <Model> for the same reason.) -->
+    <!-- Skibi's Angels: the vanilla Medic actor plays its heal-channel pose on
+         Abil.heal.SourceChannelStart -> $Spell PlayForever / SourceChannelStop -> AnimClear
+         Spell. A bare GenericUnitBase actor lacks it, so the merc stands still while healing
+         (the heal beam/effect still shows). The PLAYER merc's visible heal button casts the
+         HealWoLU clone (mechanical+air targeting), NOT vanilla heal — verified: Medic
+         AbilArray[6]=HealWoLU + card button 6 re-pointed to HealWoLU,Execute, and MercMedic
+         (parent="Medic") inherits both. HealWoLU is CAbilEffectTarget parent="heal" → same
+         channel event structure → fires Abil.HealWoLU.SourceChannelStart/Stop. Key on HealWoLU
+         (the cast that actually fires for the player); also key on vanilla heal so the pose
+         still plays if the merc autocasts the inherited vanilla heal (harmless — this actor is
+         worn only by the player-only merc). Skip the vanilla KillSquad ModelSwap (irrelevant).
+         Source: mods/_reference/liberty.sc2campaign/ActorData.xml CActorUnit id="Medic". -->
     <CActorUnit id="MercMedic" parent="GenericUnitBase" unitName="MercMedic">
         <Model value="Medic"/>
         <PortraitModel value="MedicPortrait"/>
+        <On Terms="Abil.HealWoLU.SourceChannelStart" Send="$Spell PlayForever"/>
+        <On Terms="Abil.HealWoLU.SourceChannelStop" Send="AnimClear Spell"/>
+        <On Terms="Abil.heal.SourceChannelStart" Send="$Spell PlayForever"/>
+        <On Terms="Abil.heal.SourceChannelStop" Send="AnimClear Spell"/>
     </CActorUnit>
     <CActorUnit id="MercReaper" parent="GenericUnitBase" unitName="MercReaper">
         <Model value="Reaper"/>
         <PortraitModel value="ReaperPortrait"/>
     </CActorUnit>
+    <!-- Condor: the vanilla Hellion actor kills its flame-beam (HellionAttackBeam) on a short
+         timer whenever the unit walks or stops attacking, so the beam doesn't linger as the unit
+         moves. A bare GenericUnitBase actor lacks these cleanup timers. Copy them verbatim
+         (HellionAttackBeam + the KillBeam timer name are inherited unchanged via parent="Hellion"
+         and the worn Hellion model). Source: mods/_reference/liberty.sc2mod/ActorData.xml
+         CActorUnit id="Hellion". -->
     <CActorUnit id="MercHellion" parent="GenericUnitBase" unitName="MercHellion">
         <Model value="Hellion"/>
         <PortraitModel value="HellionPortrait"/>
+        <On Terms="UnitMovementUpdate.*.Walk" Send="TimerSet 0.250000 KillBeam"/>
+        <On Terms="Abil.attack.ReadyStop" Send="TimerSet 0.250000 KillBeam"/>
+        <On Terms="TimerExpired; TimerName KillBeam" Target="HellionAttackBeam" Send="Destroy"/>
     </CActorUnit>
     <!-- Jotun: Thor's attack animation events are bound to its SPECIFIC weapon ids
          (ground ThorsHammer, air JavelinMissileLaunchers) on the vanilla Thor actor; a
@@ -70,15 +95,70 @@
         <On Terms="WeaponStop.*.AttackStop" Send="AnimBracketStop Attack"/>
         <On Terms="Abil.attack.ReadyStop" Send="AnimGroupRemove Ready"/>
     </CActorUnit>
+    <!-- Winged Nightmares: the Wraith splits its attack pose by weapon on the vanilla actor —
+         air WraithA plays the upward Attack,Superior bracket, ground WraithG plays the base
+         Attack bracket. A bare GenericUnitBase actor only has the generic
+         WeaponStart.*.AttackStart bracket, so the air attack never gets the upward-aim pose.
+         Copy the vanilla Wraith actor's weapon-anim events verbatim (WraithA/WraithG are
+         inherited unchanged via parent="Wraith"; the anims live in the Wraith model we wear).
+         Source: mods/_reference/liberty.sc2campaign/ActorData.xml CActorUnit id="Wraith". -->
     <CActorUnit id="MercWraith" parent="GenericUnitBase" unitName="MercWraith">
         <Model value="Wraith"/>
         <PortraitModel value="WraithPortrait"/>
+        <On Terms="Abil.attack.ReadyStart" Send="AnimGroupApply Ready"/>
+        <On Terms="WeaponStart.WraithA.AttackStart" Send="AnimBracketStart Attack Attack,Superior"/>
+        <On Terms="WeaponStart.WraithG.AttackStart" Send="AnimBracketStart Attack Attack"/>
+        <On Terms="WeaponStop.*.AttackStop" Send="AnimBracketStop Attack"/>
+        <On Terms="Abil.attack.ReadyStop" Send="AnimGroupRemove Ready"/>
     </CActorUnit>
     <!-- Senior Ghost wears the GhostAlternate model (a ghost variant in liberty.sc2mod);
-         portrait = the base Ghost portrait. -->
+         portrait = the base Ghost portrait. A bare GenericUnitBase actor lacks the Ghost's
+         spell-cast poses + the elevation-aim rifle bracket, so EMP/Snipe/nuke fire with no
+         caster animation. Copy the GhostAlternate actor's combat + spell-cast events
+         (mods/_reference/liberty.sc2mod/ActorData.xml CActorUnit id="GhostAlternate", which is
+         the model worn here and carries the same event set as the Ghost actor), RE-KEYED to the
+         abilities the merc ACTUALLY casts:
+           - Snipe -> SnipeWoLU  (our autocast clone the player's button casts; verified the
+             vanilla Snipe slot is APPENDED-alongside + card button 7 re-pointed to SnipeWoLU);
+           - EMP -> EMPWoLU      (same pattern, card button 11 re-pointed);
+           - TacNukeStrike + GhostHoldFireB keep their UNCHANGED vanilla ids (inherited slots,
+             not re-pointed — MercSeniorGhost has both via parent="Ghost").
+         The rifle WeaponStart Attack bracket (weapon id inherited unchanged) is copied verbatim
+         with its Superior/Inferior elevation variants. The SpellC walk-cancel cleanup carries no
+         ability id (generic) → verbatim. SKIP the Ghost->GhostAlternate morph Destroy event (the
+         merc is not a morphing unit). -->
     <CActorUnit id="MercSeniorGhost" parent="GenericUnitBase" unitName="MercSeniorGhost">
         <Model value="GhostAlternate"/>
         <PortraitModel value="GhostPortrait"/>
+        <On Terms="Abil.TacNukeStrike.SourceCastStart" Send="AnimPlay SpellA Spell,A"/>
+        <On Terms="Abil.TacNukeStrike.SourceCastStop" Send="AnimClear SpellA"/>
+        <On Terms="Abil.TacNukeStrike.SourceChannelStart" Send="AnimPlay SpellB Spell,B PlayForever"/>
+        <On Terms="Abil.TacNukeStrike.SourceChannelStop" Send="AnimClear SpellB"/>
+        <On Terms="Abil.TacNukeStrike.SourceFinishStart" Send="AnimPlay SpellC Spell,C"/>
+        <On Terms="Abil.TacNukeStrike.SourceFinishStop" Send="AnimClear SpellC"/>
+        <On Terms="Abil.SnipeWoLU.SourceCastStart" Send="AnimBaselineStop"/>
+        <On Terms="Abil.SnipeWoLU.SourceCastStart" Send="AnimPlay SpellA Spell,A"/>
+        <On Terms="Abil.SnipeWoLU.SourceCastStop" Send="AnimClear SpellA"/>
+        <On Terms="Abil.SnipeWoLU.SourceCastStop" Send="AnimBaselineStart"/>
+        <On Terms="Abil.SnipeWoLU.SourceChannelStart" Send="AnimPlay SpellB Spell,B PlayForever"/>
+        <On Terms="Abil.SnipeWoLU.SourceChannelStop" Send="AnimClear SpellB"/>
+        <On Terms="Abil.SnipeWoLU.SourceFinishStart" Send="AnimPlay SpellC Spell,C"/>
+        <On Terms="UnitMovementUpdate.*.Walk; AnimPlaying SpellC" Send="AnimClear SpellC"/>
+        <On Terms="Abil.EMPWoLU.SourceCastStart" Send="AnimPlay SpellC Spell,C 0 0.000000 0.300000"/>
+        <On Terms="Abil.attack.ReadyStart" Send="AnimGroupApply Ready"/>
+        <On Terms="Behavior.GhostHoldFireB.On" Send="AnimGroupApply Cover"/>
+        <On Terms="Behavior.GhostHoldFireB.On" Send="AnimPlay MorphStart Cover,Start"/>
+        <On Terms="Behavior.GhostHoldFireB.On" Send="AnimClear MorphEnd"/>
+        <On Terms="Behavior.GhostHoldFireB.On" Send="Create Ghost_HoldFire_Sound"/>
+        <On Terms="Behavior.GhostHoldFireB.Off" Send="AnimPlay MorphEnd Cover,End"/>
+        <On Terms="Behavior.GhostHoldFireB.Off" Send="AnimClear MorphStart"/>
+        <On Terms="Behavior.GhostHoldFireB.Off" Send="AnimGroupRemove Cover"/>
+        <On Terms="Behavior.GhostHoldFireB.Off" Send="Create Ghost_WeaponsFree_Sound"/>
+        <On Terms="WeaponStart.*.AttackStart; WeaponTargetElevation GE 20.000000" Send="AnimBracketStart Attack Attack,Superior"/>
+        <On Terms="WeaponStart.*.AttackStart; WeaponTargetElevation LE -20.000000" Send="AnimBracketStart Attack Attack,Inferior"/>
+        <On Terms="WeaponStart.*.AttackStart" Send="AnimBracketStart Attack Attack"/>
+        <On Terms="WeaponStop.*.AttackStop" Send="AnimBracketStop Attack"/>
+        <On Terms="Abil.attack.ReadyStop" Send="AnimGroupRemove Ready"/>
     </CActorUnit>
     <!-- Jotun (MercThorWreckage) wreck actor. The MercThor merc resurrects via a parallel
          Immortality Protocol chain (MercThorDontDie -> MercThorWreckage unit -> MercThorReborn).
