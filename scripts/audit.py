@@ -39,6 +39,12 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
+# Windows: the default console codepage (cp1252) can't encode the non-ASCII glyphs
+# (→ ✓ — ×) we print, raising UnicodeEncodeError. Force UTF-8 stdout/stderr.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GD = os.path.join(ROOT, "src", "mod", "Base.SC2Data", "GameData")
 GALAXY = os.path.join(ROOT, "src", "mod", "Base.SC2Data", "LibWoLUnbalanced.galaxy")

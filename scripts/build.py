@@ -14,6 +14,12 @@ import os, re, shutil, subprocess, sys, tempfile
 
 import mpyq
 
+# Windows: the default console codepage (cp1252) can't encode the non-ASCII glyphs
+# (→ ✓ — ×) we print, raising UnicodeEncodeError. Force UTF-8 stdout/stderr.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPS_SRC = os.path.join(ROOT, "mods", "Tactical_Arsenal", "WoL Tactical Arsenal")
 MOD_SRC = os.path.join(ROOT, "src", "mod")

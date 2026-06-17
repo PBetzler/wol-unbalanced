@@ -522,7 +522,10 @@ def emit():
 
     lines.append("}")
     lines.append("")
-    with open(OUT, "w") as f:
+    # Force UTF-8 + LF regardless of platform: Windows' default file encoding is
+    # cp1252 and text mode rewrites \n -> \r\n, which would mangle the em-dash/×
+    # comment chars and flip line endings vs the committed (Mac-authored) lib.
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines))
     print(f"wrote {OUT} ({len(lines)} lines)")
 

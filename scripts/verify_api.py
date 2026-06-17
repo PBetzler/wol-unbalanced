@@ -47,6 +47,12 @@ import time
 from dataclasses import dataclass, field
 from typing import Optional
 
+# Windows: the default console codepage (cp1252) can't encode the non-ASCII glyphs
+# (→ ✓ — ×) we print, raising UnicodeEncodeError. Force UTF-8 stdout/stderr.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 # --- venv guard: the protos only import under protobuf<3.21 in our pinned venv ---
 try:
     import websocket  # websocket-client

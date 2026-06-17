@@ -15,6 +15,12 @@ invariant test — cheap insurance that the rules and their enforcement move tog
 import os
 import sys
 
+# Windows: the default console codepage (cp1252) can't encode the non-ASCII glyphs
+# (→ ✓ — ×) we print, raising UnicodeEncodeError. Force UTF-8 stdout/stderr.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8")
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CLAUDE_MD = os.path.join(ROOT, "CLAUDE.md")
 HOOK = os.path.join(ROOT, "scripts", "hooks", "agent-pretool-brief-check.sh")

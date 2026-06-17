@@ -44,6 +44,15 @@ faster iteration, **not** a blocker. Don't get stuck on it.
   optional local `build`.
   - Command: on Windows use `python` (or `py`); on macOS use `python3`. Both refer to the same
     scripts. This doc writes `python` for Windows; substitute `python3` on Mac.
+  - **Create a `python3` shim (Windows).** The hook scripts call `python3`, but the python.org
+    installer only ships `python.exe` — so `python3` falls through to the Microsoft Store stub
+    and **silently disables the dispatch brief-check hook** (it degrades to "allow everything").
+    Fix once by copying the binary:
+    `copy "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" "%LOCALAPPDATA%\Programs\Python\Python312\python3.exe"`.
+    Confirm that Python dir sits *ahead* of `…\Microsoft\WindowsApps` on PATH (winget's install does this).
+  - **Restart your terminal / Claude Code after installing Python or editing PATH.** A process
+    started earlier keeps the old in-memory PATH, so `python`/`python3`/`bash` won't resolve from
+    the registry until a fresh process launches.
 - **Git** — [git-scm.com](https://git-scm.com/download/win); the installer bundles **Git Bash**,
   which you need for the `.sh` hooks. `winget install Git.Git`.
 - **`gh` CLI** — [cli.github.com](https://cli.github.com/) or `winget install GitHub.cli`; then
@@ -287,10 +296,19 @@ dead end** on retail 5.x (documented in both) — don't re-chase it.
 
 ## 8. "Verify on Windows" — what this Mac couldn't test
 
-These were written/changed on the Mac and need a Windows confirmation:
+### Confirmed during Windows bring-up (resolved)
+- **Cross-platform encoding bugs — FIXED.** The Mac's default UTF-8 file/console encoding hid two
+  bugs that surfaced on Windows (cp1252 default): `genlib.py` wrote the generated lib in cp1252
+  (mojibake `—`/`×` in comments), and verbose `audit.py` (plus 4 sibling scripts) **crashed** with
+  `UnicodeEncodeError` printing `→ ✓ — ×`. Fixed: `genlib.py` writes `encoding="utf-8", newline="\n"`;
+  the CLI scripts force UTF-8 `stdout`/`stderr` at startup. The regenerated lib is now byte-identical
+  across OSes. (`--quiet` never crashed, so the pre-commit gate was always safe.)
+- **The `.sh` hooks under Git Bash — confirmed working.** Pre-commit gate (lint + audit +
+  dispatch-doctrine) runs green; the dispatch brief-check hook correctly blocks a bad brief. Needs
+  the `python3` shim (§1) and Git's `bin` on PATH so the harness can invoke `bash`.
+
+### Still pending real Windows confirmation (local-build only — not needed to ship)
 - **`build.py install` on Windows** — the path logic (`C:\Program Files (x86)\StarCraft II`,
   `WOLU_SC2_DIR` override, `mpqpatch.exe` selection) is correct by construction but not run here.
 - **`mpqpatch.exe` build recipe (§3)** — the exact MSVC/MinGW flags are best-effort; verify and
   correct them on Windows (then update §3). Fallback: skip local build, use CI + the release zip.
-- **The `.sh` hooks under Git Bash** — should run unchanged, but confirm `bash` resolves and the
-  pre-commit gate fires on a test commit.
