@@ -65,11 +65,22 @@ edits and classifies each: **GOOD 326 / NOOP 0 / UNCERTAIN 6 / UNRESOLVED 0** af
   `SpectreCloak` id in `CLOAK_ABILS` (Spectres cloak via `RogueGhostCloak`, already listed). Each was
   a silent no-op, so removal changes no in-game behavior — it just shrinks the dead surface and makes
   CHECK8 green. The gen lib dropped 364 → 352 lines.
-- [ ] **⚠ NEW (minor) — Firebat "Infernal Pre-Igniter" +4 vs light never applied.** The
-  `FirebatUFull AttributeBonus[Light]+4` edit was an indexed-array no-op (now removed). To actually
-  grant it, needs a Shaped-Blast effect clone (recipe [13](examples/13-flatten-attribute-bonus.md)).
-  Low priority — the Firebat is already massively buffed (×2 HP +100). Decide: build the clone, or
-  drop the upgrade.
+- [x] **Firebat "+vs-light" replaced by a flat +5 damage buff (owner request).** The Firebat
+  family now gets a clean flat **+5** attack damage via the CHECK8-GOOD `Effect.Amount` field
+  (per-player, rule-9 safe): `FirebatUFull` 8→**13**, scaled to the merc/heroes per rules 4/10 —
+  `DevilDogDamage` 10→**16.25** (+5 × the 10/8 = 1.25 ratio, preserving the merc's % advantage),
+  `TychusCommandoAttackDamage` 5→**10** and `TychusChaingun` 16→**21** (Tychus = chaingun, +5 each).
+  Statically proven (manifest); awaits in-game confirmation of the tooltip/damage numbers.
+- [ ] **⚠ STOPPED AT GUARDRAIL — removing the Firebat's residual "+4 vs light" needs an effect clone.**
+  There is **no Firebat "Infernal Pre-Igniter" upgrade** to drop — the +vs-light is **hardcoded**
+  as `AttributeBonus[Light]=4` inside the `FirebatUFull` effect in static vanilla XML (Hellions, not
+  Firebats, carry the real `HellionCampaignInfernalPreIgniter` armory upgrade). A per-player
+  `AttributeBonus[Light]` edit is CHECK8-NOOP, so the **only** way to remove it for the player (and
+  not enemy Firebats) is a Shaped-Blast effect clone (recipe
+  [13](examples/13-flatten-attribute-bonus.md)) — the clone-avoidance guardrail. So today the player's
+  Firebat reads **13 (+4 vs light)** = 17 vs light, 13 vs everything else; DevilDog **16.25 (+5 vs
+  light)**; Tychus has no light bonus (chaingun) so already flat. **Owner decides:** accept the residual
+  +vs-light (no clone) or authorize the `FirebatUFull`/`DevilDogDamage` Shaped-Blast clones to strip it.
 - [x] **`heal TargetFilters` runtime edit was dead-redundant — confirmed.** The heal-mech/air feature
   ships via the `HealWoLU` clone on the Medic (`AbilArray index 6`) + Stetmann (`index 5`); the
   string-field runtime edit never did anything. Removed.

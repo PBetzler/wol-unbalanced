@@ -60,7 +60,7 @@ Baselines are WoL **campaign** values (from `unit-table.md`, cross-checked vs. `
 | **SCV** | 50/0, 1 supply, ~46 HP | +15 life (Hostile Env Adaptation); faster attack (`FusionCutter` Period 0.7) | ✅ |
 | **Marine** | 50/0, 1 supply, 45 HP | **+20 base HP**; Super Stim (heals 30, autocast via `StimpackWoLU` clone); Combat Shield; Magrail Munitions; Laser Targeting (+1 range via `GuassRifle` typo-id, +2 sight) | ✅ (autocast stim **verified in game**); 🟡 Magrail visual verified, other passives display 🟡 |
 | **Medic** | 75/50, 2 supply | Resource Efficiency (−25/−25/−1); heal range +2 (Nano Projector); **Adaptive Medpacks** (heal mech+air) via `HealWoLU` clone (re-pointed single button, index 6); Restoration + Optical Flare | 🟡 — Adaptive Medpacks: confirm Medic heals a Marauder/Viking in game (clone is statically clean; string-field gate was the original no-op) |
-| **Firebat** | 100/25, 2 supply, 50 HP | **HP ×2 then +100** (Kinetic Foam) → 200 HP; +40% flame area (Incinerator Gauntlets); +4 vs light (Infernal Pre-Igniter, `FirebatUFull`); +2 range (Nano Projectors); +2 armor (Juggernaut); Super Stim (60-heal); Resource Efficiency | ✅ stats; 🐞 `FirebatUFull AttributeBonus[Light]` Add is the same indexed-array class flagged as a possible no-op (diag3 settles it) |
+| **Firebat** | 100/25, 2 supply, 50 HP | **HP ×2 then +100** (Kinetic Foam) → 200 HP; +40% flame area (Incinerator Gauntlets); **+5 flat attack damage** (`FirebatUFull` 8→13, owner request replacing the +vs-light framing); +2 range (Nano Projectors); +2 armor (Juggernaut); Super Stim (60-heal); Resource Efficiency | ✅ stats + flat +5 (statically proven, CHECK8-GOOD); ⚠ residual **+4 vs light** stays hardcoded in `FirebatUFull` (removing per-player needs an effect clone — see open-issues) |
 | **Marauder** | 100/25, 2 supply | **Stim re-added** (campaign removed it; index-3 override + real stim button at index 10); Concussive Shells; Kinetic Foam (+25 HP); +2 armor (Juggernaut); Laser Targeting (+1 range, +2 sight); Internal Tech Module (no Tech Lab) | ✅ stim re-add statically fixed; 🟡 stim button appears; 🐞 **Internal Tech Module no-Tech-Lab** is a `Button.Requirements=""` link edit — suspected no-op, verify you can build with no Tech Lab |
 | **Reaper** | 50/50, 1 supply | Super Stim (60-heal); free permanent cloak; +10 life (Ballistic Flightsuit); out-of-combat regen (approx flat regen); Laser Targeting; keeps vanilla armory (U-238, G-4) | ✅ stats; 🟡 cloak-on-spawn; ⛔ literal flight / anti-air (owner: Reaper stays ground-only, flight needs forbidden unit-type morph) |
 | **Ghost** | 150/150, 2 supply | **Always unlocked**; Ocular Implants; **free cloak** (Crius folded in); EMP Rounds; Bargain Bin (−100/−50/−1); Laser Targeting; Super Stim; **autocast Snipe/EMP/Stim** (`SnipeWoLU`/`EMPWoLU` clones); damage flattened to 20 flat (`C10CanisterRifle`); smart-Snipe priority (healer→lethal→tanky→nearest via custom TargetSorts) | ✅ autocast kit + smart-Snipe shipped; 🐞 **+50% dealt damage** (`DamageDealtFraction` indexed) — card shows base 20, confirm *dealt* ~30 in game; 🐞 damage-flatten display (#10 "two stim buttons" not statically reproducible) |
@@ -104,7 +104,7 @@ All hero HP/damage/range/sight parity is mirrored onto the hero's **distinct** w
 | Hero | = Base unit | Inherited / added | Status |
 | --- | --- | --- | --- |
 | **Raynor** (Raynor01 / RaynorCommando / Raynor) | Marine | HP ×1.4444 (Marine-line ratio); +1 range (own `RaynorGaussRifle`/`CommandoRifle`/`RaynorWeapon`); +2 sight; stim button catalog-injected | ✅ stats; 🟡 injected stim button (experimental index 13) |
-| **Tychus** (TychusCommando / TychusChaingun) | Firebat | HP ×2 then +100 (Kinetic Foam); windup cap | ✅ |
+| **Tychus** (TychusCommando / TychusChaingun) | Firebat | HP ×2 then +100 (Kinetic Foam); windup cap; **+5 flat chaingun damage** (rule-10 base parity: `TychusCommandoAttackDamage` 5→10, `TychusChaingun` 16→21 — chaingun, no light bonus) | ✅ stats + flat +5 (statically proven) |
 | **Swann** | Marauder | +2 armor (Juggernaut); +1 range (`DutchConcussiveGrenade`); +2 sight | ✅ |
 | **Stetmann** | Medic | Adaptive Medpacks via `HealWoLU` (its heal is `BonesHeal`, button re-pointed) | 🟡 confirm Stetmann's single heal button + mech/air heal |
 | **Nova** | Ghost | Stim/Snipe/EMP kit; +1 range, +2 sight; permanent free cloak | ✅ kit; 🟡 cloak-on-spawn |
@@ -124,7 +124,7 @@ All 8 are on the Merc Compound **root** card (the submenu was dropped in v0.3.6 
 | Merc | Counterpart | Bonus vs regular | Parity status |
 | --- | --- | --- | --- |
 | **War Pigs** | Marine | +65% HP, +35% dmg | ✅ HP ×1.4444; LTS range + sight mirrored (`KelmorianMinerGaussRifle`) |
-| **Devil Dogs** | Firebat | +60% HP, +25% dmg | ✅ HP ×2 + Kinetic Foam +100; flamer +2 range |
+| **Devil Dogs** | Firebat | +60% HP, +25% dmg | ✅ HP ×2 + Kinetic Foam +100; flamer +2 range; **Firebat +5 scaled by the 1.25 ratio = +6.25** (`DevilDogDamage` 10→16.25, preserves the merc's % advantage) |
 | **Hammer Securities** | Marauder | +25% HP, +20% dmg | ✅ +2 armor; range + sight; **super-stim button added v0.3.9** (standalone unit, so the base Marauder's stim card button didn't reach it — appended a `Type=AbilCmd` stim button at idx 7 cell 2,2; 🟡 confirm it shows + autocasts) |
 | **Spartan Company** | Goliath | +33% HP, +33% dmg | 🟡 **HP re-tuned 165→198** (Shaped Hull parity: buffed Goliath 150 × 1.32) — confirm ~198 HP in game; Ares-Class range mirrored |
 | **Siege Breakers** | Siege Tank | +33% HP, +66% dmg | ✅ range/sight; +3 sieged armor; 🟡 spider-mine fixes (sieged deploy, own hotkey) |
@@ -170,7 +170,7 @@ These are the unresolved questions whose root cause is the **per-player indexed-
 
 - **"X dmg + Y vs light/armored" → "X flat"** (Ghost `C10CanisterRifle`, Spectre `SpecterU`, Thor/Jotun AA `JavelinMissileLaunchersDamage`). The effect/field paths are CONFIRMED correct; the open question is whether a per-player indexed-array edit reflects on the card. **diag3** (`gAmt`/`gLgt` readback) settles it: `gLgt=0` ⇒ works; `gLgt=10` ⇒ no-op, needs the Shaped-Blast clone pattern (already used for the Jotun AA splash). The AA *value* (35) and *splash* are correct via the clone; only the card *text* is unconfirmed.
 - **Senior / regular Ghost +50% dealt damage** — `DamageDealtFraction` rewritten to the correct indexed-per-Kind form. The card still shows weapon base (20) — a damage-*dealt* buff never changes the displayed weapon number. Confirm the *dealt* damage is ~30 in game.
-- **Firebat `FirebatUFull AttributeBonus[Light]` Add** — same indexed-array class; diag3 settles it.
+- **Firebat damage** — now a flat **+5** on `FirebatUFull.Amount` (CHECK8-GOOD, applies per player; 8→13). The vanilla `FirebatUFull AttributeBonus[Light]=4` is hardcoded in static XML and stays (per-player AttributeBonus edit is NOOP); stripping it for the player needs a Shaped-Blast effect clone (see open-issues).
 
 ---
 

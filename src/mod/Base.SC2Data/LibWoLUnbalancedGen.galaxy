@@ -246,6 +246,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Marauder Juggernaut Plating
     CatalogFieldValueModify(c_gameCatalogWeapon, "PunisherGrenades", "Range", p, "7", c_upgradeOperationSet);  // Marauder LTS: +1 range (6->7)
     CatalogFieldValueModify(c_gameCatalogUnit, "Marauder", "Sight", p, "2", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogEffect, "FirebatUFull", "Amount", p, "5", c_upgradeOperationAdd);  // Firebat: +5 flat attack damage (8 -> 13). +4-vs-light still hardcoded in XML (see open-issues)
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "100", c_upgradeOperationAdd);  // Firebat Kinetic Foam: +100 life (after x2)
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeStart", p, "100", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "Firebat", "Range", p, "4", c_upgradeOperationSet);  // Firebat Nano Projectors: +2 range (2->4)
@@ -312,6 +313,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeMax", p, "100", c_upgradeOperationAdd);  // Devil Dogs: Kinetic Foam +100
     CatalogFieldValueModify(c_gameCatalogUnit, "DevilDog", "LifeStart", p, "100", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "DevilDogFlameThrower", "Range", p, "2", c_upgradeOperationAdd);  // Devil Dogs: Nano Projectors +2 range
+    CatalogFieldValueModify(c_gameCatalogEffect, "DevilDogDamage", "Amount", p, "6.25", c_upgradeOperationAdd);  // Devil Dogs: Firebat +5 parity x1.25 ratio (10 -> 16.25)
+    CatalogFieldValueModify(c_gameCatalogEffect, "TychusCommandoAttackDamage", "Amount", p, "5", c_upgradeOperationAdd);  // TychusCommando: Firebat +5 dmg (chaingun, 5 -> 10)
+    CatalogFieldValueModify(c_gameCatalogEffect, "TychusChaingun", "Amount", p, "5", c_upgradeOperationAdd);  // TychusChaingun: Firebat +5 dmg (chaingun, 16 -> 21)
     CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "LifeMax", p, "100", c_upgradeOperationAdd);  // Tychus: Kinetic Foam +100
     CatalogFieldValueModify(c_gameCatalogUnit, "TychusCommando", "LifeStart", p, "100", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "TychusChaingun", "LifeMax", p, "100", c_upgradeOperationAdd);

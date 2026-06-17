@@ -352,9 +352,15 @@ def emit():
         ("Unit", "Marauder", "LifeArmor", "2", "Add", "Marauder Juggernaut Plating"),
         ("Weapon", "PunisherGrenades", "Range", "7", "Set", "Marauder LTS: +1 range (6->7)"),
         ("Unit", "Marauder", "Sight", "2", "Add", ""),
-        # (Removed: FirebatUFull AttributeBonus[Light] +4 — indexed-array element, no-op per-player
-        #  [preview CHECK8]. So Firebat "Infernal Pre-Igniter +4 vs light" never applied. Minor real
-        #  gap: needs a Shaped-Blast effect clone (recipe 13) to grant it — tracked in open-issues.)
+        # Firebat: flat +5 attack damage to ALL targets (owner request — replaces the old
+        #  "Infernal Pre-Igniter +vs-light" framing with a clean flat buff). FirebatUFull is the
+        #  Firebat's single damage effect (weapon Firebat -> FirebatSet -> [Firebat persistent,
+        #  FirebatUFull]; the persistent flame's FlameThrowerDamageSet also fires FirebatUFull).
+        #  Effect.Amount is the CHECK8-GOOD per-player damage field. NOTE: the +4-vs-LIGHT bonus is
+        #  HARDCODED in static XML on this same effect (AttributeBonus[Light]=4) and CANNOT be
+        #  removed per-player without an effect clone (recipe 13) — it persists; the unit now reads
+        #  13 (+4 vs light). See open-issues + the dispatch report (part 2 stopped at the guardrail).
+        ("Effect", "FirebatUFull", "Amount", "5", "Add", "Firebat: +5 flat attack damage (8 -> 13). +4-vs-light still hardcoded in XML (see open-issues)"),
         ("Unit", "Firebat", "LifeMax", "100", "Add", "Firebat Kinetic Foam: +100 life (after x2)"),
         ("Unit", "Firebat", "LifeStart", "100", "Add", ""),
         ("Weapon", "Firebat", "Range", "4", "Set", "Firebat Nano Projectors: +2 range (2->4)"),
@@ -460,6 +466,17 @@ def emit():
         ("Unit", "DevilDog", "LifeMax", "100", "Add", "Devil Dogs: Kinetic Foam +100"),
         ("Unit", "DevilDog", "LifeStart", "100", "Add", ""),
         ("Weapon", "DevilDogFlameThrower", "Range", "2", "Add", "Devil Dogs: Nano Projectors +2 range"),
+        # Firebat +5 damage parity (rule 4 — keep the merc's % advantage). DevilDogDamage is the
+        #  flamethrower's damage effect (DevilDogSet -> [DevilDogCreatePersistent, DevilDogDamage]).
+        #  DevilDog base 10 / Firebat base 8 = 1.25 ratio -> scale +5 by 1.25 = +6.25 (10 -> 16.25).
+        #  (Like the Firebat, the +5-vs-light AttributeBonus on DevilDogDamage stays hardcoded.)
+        ("Effect", "DevilDogDamage", "Amount", "6.25", "Add", "Devil Dogs: Firebat +5 parity x1.25 ratio (10 -> 16.25)"),
+        # Tychus (rule 10, Firebat hero) — chaingun, NOT the flamethrower. Two units/weapons:
+        #  TychusCommando -> TychusCommandoChaingun -> TychusCommandoAttackDamage (Amount 5),
+        #  TychusChaingun -> TychusChaingun weapon (Effect defaults to its own id) -> TychusChaingun
+        #  effect (Amount 16). Add flat +5 to each (inherits the base Firebat +5; no light bonus).
+        ("Effect", "TychusCommandoAttackDamage", "Amount", "5", "Add", "TychusCommando: Firebat +5 dmg (chaingun, 5 -> 10)"),
+        ("Effect", "TychusChaingun", "Amount", "5", "Add", "TychusChaingun: Firebat +5 dmg (chaingun, 16 -> 21)"),
         ("Unit", "TychusCommando", "LifeMax", "100", "Add", "Tychus: Kinetic Foam +100"),
         ("Unit", "TychusCommando", "LifeStart", "100", "Add", ""),
         ("Unit", "TychusChaingun", "LifeMax", "100", "Add", ""),

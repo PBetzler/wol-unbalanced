@@ -365,6 +365,20 @@ gotcha; authoritative details live in the code/plan, not here.
   `PersonalCloakingFree`, `SpectreCloakingFree`.
 - Merc calldown: `SummonMercenaries` `InfoArray[Train1..8]` with `Charge.CountMax/
   CountStart` and `Cooldown.TimeStart` (vanilla 300 = 5 min wait at mission start).
+- **Firebat damage chain (and "Infernal Pre-Igniter" is NOT a Firebat upgrade).** The Firebat's
+  attack damage is the `FirebatUFull` `CEffectDamage` (`Amount=8`, `AttributeBonus[Light]=4`) — fired
+  both directly (`FirebatSet`=[`Firebat` persistent, `FirebatUFull`]) AND repeatedly by the persistent
+  flame (`Firebat`→`FirebatE` ×4→`FlameThrowerDamageSet`=[`FirebatUFull`, `FlameThrowerApplyDoTBehavior`]).
+  So a flat attack-damage buff goes on `FirebatUFull.Amount` (CHECK8-GOOD). The merc mirror is
+  `DevilDogDamage` (`Amount=10`, `+5` Light) via `DevilDogSet`; ratio 10/8 = 1.25 sets the rule-4 merc
+  scale. Tychus (=Firebat hero, rule 10) uses **chainguns**, not the flamethrower: `TychusCommando`→
+  `TychusCommandoChaingun`→`TychusCommandoAttackDamage` (`Amount=5`); `TychusChaingun`→`TychusChaingun`
+  weapon (its `Effect`/`DisplayEffect` are commented out → defaults link to the same-id
+  `TychusChaingun` effect, `Amount=16`); neither has a Light bonus. **The +vs-light is intrinsic, not
+  an upgrade:** "Infernal Pre-Igniter" (`HellionCampaignInfernalPreIgniter`) is a **Hellion** armory
+  upgrade; the Firebat/DevilDog `AttributeBonus[Light]` is hardcoded in the static effect and applies
+  to enemies too. Removing it for the player only = a Shaped-Blast effect clone (recipe 13), since a
+  per-player `AttributeBonus[Light]` edit is CHECK8-NOOP — there's no grant-list to exclude.
 
 ## Verification tooling
 
