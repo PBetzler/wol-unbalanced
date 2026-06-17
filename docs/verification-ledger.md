@@ -50,8 +50,9 @@ instance that uses it.
 ## Layer 3 — the IRREDUCIBLE owner surface (emergent in-game behavior)
 
 These can't be shown by any static tool — they're whether a structure *does its thing* at runtime.
-Each is **one mechanism, verified once** (a verification map makes them a single Test Document run).
-**This whole list is the entire "needs the owner" surface.**
+Each is **one mechanism, verified once** — the owner settles them in a normal playthrough via the
+ready checklists ([examples/_QUEUE.md](examples/_QUEUE.md) Flow-B + [verification-checklist.md](verification-checklist.md),
+mission-ordered). **This whole list is the entire "needs the owner" surface.**
 
 | Mechanism (verify once) | Covers | Status |
 |---|---|---|
@@ -103,8 +104,10 @@ only items it leaves as WARN are the 6 free-cloak regen-array edits (UNCERTAIN, 
 After both levers:
 - **Layer 1** (structure + values) — 100% machine/editor verified.
 - **Layer 2** (application) — locked to verified-safe classes by CHECK8; each class proven once.
-- **Layer 3** — the *only* owner surface: ~6 emergent-behavior facts, each verified once via the
-  verification map (spawn player + enemy units side-by-side, trigger the behaviors).
+- **Layer 3** — the *only* owner surface: ~6 emergent-behavior facts, each verified once during a
+  normal playthrough via the ready checklists (`_QUEUE.md` Flow-B + `verification-checklist.md`). A
+  dedicated spawn-everything "verification map" is a possible future convenience, but isn't needed —
+  these units appear across the campaign the owner already plays.
 
 The "not verified by the tooling" category is then **6 small, simple, mechanism-level checks** —
 each covering many units, each hard to get subtly wrong (a behavior either morphs or it doesn't).

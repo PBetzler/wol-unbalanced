@@ -88,7 +88,16 @@ edits and classifies each: **GOOD 326 / NOOP 0 / UNCERTAIN 6 / UNRESOLVED 0** af
 
 ## Damage display + values
 
-- [ ] **"X dmg + X vs light/armored" should flatten to "X dmg"** (Ghost, Thor AA, Spectre). v0.2.4: the effect/field paths are CONFIRMED correct (`C10CanisterRifle`/`SpecterU`/`JavelinMissileLaunchersDamage` `AttributeBonus[Light/Armored]`, same class as the working `CostResource[Minerals]`). The open question is whether a per-player *indexed-array* effect edit reflects on the card. Added **diag3** readback (`gAmt`/`gLgt`) — if `gLgt=0` it works; if `gLgt=10` the array edit is a no-op and the fix is the Shaped-Blast clone pattern (like ThorsHammer). VERIFY the diag, then act.
+- [ ] **"X dmg + X vs light/armored" should flatten to "X dmg"** (Ghost, Thor AA, Spectre).
+  **DIAG QUESTION ANSWERED (2026-06-17, statically, by the preview lens / CHECK8 — no in-game diag
+  needed):** a per-player `CatalogFieldValueModify` on an effect's `AttributeBonus[Light/Armored]`
+  is an **indexed-array element → confirmed no-op** (CHECK8 classifies it NOOP; the dead edits were
+  removed from genlib). So the `Amount` raise applied but the `+vs-light/armored` bonus **remains**:
+  **Ghost rifle ships 20 (+10 vs light), Spectre 20 (+5 vs armored)** — not flat 20. (Thor AA's flat
+  35 IS delivered, via the `JavelinMissileLaunchersDamageBuffedWoLU` effect clone — that one's done.)
+  **FIX for the rifles = the Shaped-Blast effect clone** (recipe [13](examples/13-flatten-attribute-bonus.md)),
+  same pattern as Thor AA. Owner decides: build the clone (flat 20) or accept the +bonus. The diag3
+  readback is now moot — the lens settles it without a playtest.
 - [ ] **Senior Ghost should hit ~30 dmg** (base ghost 20 × +50%). v0.2.5 FIXED the likely no-op: `DamageDealtFraction` is an additive, per-damage-Kind INDEXED array (confirmed: liberty `DoubleDamage` = `DamageDealtFraction index="Ranged" value="1"` → ×2). The old scalar `DamageDealtFraction="0.5"` had no Kind index; rewritten to indexed form (Ranged/Spell/Melee/Splash = 0.5 → +50%). The card still shows weapon base (20) — a damage-dealt buff never changes the displayed weapon number; confirm the *dealt* damage is ~30 in game.
 
 ## Units / mechanics
@@ -106,9 +115,19 @@ These shipped and *probably* work, but the field/semantics were assumptions. Ver
 - [ ] **Yamato structure discrimination** — autocast currently skips ALL structures (safe energy policy; manual works on anything). Refinement (auto-fire on *defensive* structures only) is now possible — the attack-capable primitive is `CValidatorUnitCompareAttackPriority parent="Threatens"` (e.g. `ThreatensPhoenix`/`ThreatensBattlecruiser`) — but DEFERRED: an untested autocast tweak risks draining the BC's 125-energy Yamato on the wrong targets. Owner call on whether the auto-fire-on-enemy-defenses is wanted.
 - [ ] **Graduating Range** — confirm 5 stacks = +5 sieged range (`WoLUGraduatingRange` MaxStackCount). Structure CONFIRMED correct v0.2.4 (MaxStackCount=5, `Modification WeaponRange=1` per stack); in-game count check only.
 - [ ] **Assumption values** — Optimized Logistics = −25% train time; Diamondback Hyperfluxor/Maglev ±25%. Settle against AP data if findable.
-- [ ] **`Button.Requirements` per-player edit (Marauder Tech Lab + Hercules Fusion Core)** — v0.2.4 set both train buttons' `Requirements` to empty (rule-compliant attempt). This is a requirement-LINK field; per-player link edits are often no-ops. VERIFY: can the player build a Marauder with no Tech Lab / a Hercules with no Fusion Core? If not, the field is a no-op and the only working lever (`TechTreeRestrictionsEnable(p,false)`) is rejected because it also strips the Merc Compound requirement (rule 6).
-- [ ] **Medic Adaptive Medpacks (heal mech + air)** — v0.2.4 CONFIRMED the only biological/ground gate is the `heal` ability `TargetFilters` (no effect/validator gate); the genlib edit drops it correctly. Open question: does a per-player *string-field* edit apply? VERIFY the Medic can heal a Marauder/Viking in game.
-- [ ] **Risky field paths still to re-verify resolve + apply**: `Charge.*`/`Cooldown.TimeStart` on `SummonMercenaries` train infos; `Cost[0].Vital[Energy]` on cloak abils; `AttributeBonus[Light]` Add on `FirebatUFull` (same class as the damage-flatten question — diag3 will settle it).
+- [ ] **`Button.Requirements` per-player edit (Marauder Tech Lab + Hercules Fusion Core)** — v0.2.4 set both train buttons' `Requirements` to empty (rule-compliant attempt). This is a requirement-LINK field; per-player link edits are often no-ops. VERIFY: can the player build a Marauder with no Tech Lab / a Hercules with no Fusion Core? If not, the field is a no-op and the only working lever (`TechTreeRestrictionsEnable(p,false)`) is rejected because it also strips the Merc Compound requirement (rule 6). **Lens (2026-06-17): `Button.Requirements` is statically CONFIRMED a no-op class (CHECK8 NOOP — a requirement-LINK field); the two dead edits were removed from genlib.** So the feature genuinely does not work as a runtime edit — the in-game "can you build without the building?" verify is moot (confirmed no). Stays OWNER-BLOCKED (accept the prereqs, or accept losing the Compound gate).
+- [~] **Medic Adaptive Medpacks (heal mech + air)** — the "does a per-player string-field edit apply?"
+  question is **ANSWERED: NO** (the preview lens classifies `heal TargetFilters` as a NOOP string
+  field; the dead edit was removed). But the feature **ships via the `HealWoLU` clone** (broadened
+  `TargetFilters` baked in) on the Medic `AbilArray index 6` + Stetmann `index 5` — recipe
+  [09](examples/09-broaden-targeting.md). So nothing is missing; the only remaining check is the
+  [GAME]/Layer-3 one: confirm the Medic actually heals a Marauder/Viking in game (the clone's effect).
+- [x] **Risky field paths — CLASSIFIED by the preview lens / CHECK8 (2026-06-17), no diag needed.**
+  `SummonMercenaries` `Charge.*`/`Cooldown.*` and cloak `Cost[0].Vital[Energy]` are **GOOD** (nested
+  per-player scalars that apply — CHECK8 confirms the class; the manifest shows their finals).
+  `FirebatUFull AttributeBonus[Light]` was **NOOP** (indexed-array, removed — see the Pre-Igniter gap
+  above). The only **UNCERTAIN** is the free-cloak `Modification.VitalRegenArray[Energy]` (indexed
+  regen-array; cloak-free is GAME-confirmed working, so kept + flagged).
 ## Blocked — needs owner
 
 These are investigated to ground truth but need an owner decision (a rule-9 tolerance call or a design choice), not more investigation.
