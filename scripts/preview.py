@@ -308,6 +308,293 @@ def fmt_num(x):
     return str(x)
 
 
+# ----------------------------------------------------------------------------------------
+# --mod : emit a LOADABLE static-global preview .SC2Mod so the buffed numbers are visible
+# directly in the SC2 Editor's Data module. This is GLOBAL (no per-player gate) and NEVER
+# shipped/played — purely a "read the numbers in the editor" lens. It writes the COMPUTED
+# FINAL of each emittable GOOD edit as a static field override onto the vanilla id.
+# ----------------------------------------------------------------------------------------
+MOD_DIR = os.path.join(OUT_DIR, "WoLUnbalanced-Preview.SC2Mod")
+# DocumentInfo dependency — IDENTICAL to the shipped mod (build/Mods/.../DocumentInfo) so
+# base units (Marine/Thor/...) resolve when the editor loads this preview mod.
+PREVIEW_DEPENDENCY = "bnet:Liberty (Mod)/0.0/999,file:Mods/Liberty.SC2Mod"
+
+
+def _override_value_string(edit):
+    """The string to write into the static override's value="" for this GOOD edit.
+
+    For a numeric edit we emit the COMPUTED FINAL (resolve_base + compute_final). For a
+    non-numeric Set (e.g. AllowedMovement="Moving") the final IS the literal value. Returns
+    None when the value can't be computed safely (base unknown / non-Set non-numeric op) —
+    the caller SKIPS such edits (partial coverage is fine for a lens; never emit a guess)."""
+    if edit["final"] is not None:                      # numeric base + op -> computed final
+        return fmt_num(edit["final"])
+    # No numeric final. A Set writes its literal value REGARDLESS of the (unknown) base —
+    # it's the only op whose result doesn't depend on base, so it's always safe to emit
+    # without resolving base (numeric Set like Range=6 / ArmorReduction=0, OR a string-enum
+    # Set like AllowedMovement="Moving"). Add/Subtract/Multiply DO need base -> skip those.
+    if edit["op"] == "Set" and edit["value"] != "":
+        return edit["value"]
+    return None
+
+
+def _set_scalar(parent, name, value):
+    """Set a plain scalar child <Name value=...> under parent (create or update)."""
+    child = parent.find(name)
+    if child is None:
+        child = ET.SubElement(parent, name)
+    child.set("value", value)
+    return child
+
+
+def _set_indexed(parent, name, index, value):
+    """Set an indexed-scalar child <Name index=.. value=..> (match on index, else create)."""
+    for c in parent.findall(name):
+        if c.get("index") == index:
+            c.set("value", value)
+            return c
+    c = ET.SubElement(parent, name)
+    c.set("index", index)
+    c.set("value", value)
+    return c
+
+
+def _ensure_indexed_container(parent, name, index):
+    """Find-or-create an indexed container child <Name index=..>...</Name> (for InfoArray)."""
+    for c in parent.findall(name):
+        if c.get("index") == index:
+            return c
+    c = ET.SubElement(parent, name)
+    c.set("index", index)
+    return c
+
+
+def _ensure_child(parent, name):
+    """Find-or-create a plain (un-indexed) container child <Name>...</Name> (Cost/Charge/...)."""
+    c = parent.find(name)
+    if c is None:
+        c = ET.SubElement(parent, name)
+    return c
+
+
+def apply_override(el, field, value):
+    """Write `field = value` onto element `el` as the INVERSE of preview.py._field_from.
+
+    Builds/updates the right nested XML shape (verified against the reference catalogs):
+      plain scalar          LifeMax                       -> <LifeMax value=..>
+      indexed scalar        CostResource[Vespene]         -> <CostResource index="Vespene" value=..>
+      ability cost          Cost[0].Vital[Energy]         -> <Cost><Vital index="Energy" value=..></Cost>
+      train/research time   InfoArray[Train6].Time        -> <InfoArray index="Train6"><Time value=..></InfoArray>
+      charge/cooldown       InfoArray[Train1].Charge.CountMax
+                                                          -> <InfoArray index="Train1"><Charge><CountMax value=..></Charge></InfoArray>
+    Returns True if it emitted the field, False if the shape is unhandled (caller SKIPS)."""
+    # plain scalar
+    if re.match(r"^[A-Za-z]\w*$", field):
+        _set_scalar(el, field, value)
+        return True
+
+    # indexed scalar: Name[Index]
+    m = re.match(r"^([A-Za-z]\w*)\[([^\]]+)\]$", field)
+    if m:
+        _set_indexed(el, m.group(1), m.group(2), value)
+        return True
+
+    # ability cost: Cost[0].Vital[Energy]  (the [0] is the first <Cost> element)
+    m = re.match(r"^Cost\[(\d+)\]\.Vital\[([^\]]+)\]$", field)
+    if m:
+        # Match the inverse of _field_from: index into the Nth <Cost> element. We only ever
+        # emit index 0 (the only form genlib produces); create one <Cost> if absent.
+        idx = int(m.group(1))
+        costs = el.findall("Cost")
+        if idx < len(costs):
+            cost = costs[idx]
+        elif idx == 0:
+            cost = ET.SubElement(el, "Cost")
+        else:
+            return False                               # would need to fabricate gap entries
+        _set_indexed(cost, "Vital", m.group(2), value)
+        return True
+
+    # InfoArray[Train*/Research*].<...>
+    m = re.match(r"^InfoArray\[([^\]]+)\]\.(.+)$", field)
+    if m:
+        info = _ensure_indexed_container(el, "InfoArray", m.group(1))
+        sub = m.group(2)
+        if sub == "Time":
+            _set_scalar(info, "Time", value)           # <Time value=..> (child form; _field_from
+            return True                                #  reads attr-or-child, so this resolves)
+        parts = sub.split(".")                         # Charge.CountMax / Cooldown.TimeStart
+        if len(parts) == 2:
+            container = _ensure_child(info, parts[0])   # <Charge> / <Cooldown>
+            _set_scalar(container, parts[1], value)     # <CountMax value=..> (child form)
+            return True
+        return False
+
+    return False                                       # any other shape: skip (no guess)
+
+
+def _indent(elem, level=0):
+    """Pretty-print an ElementTree in place (stdlib has ET.indent only on 3.9+; do it by hand
+    so this runs on any Python the repo targets)."""
+    pad = "\n" + "    " * level
+    if len(elem):
+        if not (elem.text and elem.text.strip()):
+            elem.text = pad + "    "
+        for i, child in enumerate(elem):
+            _indent(child, level + 1)
+            tail = pad + "    " if i < len(elem) - 1 else pad
+            if not (child.tail and child.tail.strip()):
+                child.tail = tail
+    if level and not (elem.tail and elem.tail.strip()):
+        elem.tail = pad
+
+
+def emit_mod(edits):
+    """Write build/preview/WoLUnbalanced-Preview.SC2Mod/. Returns a summary dict."""
+    # Group emittable overrides by (kind -> id -> [(field, value, edit)]) IN EDIT ORDER so
+    # multiple overrides on the same id merge into ONE <C.. id=..> element per catalog file.
+    by_kind = {}                       # kind -> {entry_id: <C..> Element}
+    classes = {}                       # (kind, entry_id) -> tag (resolved entry class)
+    emitted = 0
+    skipped = []                       # (edit, reason)
+    covered_ids = {}                   # kind -> set(ids)
+
+    for e in edits:
+        # Only GOOD edits can be safely shown as a static field override; NOOP/UNCERTAIN
+        # don't apply per player at all, UNRESOLVED is a typo. (Matches the brief: skip them.)
+        if e["klass"] != GOOD:
+            skipped.append((e, f"class {e['klass']} (does not apply / not a real field)"))
+            continue
+        if not e["exists"]:
+            skipped.append((e, "id resolves to no vanilla entry"))
+            continue
+        val = _override_value_string(e)
+        if val is None:
+            reason = ("base unknown (?) for a non-Set op" if e["op"] != "Set"
+                      else "value not computable")
+            skipped.append((e, reason))
+            continue
+        # Resolve the entry's catalog class from the merged element(s).
+        elems = _find_elems(e["kind"], e["entry"])
+        tag = elems[-1].tag if elems else None
+        if not tag:
+            skipped.append((e, "could not resolve entry class"))
+            continue
+        kid = (e["kind"], e["entry"])
+        classes[kid] = tag
+        cel = by_kind.setdefault(e["kind"], {}).get(e["entry"])
+        if cel is None:
+            cel = ET.Element(tag)
+            cel.set("id", e["entry"])
+            by_kind[e["kind"]][e["entry"]] = cel
+        if apply_override(cel, e["field"], val):
+            emitted += 1
+            covered_ids.setdefault(e["kind"], set()).add(e["entry"])
+        else:
+            skipped.append((e, f"field shape unhandled for emit: {e['field']}"))
+            # leave the (possibly empty) element; drop it later if it has no children
+
+    # Build the mod folder.
+    base_gd = os.path.join(MOD_DIR, "Base.SC2Data", "GameData")
+    os.makedirs(base_gd, exist_ok=True)
+
+    files_written = []
+    for kind, ents in by_kind.items():
+        root = ET.Element("Catalog")
+        wrote_any = False
+        for entry_id, cel in ents.items():
+            if len(cel) == 0:          # no override actually emitted onto it -> drop
+                continue
+            root.append(cel)
+            wrote_any = True
+        if not wrote_any:
+            continue
+        _indent(root)
+        fn = KIND_FILE[kind]
+        path = os.path.join(base_gd, fn)
+        tree = ET.ElementTree(root)
+        with open(path, "wb") as f:
+            f.write(b'<?xml version="1.0" encoding="utf-8"?>\n')
+            tree.write(f, encoding="utf-8", xml_declaration=False)
+            f.write(b"\n")
+        files_written.append(path)
+
+    # ComponentList.SC2Components — same shape as the built mod (gada auto-discovers the
+    # GameData/*.xml; info rounds out the document). We DROP the built mod's `text` component:
+    # this lens emits no GameText, so declaring one would point at an absent component. Written
+    # CRLF to byte-match the built mod's structural files (SC2 tolerates either ending here).
+    comp_path = os.path.join(MOD_DIR, "ComponentList.SC2Components")
+    with open(comp_path, "w", encoding="utf-8", newline="\r\n") as f:
+        f.write('<?xml version="1.0" encoding="utf-8"?>\n'
+                '<Components>\n'
+                '    <DataComponent Type="gada">GameData</DataComponent>\n'
+                '    <DataComponent Type="info">DocumentInfo</DataComponent>\n'
+                '</Components>\n')
+    # DocumentInfo — the SAME single dependency the built mod declares (CRLF, byte-identical).
+    info_path = os.path.join(MOD_DIR, "DocumentInfo")
+    with open(info_path, "w", encoding="utf-8", newline="\r\n") as f:
+        f.write('<?xml version="1.0" encoding="utf-8"?>\n'
+                '<DocInfo>\n'
+                '    <Dependencies>\n'
+                f'        <Value>{PREVIEW_DEPENDENCY}</Value>\n'
+                '    </Dependencies>\n'
+                '</DocInfo>\n')
+
+    # Validate: every emitted GameData xml must parse cleanly.
+    parse_errors = []
+    for path in files_written:
+        try:
+            ET.parse(path)
+        except ET.ParseError as ex:
+            parse_errors.append((path, str(ex)))
+    for path in (comp_path, info_path):
+        try:
+            ET.parse(path)
+        except ET.ParseError as ex:
+            parse_errors.append((path, str(ex)))
+
+    return {
+        "emitted": emitted,
+        "ids": sum(len(s) for s in covered_ids.values()),
+        "covered_ids": covered_ids,
+        "files": files_written + [comp_path, info_path],
+        "gamedata_files": files_written,
+        "skipped": skipped,
+        "parse_errors": parse_errors,
+        "by_kind": by_kind,
+    }
+
+
+def run_mod(edits):
+    """`--mod` entrypoint: emit the preview mod + print the summary. Returns process code."""
+    s = emit_mod(edits)
+
+    # Top skip reasons.
+    reasons = {}
+    for _e, r in s["skipped"]:
+        # collapse field-specific reasons to a stable bucket for the histogram
+        key = re.sub(r": .*$", "", r)
+        reasons[key] = reasons.get(key, 0) + 1
+
+    print(f"preview --mod: wrote {os.path.relpath(MOD_DIR, ROOT)}")
+    print(f"  {s['emitted']} overrides across {s['ids']} ids in "
+          f"{len(s['gamedata_files'])} GameData file(s); {len(s['skipped'])} skipped")
+    for kind, ids in sorted(s["covered_ids"].items()):
+        print(f"    {KIND_FILE[kind]:16} {len(ids):3} ids")
+    if reasons:
+        print("  skip reasons:")
+        for r, n in sorted(reasons.items(), key=lambda kv: -kv[1]):
+            print(f"    {n:4}  {r}")
+    if s["parse_errors"]:
+        for path, msg in s["parse_errors"]:
+            print(f"  FAIL XML parse: {os.path.relpath(path, ROOT)}: {msg}")
+        print("  one or more emitted files are not well-formed — FAIL.")
+        return 1
+    print("  all emitted XML parses cleanly.")
+    print(f"  load it: SC2 Editor -> Open -> {os.path.relpath(MOD_DIR, ROOT)} (Data module shows the finals)")
+    return 0
+
+
 def parse_edits():
     """Parse the generated galaxy lib into a list of edit dicts."""
     if not os.path.exists(GALAXY):
@@ -325,7 +612,13 @@ def parse_edits():
 
 
 def enrich(edits):
-    """Add classification + base/final/exists to each edit."""
+    """Add classification + base/final/exists to each edit.
+
+    Stacked ops on the SAME (kind,id,field) are threaded CUMULATIVELY in emission order
+    (= the order the lib applies them at runtime), so e.g. Firebat LifeMax `Multiply 2`
+    then `Add 100` reads base → 2·base → 2·base+100 (the true runtime final), not last-wins.
+    Each edit's `base` becomes its INPUT (vanilla base on the first edit of a group, the
+    previous edit's final after that), so a manifest row shows that edit's input → output."""
     ref_present = os.path.exists(os.path.join(REF, "mods", "liberty.sc2mod", "UnitData.xml"))
     for e in edits:
         e["klass"], e["note"] = classify(e["kind"], e["field"])
@@ -333,11 +626,21 @@ def enrich(edits):
             base, exists = resolve_base(e["kind"], e["entry"], e["field"])
             e["exists"] = exists
             e["base"] = base
-            e["final"] = compute_final(base, e["op"], e["value"]) if base is not None else None
         else:
             e["exists"] = True   # can't check without the dump; don't false-fail CHECK8
             e["base"] = None
+    # Thread cumulative finals within each (kind,id,field) group, in file (= runtime) order.
+    running = {}
+    for e in edits:
+        if e["base"] is None:
             e["final"] = None
+            continue
+        key = (e["kind"], e["entry"], e["field"])
+        start = running.get(key, e["base"])   # vanilla base on the first edit; prev final after
+        e["base"] = start                      # display each edit as its own input -> output
+        e["final"] = compute_final(start, e["op"], e["value"])
+        if e["final"] is not None:
+            running[key] = e["final"]
     return ref_present
 
 
@@ -407,8 +710,19 @@ def write_manifest(edits, ref_present):
 
 def main():
     check = "--check" in sys.argv
+    mod = "--mod" in sys.argv
     edits = parse_edits()
     ref_present = enrich(edits)
+
+    # --mod is a SEPARATE emit path: build the loadable static-global preview .SC2Mod and
+    # return. It does NOT write the manifest or run CHECK8 (plain/--check behavior unchanged).
+    if mod:
+        if not ref_present:
+            print("preview --mod: reference dump (mods/_reference/) absent — cannot resolve "
+                  "base values / entry classes. Run from a checkout with the dump present.")
+            return 1
+        return run_mod(edits)
+
     by, unresolved = write_manifest(edits, ref_present)
 
     # Summary to stdout.

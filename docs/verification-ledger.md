@@ -74,8 +74,11 @@ verified once, each a tiny per-unit variation on a proven pattern.
 ### Lever 1 — Preview lens (auto-verifies every buff VALUE) — ✅ BUILT (`scripts/preview.py`)
 `scripts/preview.py` **parses the generated lib** (no genlib change → shipped galaxy byte-identical),
 resolves each edit's vanilla base, computes the final, and writes `build/preview/buff-manifest.md` —
-every edit as `kind | id | field | op value | base → final`. (A loadable static-override
-`*-Preview.SC2Mod` for the editor is the planned next step.) Two payoffs:
+every edit as `kind | id | field | op value | base → final`. **`preview.py --mod`** also emits a
+loadable static-global `build/preview/WoLUnbalanced-Preview.SC2Mod` (321 overrides / 128 ids) — load
+it in the SC2 Editor Data module and the buffed numbers show directly. **EDITOR-CONFIRMED 2026-06-17:**
+Marine `LifeMax = 65` (45 + 20), Sight 11; Marauder Life Armor 3, Sight 12; `CargoSize` correctly
+un-buffed (the dead edit was removed). Two payoffs:
 - **Editor**: load it → every buffed field shows its real number directly (`Marine LifeMax = 65`,
   `Predator Vespene = 0`, `ThorsHammer Range = 13`). You read the numbers, no playtest.
 - **Automated audit**: a check diffs preview-vs-vanilla and asserts **every intended delta landed
