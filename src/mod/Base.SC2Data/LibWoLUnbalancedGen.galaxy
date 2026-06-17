@@ -276,6 +276,24 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // BC fire while moving (air->air)
     CatalogFieldValueModify(c_gameCatalogEffect, "ATSLaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (ground): ArmorReduction multiplier 1->0
     CatalogFieldValueModify(c_gameCatalogEffect, "ATALaserBatteryU", "ArmorReduction", p, "0", c_upgradeOperationSet);  // BC attacks ignore armor (air)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "Period", p, "0.3333", c_upgradeOperationMultiply);  // BC fire 3x faster (0.225 -> 0.075)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "Period", p, "0.3333", c_upgradeOperationMultiply);  // BC fire 3x faster (AA)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserG", "Period", p, "0.3333", c_upgradeOperationMultiply);  // Jackson's Revenge fire 3x faster (ground)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "Period", p, "0.3333", c_upgradeOperationMultiply);  // Jackson's Revenge fire 3x faster (air)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "Period", p, "0.3333", c_upgradeOperationMultiply);  // Jackson's Revenge cannons 3x faster (ground)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "Period", p, "0.3333", c_upgradeOperationMultiply);  // Jackson's Revenge cannons 3x faster (air)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "DamagePoint", p, "0.04", c_upgradeOperationSet);  // BC: trim windup so the 3x rate isn't bottlenecked
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATSLaserBattery", "Backswing", p, "0.02", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "DamagePoint", p, "0.04", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "ATALaserBattery", "Backswing", p, "0.02", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserG", "DamagePoint", p, "0.04", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserG", "Backswing", p, "0.02", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "DamagePoint", p, "0.04", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRBattlecruiserA", "Backswing", p, "0.02", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "DamagePoint", p, "0.04", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsG", "Backswing", p, "0.02", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "DamagePoint", p, "0.04", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogWeapon, "DRCannonsA", "Backswing", p, "0.02", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogWeapon, "P38ScytheGuassPistol", "Range", p, "1", c_upgradeOperationAdd);  // Reaper LTS: +1 range
     CatalogFieldValueModify(c_gameCatalogUnit, "Reaper", "Sight", p, "2", c_upgradeOperationAdd);  // Reaper LTS: +2 sight
     CatalogFieldValueModify(c_gameCatalogWeapon, "CrucioShockCannon", "Range", p, "1", c_upgradeOperationAdd);  // Siege Tank LTS: +1 sieged range

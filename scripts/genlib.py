@@ -404,6 +404,29 @@ def emit():
         # (≈0 damage to any armored target). Corrected to 0.
         ("Effect", "ATSLaserBatteryU", "ArmorReduction", "0", "Set", "BC attacks ignore armor (ground): ArmorReduction multiplier 1->0"),
         ("Effect", "ATALaserBatteryU", "ArmorReduction", "0", "Set", "BC attacks ignore armor (air)"),
+        # ALL BCs fire 3x faster: weapon Period /3 (base BC ATS/ATA + Jackson's Revenge DR weapons).
+        # Period is the per-player "fire rate" scalar (GOOD class). These weapons set no explicit
+        # DamagePoint/Backswing (engine default 0.167) → the rule-7 pass sets DamagePoint=0.1, which
+        # would bottleneck the new 0.075 s period. So ALSO trim DamagePoint(0.04)+Backswing(0.02)
+        # below the new period so the full 3x rate actually holds (rule-7-compliant: 0.04 < 0.1).
+        ("Weapon", "ATSLaserBattery", "Period", "0.3333", "Multiply", "BC fire 3x faster (0.225 -> 0.075)"),
+        ("Weapon", "ATALaserBattery", "Period", "0.3333", "Multiply", "BC fire 3x faster (AA)"),
+        ("Weapon", "DRBattlecruiserG", "Period", "0.3333", "Multiply", "Jackson's Revenge fire 3x faster (ground)"),
+        ("Weapon", "DRBattlecruiserA", "Period", "0.3333", "Multiply", "Jackson's Revenge fire 3x faster (air)"),
+        ("Weapon", "DRCannonsG", "Period", "0.3333", "Multiply", "Jackson's Revenge cannons 3x faster (ground)"),
+        ("Weapon", "DRCannonsA", "Period", "0.3333", "Multiply", "Jackson's Revenge cannons 3x faster (air)"),
+        ("Weapon", "ATSLaserBattery", "DamagePoint", "0.04", "Set", "BC: trim windup so the 3x rate isn't bottlenecked"),
+        ("Weapon", "ATSLaserBattery", "Backswing", "0.02", "Set", ""),
+        ("Weapon", "ATALaserBattery", "DamagePoint", "0.04", "Set", ""),
+        ("Weapon", "ATALaserBattery", "Backswing", "0.02", "Set", ""),
+        ("Weapon", "DRBattlecruiserG", "DamagePoint", "0.04", "Set", ""),
+        ("Weapon", "DRBattlecruiserG", "Backswing", "0.02", "Set", ""),
+        ("Weapon", "DRBattlecruiserA", "DamagePoint", "0.04", "Set", ""),
+        ("Weapon", "DRBattlecruiserA", "Backswing", "0.02", "Set", ""),
+        ("Weapon", "DRCannonsG", "DamagePoint", "0.04", "Set", ""),
+        ("Weapon", "DRCannonsG", "Backswing", "0.02", "Set", ""),
+        ("Weapon", "DRCannonsA", "DamagePoint", "0.04", "Set", ""),
+        ("Weapon", "DRCannonsA", "Backswing", "0.02", "Set", ""),
 
         # ========================================================================
         # PARITY + COMPLETENESS SWEEP (rules 4/10). Mercs & heroes use DISTINCT
