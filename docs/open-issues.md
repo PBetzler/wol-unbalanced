@@ -82,6 +82,26 @@ edits and classifies each: **GOOD 326 / NOOP 0 / UNCERTAIN 6 / UNRESOLVED 0** af
 > removals confirmed — both already tracked; the cleanup just stopped pretending the dead runtime
 > edits implemented them.
 
+## Yamato + Defensive Matrix autocast — verified + retuned (2026-06-17)
+
+Owner asked to verify the Battlecruiser / Jackson's Revenge (`DukesRevenge`) kit.
+
+- [x] **Yamato autocast — VERIFIED wired correctly.** `YamatoWoLU` (base BC) + `DukesRevengeYamatoWoLU`
+  both: `AutoCast`+`AutoCastOn`, explicit `Effect=Yamato` (CHECK4-safe), `AutoCastValidatorArray=
+  WoLUYamatoBigTarget` (only fires on `LifeMax≥300` targets, so the 125-energy blast isn't wasted on
+  small units), structures skipped, button re-pointed (`WoLUHaveFlag`). Statically sound; in-game
+  firing is the owner's [GAME] check.
+- [x] **Defensive Matrix autocast — RETUNED to "on taking damage" (was "on firing").** Owner spec:
+  the shield should auto-trigger **only when the unit takes any damage**. It was gated on
+  `CasterIsFiringWeapon` (fires while *attacking*) — wrong. Changed both `DefensiveMatrixWoLU` (base
+  BC + Science Vessel) and `DukesRevengeDefensiveMatrixWoLU` to a new `WoLUCasterDamaged` validator =
+  caster **Life fraction < 1.0** (`CValidatorUnitCompareVital Type=Fraction`, the percent-of-max mode
+  confirmed from vanilla `ShieldsFull`). So the shield now goes up only when the unit is below full
+  HP (= has taken damage). [STATIC — audit confirms the validator resolves + is referenced; the stim
+  autocasts correctly KEEP `CasterIsFiringWeapon`. GAME — owner confirms it auto-shields when hit; it
+  reuses the same self-buff-autocast mechanism as the GAME-confirmed super-stim, just a different
+  caster-state gate.]
+
 ## Clone metadata (the Merc* elite mercs)
 
 - [x] **Inspect panel armor/defense category** — shield armor was "unknown" (FIXED v0.2.2 via `ShieldArmorName`). **v0.3.8: the NORMAL life-armor sign was missing** — added an explicit `LifeArmorName` (= each merc's base-unit vanilla value, verified against `mods/_reference/`) so the life-armor category resolves on a shielded clone. Statically proven (audit CHECK7 confirms the keys resolve); the heart-portrait piece is the only remaining in-game item (see v0.3.7 #4 below).

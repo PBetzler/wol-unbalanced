@@ -186,14 +186,14 @@
          never auto-fires, fall back to manual-only. -->
     <!-- Defensive Matrix is a SELF-buff instant (parent applies DefensiveMatrixSet to the
          caster). The old AutoCastFilters EXCLUDED Self/Ally (offensive-target form) so the
-         autocast had no valid target and never fired. A self-buff autocasts like Stimpack:
-         drive it off the caster's combat state, not a target filter. Mirror the verified
-         StimpackWoLU pattern (CasterIsFiringWeapon) so the BC/SV auto-shields when fighting. -->
+         autocast had no valid target and never fired. A self-buff autocasts off the caster's own
+         state, not a target filter. Gate it on `WoLUCasterDamaged` (Life below full) so the shield
+         goes up ONLY when the unit has TAKEN any damage — not merely when it is firing. -->
     <CAbilEffectInstant id="DefensiveMatrixWoLU" parent="DefensiveMatrix">
         <Flags index="AutoCast" value="1"/>
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="5"/>
-        <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
+        <AutoCastValidatorArray value="WoLUCasterDamaged"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
@@ -466,7 +466,7 @@
          Jackson's Revenge (DukesRevenge) autocast kit. Its three actives work manually
          but never autocast (user report); clone them with the same autocast blocks as
          the base BC kit (Yamato big-target-gated + structure-skipping; Missile Pods vs
-         air; Defensive Matrix self-buff on firing). Appended to DukesRevenge with the
+         air; Defensive Matrix self-buff when the unit has taken damage). Appended to DukesRevenge with the
          vanilla buttons re-pointed (player-exclusive hero unit, so rule-9 safe). ====== -->
     <CAbilEffectTarget id="DukesRevengeYamatoWoLU" parent="DukesRevengeYamato">
         <Flags index="AutoCast" value="1"/>
@@ -496,7 +496,7 @@
         <Flags index="AutoCast" value="1"/>
         <Flags index="AutoCastOn" value="1"/>
         <AutoCastRange value="5"/>
-        <AutoCastValidatorArray value="CasterIsFiringWeapon"/>
+        <AutoCastValidatorArray value="WoLUCasterDamaged"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="DefensiveMatrix" State="Normal" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
