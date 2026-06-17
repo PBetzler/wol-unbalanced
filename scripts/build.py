@@ -18,8 +18,29 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPS_SRC = os.path.join(ROOT, "mods", "Tactical_Arsenal", "WoL Tactical Arsenal")
 MOD_SRC = os.path.join(ROOT, "src", "mod")
 BUILD = os.path.join(ROOT, "build")
-MPQPATCH = os.path.join(ROOT, "tools", "mpqpatch")
-SC2 = "/Applications/StarCraft II"
+
+# --- Cross-platform paths (macOS + Windows) ---------------------------------------
+# The map patcher is a compiled C binary (tools/mpqpatch.c -> StormLib); on Windows it
+# builds to mpqpatch.exe. It's gitignored, so each machine builds its own — see
+# docs/SETUP.md. os.path.exists below tolerates either name.
+MPQPATCH = os.path.join(ROOT, "tools",
+                        "mpqpatch.exe" if os.name == "nt" else "mpqpatch")
+
+
+def _default_sc2_dir() -> str:
+    """The StarCraft II install dir, OS-specific. Override with $WOLU_SC2_DIR (any OS)
+    if SC2 lives somewhere non-default — e.g. a D: drive on Windows, or an EU/region
+    folder. Only `install`/`uninstall` touch this; `build`/`package` do not, so a
+    missing/wrong SC2 dir never blocks a build."""
+    override = os.environ.get("WOLU_SC2_DIR")
+    if override:
+        return override
+    if os.name == "nt":  # Windows — default Battle.net install location
+        return r"C:\Program Files (x86)\StarCraft II"
+    return "/Applications/StarCraft II"  # macOS
+
+
+SC2 = _default_sc2_dir()
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
@@ -57,8 +78,9 @@ def preflight() -> None:
     """Fail early with a clear, actionable message if a build input is missing — so anyone
     who clones the repo and runs a build learns exactly what to fetch and from where."""
     if not os.path.exists(MPQPATCH):
-        _missing("the StormLib map patcher (tools/mpqpatch)", MPQPATCH,
-                 "build StormLib into vendor/ and compile tools/mpqpatch.c — see README §Building step 3.")
+        _missing("the StormLib map patcher (tools/mpqpatch[.exe])", MPQPATCH,
+                 "build StormLib into vendor/ and compile tools/mpqpatch.c — see README §Building step 3 "
+                 "(macOS) or docs/SETUP.md (Windows, builds mpqpatch.exe).")
     maps = NIGHTMARE_MAPS_SRC if NIGHTMARE_BASE else MAPS_SRC
     label = "the Nightmare pack's maps" if NIGHTMARE_BASE else "the map base (Tactical Arsenal campaign)"
     src_hint = (f"download \"Wings of Liberty Nightmare Difficulty\" by Rhyme from GiantGrantGames' "

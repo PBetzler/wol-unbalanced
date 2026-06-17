@@ -67,9 +67,14 @@ except Exception as exc:  # pragma: no cover
     raise SystemExit(2)
 
 # ----------------------------------------------------------------------------
-# Constants — local install paths (this Mac is the test machine; see plan.md §2)
+# Constants — local install paths. NOTE: this harness is SHELVED (SC2 API live
+# reads are hard-blocked on retail 5.x — see docs/learnings.md §Verification tooling);
+# kept only for the map-load sanity check. The default below is macOS; override with
+# $WOLU_SC2_DIR on any OS (e.g. Windows C:\Program Files (x86)\StarCraft II).
 # ----------------------------------------------------------------------------
-SC2_ROOT = "/Applications/StarCraft II"
+SC2_ROOT = os.environ.get("WOLU_SC2_DIR") or (
+    r"C:\Program Files (x86)\StarCraft II" if os.name == "nt"
+    else "/Applications/StarCraft II")
 SC2_VERSIONS = os.path.join(SC2_ROOT, "Versions")
 DEFAULT_MAP = "traynor01.SC2Map"  # Liberation Day: P1 starts with Marines + Raynor
 DEFAULT_PORT = 8765  # CLEAN port — 5000 is hijacked by macOS AirPlay Receiver
