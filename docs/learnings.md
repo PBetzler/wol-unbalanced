@@ -189,6 +189,29 @@ gotcha; authoritative details live in the code/plan, not here.
   `[0]=ScavengingSystemsMechDeath, [1]=ThorDontDie`, index-less appends in libertystory). To
   re-point it to a different behavior, OVERRIDE the same index with a `Link` instead of the
   tombstone (`<BehaviorArray index="1" Link="MercThorDontDie"/>`).
+- **To change ONE build-button's prereq, re-point it to an EXISTING requirement of a
+  sibling that already lacks the unwanted node — don't edit a shared requirement, and a
+  card `Requirements` link can't be edited per player anyway.** A train button's prereq lives in
+  `CAbilTrain.InfoArray[TrainN].Button.Requirements` (a `CRequirement` id). That id is a UI/card
+  field → a per-player `CatalogFieldValueModify` on it is a **runtime no-op** (only scalar stat-like
+  fields apply per player; this is a *link*). So the prereq must change in **static XML**, which is
+  global — fine when the same-named structure trains no enemy units in the campaign (e.g. no WoL
+  enemy Starport trains a Hercules), making the global edit rule-9-safe *in effect* (owner-approved
+  for build prereqs: "build requirements can be equal for all players"). The clean way to drop part
+  of an AND-requirement: requirements decompose into `CRequirementAnd` over `CRequirementCountUnit`
+  nodes (`RequirementData.xml` → `RequirementNodeData.xml`); find a **sibling button that already
+  uses the sub-requirement you want** and re-point to *its* id, rather than editing the AND
+  requirement in place. Concretely, the Hercules (`StarportTrain InfoArray Train6`) gated on
+  `HaveAttachedStarportTechLabAndFusionCore` (= Tech-Lab-attached AND Fusion-Core) was freed of the
+  Fusion Core by re-pointing its `Requirements` to **`HaveAttachedTechLab`** — the exact same prereq
+  the Banshee/Raven/Wraith Starport trains use (just the Tech-Lab node, no Fusion-Core conjunct).
+  **Never edit the AND requirement in place unless it's exclusive to the one button** — grep every
+  reference layer first: `HaveAttachedStarportTechLabAndFusionCore` is *also* the Battlecruiser's
+  prereq, so editing it would have freed the BC too. Merge-safety: do it as a same-id
+  `<CAbilTrain>` override of just the one `InfoArray index="TrainN"`, re-stating the FULL `<Button>`
+  (copy `DefaultButtonFace`/`State` verbatim, change only `Requirements`) + `<Unit>` + the element's
+  `Time` so no sibling fields are blanked, and touch no other TrainN. (Done for the Hercules,
+  v0.3.x — `src/mod/Base.SC2Data/GameData/AbilData.xml`.)
 - **A death-response RESURRECT chain has THREE links to clone for a merc clone to revive AS
   ITSELF, and the rebuild's gas cost lives on the REBUILT UNIT, not the morph ability.** The Thor
   Immortality Protocol is: `ThorDontDie` (`CBehaviorBuff`, `DamageResponse Fatal=1

@@ -318,6 +318,28 @@
         <!-- (Train16 Brynhilds/Valkyrie removed per owner.) -->
     </CAbilTrain>
 
+    <!-- Hercules buildable WITHOUT a Fusion Core (keep Starport + Tech Lab). Owner-approved.
+         The merged StarportTrain (base liberty Train1-5 + libertystory Train6-8) gates the
+         Hercules (Train6) on Requirements="HaveAttachedStarportTechLabAndFusionCore" (an AND of
+         a Tech-Lab-attached node + a FusionCore-exists node). We re-point Train6's Button to
+         "HaveAttachedTechLab" — the SAME requirement the Banshee/Raven/Wraith trains use, which
+         is exactly the Tech-Lab-attached node WITHOUT the Fusion-Core conjunct (verified in
+         RequirementData/RequirementNodeData: HaveAttachedTechLab ->
+         CountUnitAlias_TechLabCompleteOnlyAtUnit...TechTreeCheat = Alias_TechLab CompleteOnlyAtUnit;
+         the FusionCore-AND requirement is NOT Hercules-exclusive — the Battlecruiser (Train4) also
+         uses it — so we MUST NOT edit it in place; re-point only Train6). This is a same-id merge
+         override: we re-state the FULL Button (DefaultButtonFace/State copied verbatim, only
+         Requirements changed) and the <Unit> and Time so no sibling fields are blanked. GLOBAL by
+         design — no enemy Starport trains a Hercules in WoL, so this is rule-9 safe in effect
+         (owner: "build requirements can be equal for all players"). We touch ONLY Train6 — the
+         other Starport trains (Banshee/Raven/Viking/Medivac/BC/ScienceVessel/Wraith) are untouched. -->
+    <CAbilTrain id="StarportTrain">
+        <InfoArray index="Train6" Time="70">
+            <Button DefaultButtonFace="BuildHercules" State="Restricted" Requirements="HaveAttachedTechLab"/>
+            <Unit value="Hercules"/>
+        </InfoArray>
+    </CAbilTrain>
+
     <!-- (Midnight Riders / Liberator merc removed per owner — the Liberator/LiberatorAG
          models don't exist in WoL, so the morph only ever reskinned to a Viking. The
          MercLiberatorDeploy/Undeploy morph abilities were deleted with it.) -->

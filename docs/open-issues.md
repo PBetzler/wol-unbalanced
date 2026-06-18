@@ -88,10 +88,11 @@ edits and classifies each: **GOOD 326 / NOOP 0 / UNCERTAIN 6 / UNRESOLVED 0** af
   an indexed regen-array element (recipe-02 would call it a no-op) but free cloak is GAME-confirmed
   working — kept, re-verify only if cloak energy-drain ever returns.
 
-> Cross-ref: the **rifle-flatten** item below (Ghost/Spectre still read +vs-light/armored) and the
-> **Marauder Tech Lab / Hercules Fusion Core** blocked item are the two real gaps these no-op
-> removals confirmed — both already tracked; the cleanup just stopped pretending the dead runtime
-> edits implemented them.
+> Cross-ref: the **rifle-flatten** item below (Ghost/Spectre still read +vs-light/armored) was one
+> real gap these no-op removals confirmed. The **Hercules Fusion Core** drop (same no-op family — a
+> card `Requirements` link can't be runtime-edited per player) is now RESOLVED via a static all-players
+> `StarportTrain` Train6 requirement swap (see the Blocked section); the Marauder/Medic Tech Lab gate
+> is left in place per owner decision.
 
 ## Yamato + Defensive Matrix autocast — verified + retuned (2026-06-17)
 
@@ -227,7 +228,8 @@ These shipped and *probably* work, but the field/semantics were assumptions. Ver
 
 These are investigated to ground truth but need an owner decision (a rule-9 tolerance call or a design choice), not more investigation.
 
-- [ ] **Marauder Tech Lab / Hercules Fusion Core drop** — if the per-player `Button.Requirements=""` edit proves a no-op in game (verify), the only working lever is `TechTreeRestrictionsEnable(p,false)`, which also strips the Merc Compound requirement (rule 6). **DECISION:** accept losing the Compound gate to drop build prereqs, or leave the prereqs in place?
+- [x] **Hercules Fusion Core drop** — RESOLVED (owner-approved; static, all-players, rule-9-safe in effect). The earlier per-player `Button.Requirements=""` idea was a runtime no-op (a card `Requirements` link is a UI field, not a per-player-editable scalar). Owner guidance: "build requirements can be equal for all players." So instead of the upgrade-gate fallback, we re-pointed the Hercules train button's `Requirements` from `HaveAttachedStarportTechLabAndFusionCore` (Tech Lab AND Fusion Core) to **`HaveAttachedTechLab`** — the *same* requirement the Banshee/Raven/Wraith Starport trains already use, which is exactly the Tech-Lab-attached node with the Fusion-Core conjunct dropped (verified in RequirementData/RequirementNodeData). Done as a same-id merge override of `StarportTrain InfoArray index="Train6"` in `src/mod/Base.SC2Data/GameData/AbilData.xml` (full Button + Unit + Time re-stated; only Requirements changed). We did NOT edit `HaveAttachedStarportTechLabAndFusionCore` in place because it is NOT Hercules-exclusive — the **Battlecruiser** (Train4) also uses it, so editing it would have freed the BC from needing a Fusion Core too. Global, but no enemy Starport trains a Hercules in WoL → harmless. [GAME-pending: confirm the Hercules is buildable from a Starport+Tech-Lab with no Fusion Core.]
+- **Marauder / Medic Tech Lab — LEFT AS-IS per owner decision.** The Marauder and Medic are trained via `BarracksTrain` gated on the shared `HaveAttachedTechLab` requirement; this is NOT a Marauder special case (it's the generic Tech-Lab gate every Tech-Lab Barracks unit uses). Owner decided to leave the Tech Lab prereq in place. Do not re-investigate.
 
 ### Owner-resolved (v0.3.3)
 - [x] **Raven self-Point-Defense** — owner rejected a hidden always-on intercept weapon (would be active on enemy Ravens). RESOLVED with the owner's energy-cost design: the player's Raven kit is made free to activate (`PlacePointDefenseDrone`/`BuildAutoTurret`/`SeekerMissile` energy → 0 per-player) so it spams free permanent PDDs/turrets; enemies keep vanilla costs (rule 9 clean).
