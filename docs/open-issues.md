@@ -11,8 +11,34 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis pass was run on each but came back **too uncertain to ship** — each lead below was found unreliable, so these need rigorous investigation before a fix lands (do NOT ship the first-pass guesses):
 
 - [ ] **(PARKED — known cosmetic limitation, owner decision 2026-06-18) Elite mercs show the "heart" placeholder portrait in-game.** Recurring (v0.2.4 / v0.3.7#4 / v0.3.8). It is a **PRELOAD** failure — the portrait model isn't loaded into memory for the merc *calldown* identity — **NOT a path/reference problem.** Verified via git that v0.2.4's local `Merc*Portrait` CModels used the EXACT correct `.m3` paths (`Assets\Portraits\Terran\<Unit>Portrait\<Unit>Portrait.m3`, identical to the moebius `SCVPortrait` pattern) **and still hearted**; the current base-token references also heart. So **both** the base-token AND correct-path-local-CModel approaches fail → the model reference is not the lever. The SC2 Editor only shows the portrait *resolving* (it always did), never the in-game preload, so it **cannot validate a candidate** — any test is owner-in-game-only. Remaining untried levers, both uncertain: (a) re-parent each merc actor to its base unit's actor (likely inherits the same no-explicit-preload behavior → probably still hearts); (b) a map-level model preload (touches the 30 campaign maps = map-affecting + fragile). Cosmetic; **parked** unless the owner wants to spend an in-game iteration on the re-parent shot.
-- [~] **Merc Medics (`MercMedic`) can't heal Spartan Companies (`SpartanCompany`, the Goliath merc).**
-  **ROOT-CAUSED + FIXED (v0.3.11, [STATIC]; [GAME] confirm pending).** The *manual* heal already works
+- [~] **Medic / Skibi's Angels (`MercMedic`) can't heal mechanical units (Goliath / `SpartanCompany`).**
+  **REAL ROOT CAUSE FOUND (v0.3.11, [STATIC]; [GAME] confirm pending) — the prior diagnosis below was
+  WRONG.** Owner playtest 2026-06-18: the player's Medic heals NO mechanical unit, **neither manual NOR
+  autocast.** The earlier note claimed "manual already works, only autocast was the gap" — that was an
+  **UNVERIFIED ASSUMPTION and is FALSE.** The actual blocker is a `parent=`-clone merge trap, not the
+  autocast.
+  **THE BUG:** `HealWoLU` (`parent="heal"`) overrode `TargetFilters` with a **bare `value=`** (no
+  `index=`). `TargetFilters` is an **INDEXED array** (`CFiltersParam[]`), not a scalar string — vanilla
+  `heal` carries `Ground,Biological,Visible;…` at **index 0**. A bare `<TargetFilters value=…/>` on a
+  `parent=` clone does **not replace** the inherited slot 0; it **appends** a second entry, and the
+  engine **AND-combines** both → the clone STILL required `Biological` → it refused mechanical targets
+  for **both** manual and autocast. (`CEffectCreateHealer` is NOT bio-only — `NanoRepair`/`Repair`/
+  `MULERepair` are the same effect class and restore mechanical; the determinant is purely the
+  ABILITY's `TargetFilters` require-bits. So the effect was never the problem — the inherited filter
+  bit was.) Evidence: every reference layer that overrides an inherited heal `TargetFilters` uses
+  explicit `index="0"` (`mods/_reference/rogue/GameData/AbilData.xml:603`; `index="0" removed="1"` at
+  `:347` proves the array indexing).
+  **THE FIX:** `<TargetFilters index="0" value="Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable"/>`
+  — `index="0"` REPLACES the inherited `Ground,Biological` slot 0 so only the broad filter remains.
+  Now heals any Visible friendly non-structure unit: biological, mechanical, ground, AND air, both
+  manually and on autocast. `src/mod/Base.SC2Data/GameData/AbilData.xml` (`HealWoLU`); gate green
+  (genlib/lint/audit/preview CHECK8/check_autocast CHECK9). **⚠ [GAME] owner confirms: a player Medic /
+  Skibi's Angels can now MANUALLY heal AND auto-heals a damaged Goliath / Spartan Company / tank /
+  Viking; enemy Medics still heal only biological.**
+
+  <details><summary>Prior (WRONG) diagnosis — kept for the record; do not trust it</summary>
+
+  The *manual* heal already works
   (HealWoLU's broadened `TargetFilters` has no Biological req, `SpartanCompany` IS `Mechanical,Armored`),
   but the user-visible "can't heal" was the **autocast**: the gap was *auto*-heal of mechanical allies.
   Trace: vanilla `heal` (`CAbilEffectTarget`, `mods/_reference/campaigns/liberty.sc2campaign/AbilData.xml`
@@ -44,6 +70,14 @@ Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis 
   inherited by `HealWoLU` from vanilla `heal`. The drone is drone-tuned (no energy cost) → a slight
   DOWNGRADE for a Medic. **No switch needed** — our heal is a complete biomechanical heal; the only
   missing piece was the autocast (fixed above).
+
+  </details>
+
+  > **Why the autocast gate (`AutoCastValidatorArray=WoLUHasFlag`) still stands:** the player-gated
+  > autocast from the prior pass is correct and KEPT — it prevents enemy Medics auto-healing their
+  > mechanical allies once the filter is broadened (a rule-9 leak). It just wasn't the bug the owner
+  > reported. Both pieces ship: the `index="0"` filter fix (heals mechanical at all) + the WoLUHasFlag
+  > autocast gate (only the player auto-heals mechanical). `MercMedic` (parent `Medic`) inherits both.
 - [x] **Spartan Companies can't fire (at least their AA missiles) while loaded in a Bunker — ACCEPTED as an inherent SC2 limitation (v0.3.11).** Our mod lets mechanical/size-8 units load (open-issues #2/#3). The `Weapon.Arc=360` candidate was shipped then **REVERTED** — owner playtest (2026-06-18) confirmed a bunkered Spartan **STILL won't fire AA**, so widening the arc doesn't help: a stowed (bunkered) unit can't aim its turret at all, and the engine appears to block a turret-mounted unit's weapon acquisition from inside a bunker. No static fix exists. **Accepted:** load Spartans in a bunker for transport/ground, not for AA.
   **ROOT-CAUSED (2026-06-18) — it's a TURRET-AIM + narrow weapon-`Arc` limitation, NOT `CasterIsNotHidden`. No clean static fix proven; `Arc` is the one candidate lever but its in-bunker efficacy is unverifiable statically → owner-gated in-game test.**
   - **`CasterIsNotHidden` RULED OUT as the AA-specific cause.** It IS present on the SpartanCompany weapon effects, but on **BOTH** ground and air *identically* — `SpartanCompanyG` (`campaigns/liberty.sc2campaign/EffectData.xml:5278`) AND `SpartanCompanyA` (`:5267`) each carry `<ValidatorArray value="CasterIsNotHidden"/>`, same for the regular Goliath (`GoliathG :5252`, `GoliathA :5241`). A validator that gates both weapons equally cannot explain an **AA-only** failure. (Whether it gates *anything* in a bunker is also unproven — `CasterIsNotHidden` is undefined in the whole reference dump, so it's a core/built-in validator; in vanilla it appears only on burrow/baneline self-spawn effects. If it DID block on Hidden state it would silence the ground cannon too, contradicting the report.)

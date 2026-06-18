@@ -593,7 +593,19 @@
              CEffectCreateHealer). A clone re-defaults to its OWN id "HealWoLU" (nonexistent)
              and would heal nothing — so set the effect explicitly to "heal". -->
         <Effect index="0" value="heal"/>
-        <TargetFilters value="Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable"/>
+        <!-- TargetFilters is an INDEXED array (CFiltersParam[]), NOT a scalar string — the
+             vanilla `heal` carries `Ground,Biological,Visible;...` at index 0. A bare
+             `<TargetFilters value=.../>` on a parent= clone does NOT replace that inherited
+             slot 0; it appends a new entry, so the engine AND-combines BOTH (inherited
+             Ground,Biological AND ours) → the clone STILL requires Biological → it refuses
+             mechanical targets. This was the real "Medic can't heal mechanical" bug (manual
+             AND autocast both failed in game, 2026-06-18). Override slot 0 EXPLICITLY with
+             index="0" so the Biological/Ground require-bits are gone and only our broad filter
+             remains (every reference layer that overrides an inherited heal TargetFilters uses
+             index="0" — e.g. rogue/AbilData.xml:603; index="0" removed="1" at :347 proves the
+             array indexing). Net: heals any Visible friendly non-structure unit — biological,
+             mechanical, ground, AND air. -->
+        <TargetFilters index="0" value="Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable"/>
         <!-- Explicit autocast (parent supplies these, restated for clarity + so the gate below
              reads as a complete autocast spec). AutoCastFilters / AutoCastRange / heal energy
              cost are inherited from `heal` and already allow mechanical (no Biological req). -->

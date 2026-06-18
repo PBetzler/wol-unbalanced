@@ -60,6 +60,23 @@ gotcha; authoritative details live in the code/plan, not here.
 - A `CAbilEffectTarget`/`CWeaponLegacy` with **no `Effect` element defaults the link
   to its own id** (vanilla `Obliterate` ability → `Obliterate` damage effect). Clones
   must set `Effect` explicitly or they point at a nonexistent `<clone-id>` effect.
+- **`TargetFilters` is an INDEXED array (`CFiltersParam[]`), not a scalar string — on a
+  `parent=` clone a bare `<TargetFilters value=…/>` does NOT replace the inherited filter;
+  it APPENDS, and the engine AND-combines the entries.** This silently kept a require-bit we
+  meant to drop: `HealWoLU parent="heal"` set a broad bare-`value=` filter to heal mechanical,
+  but the inherited slot 0 (`Ground,Biological,…` from vanilla `heal`) survived and AND'd in →
+  the Medic refused mechanical targets for **both** manual and autocast (owner playtest, not
+  catchable statically by our gate). The require-list before the `;` is an AND of all entries.
+  **Fix: override the inherited slot EXPLICITLY with `index="0"`** —
+  `<TargetFilters index="0" value="Visible;…"/>` replaces `Ground,Biological,…` so only the broad
+  filter remains. Every reference layer that edits an inherited `heal` filter uses `index="0"`
+  (`mods/_reference/rogue/GameData/AbilData.xml:603`; the `index="0" removed="1"` tombstone at
+  `:347` proves the indexing). General rule: **any time a `parent=` clone overrides an inherited
+  indexed-array field (`TargetFilters`, `Effect`, `AbilArray`, …), carry the explicit `index=`** —
+  bare `value=` only safely replaces on a SAME-ID override (e.g. our `BunkerTransport` filter edit),
+  not on a clone. (Aside, unrelated to this bug: `CEffectCreateHealer` is NOT biological-only — the
+  Medic `heal`, SCV `Repair`/`NanoRepair`, and `MULERepair` are all the same effect class; bio-vs-mech
+  is decided ENTIRELY by the casting ABILITY's `TargetFilters`, never the healer effect.)
 - **Verify Blizzard ids letter-by-letter** — the Marine rifle is `GuassRifle`
   (Blizzard's typo). A runtime edit on a misspelled id is a silent no-op; our Marine
   +1 range was dead for a whole batch. Same for card cells: audit the unit's vanilla
