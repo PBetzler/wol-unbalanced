@@ -208,6 +208,24 @@ python scripts\build.py install
 (`build`/`package` never touch the SC2 dir, so a wrong/missing path can't block a build — only
 `install`/`uninstall` use it.)
 
+### How CCM places files (and how `install` mirrors it)
+CCM ([github.com/7thAce/SC2CCM](https://github.com/7thAce/SC2CCM)) is an **importer, not a launcher** —
+it puts files in the **game install dir** (it resolves `sc2BasePath` from the `.SC2Save` registry
+association, fallback the install dir above) and you then launch the campaign **normally**:
+- the **mod** (`.SC2Mod`) → `…\StarCraft II\Mods\` (its `handleDependencies` step);
+- the **active campaign maps** → `…\StarCraft II\Maps\Campaign\` — it **clears that folder first**
+  (loose files only; the `swarm`/`void`/`nova`/`voidprologue` subfolders, i.e. the *other* campaigns,
+  are preserved), then copies the maps + a `metadata.txt` in;
+- **activation is by file presence** — there is **no controlling/state file** (not in Documents, not
+  anywhere); CCM only reads `Maps\Campaign\metadata.txt` to *display* which campaign is active.
+
+`build.py install` now **replicates this exactly** (clear the WoL slot's loose files, preserve the
+other subfolders, copy maps + `metadata.txt`, mod → `Mods\`), so a direct `install` is a drop-in for
+a CCM import — the campaign menu loads our loose `Maps\Campaign` maps over CASC, and the mod resolves
+from `Mods\`. The mod is a standalone `.SC2Mod` (alongside SC2's own), never an edit of an original
+game file. **Do NOT also install into the Documents user folder** — the campaign menu reads the
+install dir, so a Documents copy is ignored on direct launch (and only confuses the Editor's search).
+
 ---
 
 ## 5. The dev loop

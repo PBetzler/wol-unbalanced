@@ -347,12 +347,30 @@ def package() -> None:
 
 
 def install() -> None:
+    r"""Mirror CCM's "Set Active Campaign" for the WoL slot, into the game install dir
+    (sc2BasePath): CLEAR the loose files in Maps\Campaign (the WoL campaign maps + metadata)
+    while PRESERVING the swarm/void/nova/voidprologue SUBFOLDERS (the other campaigns' slots),
+    then copy our maps + a CCM-format metadata.txt in. The mod (.SC2Mod) goes to Mods\, exactly
+    where CCM's handleDependencies puts it. Activation is by file presence — CCM writes no
+    controlling file (verified from its source, github.com/7thAce/SC2CCM)."""
     maps_dst = os.path.join(SC2, "Maps", "Campaign")
     mods_dst = os.path.join(SC2, "Mods")
     os.makedirs(maps_dst, exist_ok=True)
     os.makedirs(mods_dst, exist_ok=True)
+    # Clear the WoL slot: loose FILES only — never the other-campaign subfolders.
+    for name in os.listdir(maps_dst):
+        p = os.path.join(maps_dst, name)
+        if os.path.isfile(p):
+            os.unlink(p)
+    # Copy our campaign maps (skip mpqpatch .tmp leftovers) + the CCM-format metadata.txt.
     for name in os.listdir(os.path.join(BUILD, "Campaign")):
+        if name.endswith(".tmp"):
+            continue
         shutil.copy2(os.path.join(BUILD, "Campaign", name), os.path.join(maps_dst, name))
+    meta = os.path.join(BUILD, "metadata.txt")
+    if os.path.exists(meta):
+        shutil.copy2(meta, os.path.join(maps_dst, "metadata.txt"))
+    # Mod -> Mods\ (replace any existing copy).
     for name in os.listdir(os.path.join(BUILD, "Mods")):
         src = os.path.join(BUILD, "Mods", name)
         dst = os.path.join(mods_dst, name)
@@ -361,14 +379,21 @@ def install() -> None:
             shutil.copytree(src, dst)
         else:
             shutil.copy2(src, dst)
-    print(f"installed -> {SC2} (Maps/Campaign + Mods)")
+    print(f"installed -> {SC2} (cleared WoL Maps/Campaign slot; maps + metadata.txt; mod -> Mods/)")
 
 
 def uninstall() -> None:
+    r"""Reverse install (CCM "Reset to Default" for the WoL slot): remove our campaign maps +
+    metadata.txt from Maps\Campaign (loose files; the other-campaign subfolders are untouched)
+    and our mod from Mods\."""
+    maps_dir = os.path.join(SC2, "Maps", "Campaign")
     for name in os.listdir(os.path.join(BUILD, "Campaign")):
-        p = os.path.join(SC2, "Maps", "Campaign", name)
+        p = os.path.join(maps_dir, name)
         if os.path.exists(p):
             os.unlink(p)
+    meta = os.path.join(maps_dir, "metadata.txt")
+    if os.path.exists(meta):
+        os.unlink(meta)
     for name in os.listdir(os.path.join(BUILD, "Mods")):
         p = os.path.join(SC2, "Mods", name)
         if os.path.isdir(p):
