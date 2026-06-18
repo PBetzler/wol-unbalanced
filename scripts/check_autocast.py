@@ -43,6 +43,7 @@ GD = os.path.join(ROOT, "src", "mod", "Base.SC2Data", "GameData")
 AUTOCAST_INTENT = {
     "StimpackWoLU":               {"validators": {"CasterIsFiringWeapon"},     "air": False, "targetsorts": False},  # perma-stim while firing
     "StimpackMarauderWoLU":       {"validators": {"CasterIsFiringWeapon"},     "air": False, "targetsorts": False},
+    "HealWoLU":                   {"validators": {"WoLUHasFlag"},              "air": False, "targetsorts": False},  # player-gated heal autocast (mech+air+bio); inherits heal's energy/warp validators + AutoCastFilters
     "SnipeWoLU":                  {"validators": {"WoLUSnipeWorthwhile"},      "air": False, "targetsorts": True},   # smart-snipe priority
     "EMPWoLU":                    {"validators": {"WoLUTargetEnergyOrShields"},"air": False, "targetsorts": False},  # only vs energy/shields
     "ObliterateWoLU":             {"validators": set(),                        "air": False, "targetsorts": False},  # Psionic Lash: enemy in range

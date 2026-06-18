@@ -564,17 +564,44 @@
     <!-- Medic Adaptive Medpacks (AP): heal MECHANICAL + air, not just biological ground.
          The vanilla `heal` gates on TargetFilters "Ground,Biological,..." — a STRING field,
          and per-player string edits are silent no-ops (the genlib attempt never took, user
-         report). So clone `heal` (inherits the autocast, heal effect, range, sorts) and
-         override TargetFilters to allow any visible friendly non-structure unit (mechanical
-         AND biological, ground AND air). Appended to the Medic alongside vanilla heal
-         (enemy medics keep vanilla); both autocast, so the player's medic auto-heals
-         everything. Button gated WoLUHaveFlag. -->
+         report). So clone `heal` (inherits the heal effect, range, sorts) and override
+         TargetFilters to allow any visible friendly non-structure unit (mechanical AND
+         biological, ground AND air). Appended to the Medic alongside vanilla heal.
+
+         AUTOCAST + RULE-9 GATE (v0.3.11 — fixes "Skibi's Angels can't heal Spartan Companies"):
+         The player's *auto*-heal is what was missing on mechanical allies. `heal`'s autocast
+         is gated by its TargetFilters (Ground,Biological) → vanilla auto-heal never picks a
+         mechanical/air ally; the player had to click the button. HealWoLU inherits heal's
+         AutoCast flags AND drops the Ground,Biological require-list, so it CAN auto-acquire a
+         damaged Spartan Company / Goliath / tank / Viking. BUT HealWoLU is on the Medic's
+         AbilArray STATICALLY (global) → enemy Medics carry it too. An ungated autocast would
+         make ENEMY Medics auto-heal their mechanical allies as well = a rule-9 leak (and is the
+         latent state today, since the clone already inherits AutoCast=1). So we PLAYER-GATE the
+         autocast: explicit AutoCast/AutoCastOn (even though inherited) + an
+         AutoCastValidatorArray on WoLUHasFlag (the player-only WoLUHaveFlag upgrade). Net:
+           - PLAYER's Medic (flag set) auto-heals mechanical + air + bio via HealWoLU.
+           - ENEMY Medics (no flag) FAIL the autocast validator → HealWoLU never auto-fires for
+             them; they keep ONLY their vanilla biological `heal`. Enemies stay vanilla.
+         The button stays gated WoLUHaveFlag (manual cast = player only). The inherited vanilla
+         `heal` (index 3) still autocasts on bio allies; HealWoLU supersets it on the player's
+         Medic — the shared `Marker Link="Abil/MedivacHeal"` + the heal effect's `noMarkers`
+         validator coordinate the two so the SAME target isn't double-healed / double-drained
+         (the verified two-autocast precedent: the Medic `heal` + `MedivacDoubleBeamHeal` both
+         carry `Marker Link="Abil/MedivacHeal"` and the heal effect's `noMarkers` validator). -->
     <CAbilEffectTarget id="HealWoLU" parent="heal">
         <!-- Vanilla `heal` has no explicit Effect (defaults to its own id = the "heal"
              CEffectCreateHealer). A clone re-defaults to its OWN id "HealWoLU" (nonexistent)
              and would heal nothing — so set the effect explicitly to "heal". -->
         <Effect index="0" value="heal"/>
         <TargetFilters value="Visible;Self,Enemy,Structure,Missile,UnderConstruction,Dead,Hidden,Invulnerable"/>
+        <!-- Explicit autocast (parent supplies these, restated for clarity + so the gate below
+             reads as a complete autocast spec). AutoCastFilters / AutoCastRange / heal energy
+             cost are inherited from `heal` and already allow mechanical (no Biological req). -->
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <!-- Player-only autocast gate (rule 9): inherits heal's healCasterMinEnergy + NotWarpingIn
+             autocast validators AND adds WoLUHasFlag, so only the flag-bearing player auto-casts. -->
+        <AutoCastValidatorArray value="WoLUHasFlag"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="MedicHeal" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
 </Catalog>

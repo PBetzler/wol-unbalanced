@@ -11,7 +11,32 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis pass was run on each but came back **too uncertain to ship** — each lead below was found unreliable, so these need rigorous investigation before a fix lands (do NOT ship the first-pass guesses):
 
 - [ ] **Elite mercs STILL show the "heart" placeholder portrait in-game.** Recurring (v0.2.4 / v0.3.7#4 / v0.3.8). The Editor Previewer shows the portrait *resolves* (MercThor → "Portrait - Thor"), but in-game it's a heart → the portrait model isn't **preloaded** for the merc unit identity. ⚠ First-pass fix (local `Merc*Portrait` CModels at *guessed* `.m3` paths + *assumed* parent classes) is **exactly the v0.2.4 approach that already failed** — do not repeat. NEEDS: the EXACT verified preload pattern (check how `mods/_reference/moebius` wires its `MercMedic`/`MercHellion`/`MercReaper` portraits and whether they actually render), or an owner-driven in-game candidate test. Likely [GAME]-iteration.
-- [ ] **Merc Medics (`MercMedic`) can't heal Spartan Companies (`SpartanCompany`, the Goliath merc).** ⚠ First-pass blamed `HealWoLU.TargetFilters` — but that filter has **no required attribute** (just `Visible;…exclusions`), so it should already permit mechanical (and `SpartanCompany` IS `Mechanical`). The proposed "add `Biological,Mechanical` to the required side" is wrong (required side is AND → heals nothing). REAL blocker is elsewhere — trace the actual **heal EFFECT chain** (does the `heal`-parented effect itself gate Biological?) and whether `MercMedic` even carries/auto-targets the heal on a mechanical ally.
+- [~] **Merc Medics (`MercMedic`) can't heal Spartan Companies (`SpartanCompany`, the Goliath merc).**
+  **ROOT-CAUSED + FIXED (v0.3.11, [STATIC]; [GAME] confirm pending).** The *manual* heal already works
+  (HealWoLU's broadened `TargetFilters` has no Biological req, `SpartanCompany` IS `Mechanical,Armored`),
+  but the user-visible "can't heal" was the **autocast**: the gap was *auto*-heal of mechanical allies.
+  Trace: vanilla `heal` (`CAbilEffectTarget`, `mods/_reference/campaigns/liberty.sc2campaign/AbilData.xml`
+  ~line 2485) carries `AutoCast=1`/`AutoCastOn=1` but its **autocast acquisition is gated by its own
+  `TargetFilters` (`Ground,Biological,…`)** → vanilla auto-heal NEVER picks a mechanical/air ally; the
+  player had to click the button. `HealWoLU` (`parent="heal"`) inherits the AutoCast flags AND drops
+  `Ground,Biological`, so it CAN auto-acquire a damaged Spartan Company / Goliath / tank / Viking — and
+  the heal effect (`CEffectCreateHealer`), `healSmartTargetFilters` (`-;Enemy`), and `AutoCastFilters`
+  (`Visible;Neutral,Enemy`) gate NONE of them by attribute. **Contradiction resolved:** because
+  `HealWoLU` inherited the autocast, it was *already* a latent rule-9 leak — ENEMY Medics (who carry
+  `HealWoLU` on the global AbilArray) could auto-heal their mechanical allies too. **Fix:** make
+  `HealWoLU` a **player-gated autocast** — explicit `<Flags AutoCast/AutoCastOn>` + an
+  `<AutoCastValidatorArray value="WoLUHasFlag"/>` (the player-only `WoLUHaveFlag` upgrade). Net: the
+  PLAYER's Medic auto-heals mechanical + air + bio via HealWoLU; ENEMY Medics FAIL the autocast
+  validator (no flag) → keep ONLY vanilla biological `heal`. The inherited vanilla `heal` (idx 3) still
+  autocasts on bio allies; HealWoLU supersets it on the player's Medic and the shared
+  `Marker Link="Abil/MedivacHeal"` + the heal effect's `noMarkers` validator coordinate the two so the
+  same target isn't double-healed/double-drained (verified two-autocast precedent: `heal` +
+  `MedivacDoubleBeamHeal` both carry `Marker Link="Abil/MedivacHeal"`). `MercMedic` (parent `Medic`,
+  no AbilArray override) inherits the whole thing.
+  `src/mod/Base.SC2Data/GameData/AbilData.xml` (`HealWoLU`); `scripts/check_autocast.py` AUTOCAST_INTENT
+  gained `HealWoLU` = `{WoLUHasFlag}`. Gate green (genlib/lint/audit/preview CHECK8/check_autocast CHECK9).
+  ⚠ **[GAME]** owner confirms: the player's Medic/Skibi's Angels AUTO-heals a damaged Spartan
+  Company / Goliath when idle nearby, and nothing enemy-side changed (enemy Medics don't auto-heal mech).
 - [ ] **Spartan Companies can't fire (at least their AA missiles) while loaded in a Bunker.** Our mod lets mechanical/size-8 units load (open-issues #2/#3). ⚠ First-pass blamed a `CasterIsNotHidden` validator on `SpartanCompanyA`, but bunkered units stay the *caster* (not the bunker), so that's unconfirmed. NEEDS: the actual bunker passenger-weapon relay mechanism + why the AA weapon specifically doesn't fire (weapon flags / `Options` / the bunker's weapon handling for a non-infantry passenger).
 
 ## Editor verification pass (2026-06-17) — SC2 Editor Previewer, local build working
@@ -224,8 +249,12 @@ These shipped and *probably* work, but the field/semantics were assumptions. Ver
   question is **ANSWERED: NO** (the preview lens classifies `heal TargetFilters` as a NOOP string
   field; the dead edit was removed). But the feature **ships via the `HealWoLU` clone** (broadened
   `TargetFilters` baked in) on the Medic `AbilArray index 6` + Stetmann `index 5` — recipe
-  [09](examples/09-broaden-targeting.md). So nothing is missing; the only remaining check is the
-  [GAME]/Layer-3 one: confirm the Medic actually heals a Marauder/Viking in game (the clone's effect).
+  [09](examples/09-broaden-targeting.md). **v0.3.11 made HealWoLU a PLAYER-GATED AUTOCAST** (explicit
+  AutoCast flags + `AutoCastValidatorArray=WoLUHasFlag`) so the player's Medic now *auto*-heals
+  mechanical/air (not just on a manual click) while enemy Medics keep vanilla biological auto-heal —
+  see the v0.3.10-playtest "can't heal Spartan Companies" entry above. So nothing is missing; the only
+  remaining check is the [GAME]/Layer-3 one: confirm the Medic actually auto-heals a Marauder/Viking/
+  Goliath in game (the clone's autocast).
 - [x] **Risky field paths — CLASSIFIED by the preview lens / CHECK8 (2026-06-17), no diag needed.**
   `SummonMercenaries` `Charge.*`/`Cooldown.*` and cloak `Cost[0].Vital[Energy]` are **GOOD** (nested
   per-player scalars that apply — CHECK8 confirms the class; the manifest shows their finals).
