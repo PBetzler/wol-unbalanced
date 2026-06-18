@@ -6,6 +6,14 @@ Format: `- [ ]` open, `- [x]` resolved. Newest at the top of each section. When 
 
 Running gate: `python3 scripts/audit.py` catches the structural classes statically (missing/malformed actors, dead calldowns) before a build ships; the rest below need in-game observation.
 
+## v0.3.10 playtest bugs — reported, NOT yet fixed (→ v0.3.11)
+
+Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis pass was run on each but came back **too uncertain to ship** — each lead below was found unreliable, so these need rigorous investigation before a fix lands (do NOT ship the first-pass guesses):
+
+- [ ] **Elite mercs STILL show the "heart" placeholder portrait in-game.** Recurring (v0.2.4 / v0.3.7#4 / v0.3.8). The Editor Previewer shows the portrait *resolves* (MercThor → "Portrait - Thor"), but in-game it's a heart → the portrait model isn't **preloaded** for the merc unit identity. ⚠ First-pass fix (local `Merc*Portrait` CModels at *guessed* `.m3` paths + *assumed* parent classes) is **exactly the v0.2.4 approach that already failed** — do not repeat. NEEDS: the EXACT verified preload pattern (check how `mods/_reference/moebius` wires its `MercMedic`/`MercHellion`/`MercReaper` portraits and whether they actually render), or an owner-driven in-game candidate test. Likely [GAME]-iteration.
+- [ ] **Merc Medics (`MercMedic`) can't heal Spartan Companies (`SpartanCompany`, the Goliath merc).** ⚠ First-pass blamed `HealWoLU.TargetFilters` — but that filter has **no required attribute** (just `Visible;…exclusions`), so it should already permit mechanical (and `SpartanCompany` IS `Mechanical`). The proposed "add `Biological,Mechanical` to the required side" is wrong (required side is AND → heals nothing). REAL blocker is elsewhere — trace the actual **heal EFFECT chain** (does the `heal`-parented effect itself gate Biological?) and whether `MercMedic` even carries/auto-targets the heal on a mechanical ally.
+- [ ] **Spartan Companies can't fire (at least their AA missiles) while loaded in a Bunker.** Our mod lets mechanical/size-8 units load (open-issues #2/#3). ⚠ First-pass blamed a `CasterIsNotHidden` validator on `SpartanCompanyA`, but bunkered units stay the *caster* (not the bunker), so that's unconfirmed. NEEDS: the actual bunker passenger-weapon relay mechanism + why the AA weapon specifically doesn't fire (weapon flags / `Options` / the bunker's weapon handling for a non-infantry passenger).
+
 ## Editor verification pass (2026-06-17) — SC2 Editor Previewer, local build working
 
 The Windows local build now works end-to-end (portable MinGW+CMake → `mpqpatch.exe` →
