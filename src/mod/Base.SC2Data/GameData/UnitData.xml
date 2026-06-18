@@ -183,10 +183,18 @@
          units with MORE life than a Marine (65 after our +20) use the 60-heal marauder
          set so the heal stays proportional — Reaper (70), Ghost/Spectre (100), Hellion.
          Marine + Raynor variants keep the 30-heal Marine set. (open-issues: stim-60.) -->
+    <!-- Stim at cell 2,2 (NOT 2,1): the merged Reaper card already has the JetPack passive
+         display button (libertystory index 5) at 2,1, so a stim button at 2,1 COLLIDES with
+         it — one of the two silently hides (learnings: a colliding card button hides one). 2,2
+         is free (vanilla U238Rounds lived there before our index-6 override). This card is
+         inherited by Death Heads (MercReaper parent="Reaper"), so the merc gets the same clean
+         stim cell — fixes the owner's "Death Heads have no super stim" (the button was hidden
+         under JetPack at 2,1). The stim ABILITY (AbilArray index 3) was always present; the bug
+         was the colliding BUTTON cell. -->
     <CUnit id="Reaper">
         <AbilArray index="3" Link="StimpackMarauderWoLU"/>
         <CardLayouts index="0">
-            <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="1"/>
+            <LayoutButtons index="6" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
         </CardLayouts>
     </CUnit>

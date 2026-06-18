@@ -370,10 +370,15 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_AddBehaviorToType(libWoLU_Player, "Nova", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "Tosh", "SpectreCloakingFree");
         // Mercs inherit their counterpart's cloak: Dusk Wings (Banshee), Winged
-        // Nightmares (Wraith), Senior Ghost (Ghost).
+        // Nightmares (Wraith), Senior Ghost (Ghost), Death Heads (Reaper).
         libWoLU_AddBehaviorToType(libWoLU_Player, "DuskWing", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "MercWraith", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "MercSeniorGhost", "PersonalCloakingFree");
+        // Death Heads (MercReaper, parent="Reaper") — base Reaper IS cloaked above but the
+        // merc is a SEPARATE unit id, so the base-Reaper line never reached it (owner playtest:
+        // Death Heads weren't cloaked). Reaper has NO toggle cloak ability, so like the base
+        // Reaper/Medivac/Predator it needs ONLY the permanent buff (no ToggleCloakOn entry).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "MercReaper", "PersonalCloakingFree");
         // #7: sync the toggle cloak ability to ON so the DECLOAK button is shown for units
         // that have a toggle (the permanent PersonalCloakingFree leaves the toggle OFF →
         // shows CloakOn). Unit -> its cloak ability id (from the reference catalogs):

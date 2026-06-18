@@ -10,6 +10,39 @@ Running gate: `python3 scripts/audit.py` catches the structural classes statical
 
 Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis pass was run on each but came back **too uncertain to ship** — each lead below was found unreliable, so these need rigorous investigation before a fix lands (do NOT ship the first-pass guesses):
 
+- [~] **Death Heads (`MercReaper`, the Reaper merc) had NO cloak and NO super-stim; normal Reapers have both.**
+  Owner playtest 2026-06-18. Two SEPARATE root causes, both fixed (v0.3.11, [STATIC]; [GAME] confirm pending):
+  - **CLOAK — confirmed gap, fixed.** `LibWoLUnbalanced.galaxy` applies permanent free cloak via
+    `libWoLU_AddBehaviorToType(p, "<UnitType>", "PersonalCloakingFree")` on the 2 s periodic. The list
+    targets BASE unit ids (`Reaper`, `Ghost`, …) plus the cloak-capable mercs (`DuskWing`, `MercWraith`,
+    `MercSeniorGhost`) — but **`MercReaper` was missing**. `MercReaper` is a SEPARATE unit id from
+    `Reaper`, so the base-`Reaper` cloak line never reached it (recurring merc-parity class: per-player
+    loops keyed to the base id silently skip the elite mercs). **Fix:** added
+    `libWoLU_AddBehaviorToType(libWoLU_Player, "MercReaper", "PersonalCloakingFree");` in the mercs
+    block. Reaper has NO toggle cloak ability, so (like base Reaper/Medivac/Predator) it needs ONLY the
+    permanent buff — no `ToggleCloakOn` entry. Player-only (rule-9-safe; `MercReaper` is a player-exclusive
+    id). `src/mod/Base.SC2Data/LibWoLUnbalanced.galaxy`.
+  - **STIM — card-cell COLLISION, fixed.** The stim ABILITY and BUTTON were both [STATIC]-present on
+    `MercReaper` (proven via the card-merge simulator: `MercReaper`'s merged AbilArray + card are
+    byte-identical to base `Reaper` — both carry `StimpackMarauderWoLU` ability and the `Stim` button via
+    `parent="Reaper"`). The defect was a **card-cell collision**: our `Reaper` override placed the Stim
+    button at cell **R2,C1**, but the merged Reaper card ALREADY has the **JetPack passive display button**
+    (libertystory index 5) at R2,C1 → two buttons at one cell, one silently hides (learnings: a colliding
+    card button hides one of the two). **Fix:** moved the Reaper Stim button from R2,C1 → **R2,C2** (free;
+    vanilla `U238Rounds` lived there before our index-6 override). `MercReaper parent="Reaper"` inherits the
+    clean cell. The simulator now reports the stim button at R2,C2 with **zero collisions** on both Reaper
+    AND MercReaper. `src/mod/Base.SC2Data/GameData/UnitData.xml` (`Reaper` card). NB: base Reaper apparently
+    resolved the R2,C1 overlap in stim's favor in-game (owner said normal Reaper stim works), so the
+    collision was a latent risk that surfaced on the merc — moving the cell eliminates it as a variable for
+    both. **⚠ [GAME] owner confirms: Death Heads spawn cloaked (stay cloaked, free) AND show a working
+    super-stim button like a normal Reaper.**
+  - **Broader merc-parity audit (this pass).** Swept all 6 elite mercs for base-id-keyed per-player gaps:
+    cloak (`PersonalCloakingFree`/`ToggleCloakOn`), inherited stim, and the behavior/order periodic loops.
+    Only `MercReaper`'s cloak was a real gap (fixed). `MercWraith`/`MercSeniorGhost` cloak: correct.
+    `MercMedic`/`MercHellion`/`MercThor`: correctly have no cloak (their base units don't). Stim parity:
+    `MercHellion`/`MercSeniorGhost` inherit stim with no collision; the Ghost/MercSeniorGhost R2,C2 "overlap"
+    is the cloak toggle's On/Off pair (mutually exclusive by toggle state — vanilla, not a real collision).
+    No other clear gaps found.
 - [ ] **(PARKED — known cosmetic limitation, owner decision 2026-06-18) Elite mercs show the "heart" placeholder portrait in-game.** Recurring (v0.2.4 / v0.3.7#4 / v0.3.8). It is a **PRELOAD** failure — the portrait model isn't loaded into memory for the merc *calldown* identity — **NOT a path/reference problem.** Verified via git that v0.2.4's local `Merc*Portrait` CModels used the EXACT correct `.m3` paths (`Assets\Portraits\Terran\<Unit>Portrait\<Unit>Portrait.m3`, identical to the moebius `SCVPortrait` pattern) **and still hearted**; the current base-token references also heart. So **both** the base-token AND correct-path-local-CModel approaches fail → the model reference is not the lever. The SC2 Editor only shows the portrait *resolving* (it always did), never the in-game preload, so it **cannot validate a candidate** — any test is owner-in-game-only. Remaining untried levers, both uncertain: (a) re-parent each merc actor to its base unit's actor (likely inherits the same no-explicit-preload behavior → probably still hearts); (b) a map-level model preload (touches the 30 campaign maps = map-affecting + fragile). Cosmetic; **parked** unless the owner wants to spend an in-game iteration on the re-parent shot.
 - [~] **Medic / Skibi's Angels (`MercMedic`) can't heal mechanical units (Goliath / `SpartanCompany`).**
   **REAL ROOT CAUSE FOUND (v0.3.11, [STATIC]; [GAME] confirm pending) — the prior diagnosis below was
