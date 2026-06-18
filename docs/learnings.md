@@ -177,6 +177,28 @@ gotcha; authoritative details live in the code/plan, not here.
   so the space bar (and per-unit `CargoSize`) is what binds. Both `MaxCargoCount` and
   `TotalCargoSpace`/`MaxCargoSize` are scalar `CAbilTransport` fields editable per player; only
   the per-UNIT `CargoSize` is the load-time no-op.
+- **A TURRET-mounted weapon with a narrow `Arc` cannot fire from a bunker; an omni weapon (no
+  turret, default 360° `Arc`) can.** The engine fires a bunkered passenger's OWN weapons from the
+  bunker (the passenger stays the caster — `BunkerTransport.LoadCargoBehavior=BunkerWeaponRangeBonus`
+  even *adds* +1 range), but the stowed unit's model/turret can't articulate to aim. So a weapon
+  whose firing is gated by turret aim never connects. The verified diagnostic: a **Marine fires fine
+  from a bunker** because `GuassRifle` sets **no `Arc`** (engine default 360°) and has **no turret** →
+  omnidirectional. A **Goliath/Spartan Company AA does NOT fire** because each weapon sets
+  **`Arc=29.9926`** (a ~30° wedge) AND is turret-mounted (`Turret="SpartanCompany"` 135° yaw, or
+  `"FreeRotate"` 360° on the Multi-Lock-upgraded variant) — the 30° arc needs the turret to swing to
+  the target, which a stowed unit can't do; air targets (any bearing) fall outside the frozen wedge.
+  Ground targets often sit ahead of the bunker's frozen facing, so "at least the AA" fails first.
+  **NOT `CasterIsNotHidden`** — that validator sits on BOTH the ground and air effects identically
+  (and is undefined in the reference dump = a core validator used in vanilla only on burrow/baneling
+  self-spawns), so it can't explain an AA-*only* failure. **No weapon `Options` flag bypasses
+  facing** (`LockTurretWhileFiring` is the opposite lever; there's no ignore-facing/fire-from-cargo
+  flag). The ONLY candidate lever is per-player **`Weapon.Arc → 360`** (a GOOD scalar class, rule-9
+  safe — enemy Goliaths keep 29.99°), which would let the weapon fire any direction without the
+  turret aiming — **but only IF the engine lets a stowed unit acquire/fire at all, which is UNPROVEN
+  statically** (no vanilla precedent of a turret AA unit firing from a bunker). Treat `Arc=360` as an
+  owner-gated in-game candidate, not a confirmed fix; if it still doesn't fire air from a bunker, it's
+  an inherent SC2 turret-from-bunker limitation with no static fix. [STATIC root-cause; [GAME] for any
+  fix.]
 - **`removed="1"` on an array index is a tombstone the campaign uses to delete inherited
   entries** (e.g. libertystory strips the Marauder's `StimpackMarauder` via
   `<AbilArray index="3" removed="1"/>`). A later layer that sets the same index with a real
