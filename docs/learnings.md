@@ -91,6 +91,26 @@ gotcha; authoritative details live in the code/plan, not here.
   = vanilla). Per-player stat buffs (e.g. windup cap) go on the **clone id** at
   runtime — neither runtime edits on the vanilla id nor parent inheritance propagate
   to a clone after load.
+- **The merc/hero PARITY trap (recurring class — now gated by CHECK10).** Per-player buffs live
+  keyed to BASE unit ids in two places: (a) genlib `CatalogFieldValueModify` edits (keyed to the base
+  `id`) and (b) per-unit-type loops in the hand-written `LibWoLUnbalanced.galaxy`
+  (`libWoLU_AddBehaviorToType`/`ToggleCloakOn`/`GraduateSiegeRange` — keyed to a `unitType` string).
+  **NEITHER reaches a counterpart automatically:** a `parent=` elite merc (`Merc*`) inherits the base's
+  STATIC XML (AbilArray/CardLayouts/weapons/armor) but NOT the per-player (a) edits or (b) loops;
+  standalone mercs (`WarPig`/`DevilDog`/`HammerSecurity`/`SpartanCompany`/`SiegeBreaker`/`HelsAngel*`/
+  `DuskWing`/`DukesRevenge`) and heroes (`Raynor*`/`Tychus*`/`Swann`/`Stetmann`/`Nova`/`Tosh`/`Odin`) are
+  separate ids that inherit NOTHING. So a base-keyed buff silently SKIPS the merc/hero (Spartan ←
+  Goliath upgrades #12, Death Heads ← cloak + super-stim, Hammer Securities ← stim). When you add ANY
+  per-player Unit edit or galaxy per-type loop to a base unit, you MUST mirror it onto every
+  counterpart (genlib edit on the merc/hero id; a `libWoLU_*ToType(p, "<MercId>", …)` line in the
+  hand-lib), scaled per rule 4 (keep the merc's % advantage) / rule 10 (mirror for heroes). `scripts/
+  check_merc_parity.py` (**CHECK10**, in the gate) now enumerates each base's functional buffs and
+  FAILS if a counterpart is missing the same buff CLASS — so a future omission can't ship silently.
+  It checks PRESENCE not value (mercs keep a % advantage), excludes cost/Food (free calldowns / map-
+  placed heroes never pay), collapses same-effect ids to a class (`PersonalCloakingFree`≈
+  `SpectreCloakingFree`; any cloak toggle ⇒ `cloak-toggle`), and does NOT police cosmetic passive-
+  display card faces (display-only; audit.py's #3-class check already guards face↔capability). Genuine
+  N/A cases go in the script's `EXCEPTIONS` allowlist with a reason; a STALE exception also FAILs.
 - **Never clone unit types** — mission scripts check unit types ("all your Marines
   are dead", drop pods spawning `Marine`, …).
 - Static XML is global. Safe there: pure definitions, and additions to

@@ -6,6 +6,55 @@ Format: `- [ ]` open, `- [x]` resolved. Newest at the top of each section. When 
 
 Running gate: `python3 scripts/audit.py` catches the structural classes statically (missing/malformed actors, dead calldowns) before a build ships; the rest below need in-game observation.
 
+## Merc/hero parity guard (CHECK10) + full audit (2026-06-18)
+
+Owner's ask: "how do we stop this from happening?" — mercs/heroes/variants keep silently
+MISSING per-player upgrades their BASE unit has (Spartan ← Goliath #12, Death Heads ← cloak/stim,
+Hammer Securities ← stim, …). Built the PREVENTION mechanism + ran the full audit + fixed the gaps.
+
+- [x] **CHECK10 — `scripts/check_merc_parity.py` (wired into the gate: pre-commit + CI + CLAUDE.md
+  dev-loop).** For each base unit it enumerates the FUNCTIONAL per-player buffs it gets — (a) genlib
+  `CatalogFieldValueModify` Unit fields keyed to the base id, and (b) `LibWoLUnbalanced.galaxy`
+  per-unit-type loop memberships (cloak / def-matrix / graduate-range, by EFFECT CLASS so a
+  legitimate id difference like `PersonalCloakingFree` vs `SpectreCloakingFree` or `BansheeCloak`
+  vs `DuskWingBansheeCloakingField` isn't flagged) — then verifies each merc/hero counterpart has
+  the SAME CLASS of buff present (rule 4: values legitimately differ; it checks PRESENCE). `parent=`
+  elite mercs inherit static XML (abilities/cards/weapons) so they only need (a)+(b); standalone
+  mercs + heroes inherit nothing. **FAILS** on any un-excepted gap, and on a STALE exception (so the
+  allowlist can't rot). Self-test confirmed it catches a simulated regression (dropping MercThor's
+  Sight edit → FAIL). **SCOPE (deliberate):** checks the two FUNCTIONAL dimensions where the real
+  bugs lived; does NOT enforce the cosmetic WoLU passive-display *card faces* (`WoLUUpg*`/`ShapedHull`/
+  …) — those grant nothing (AbilCmd=255, display-only), are noisy to diff (vanilla campaign faces look
+  identical), and audit.py's #3-class check already guards face↔capability fit. Cost fields
+  (`CostResource[*]`/`Food`) are excluded wholesale (mercs are free calldowns, heroes are map-placed →
+  cost is never paid). **Exceptions allowlist: EMPTY** — after the cost-filter + class-collapse, every
+  remaining gap was a REAL functional gap and got fixed (below), so no per-pair exception was needed.
+
+- [x] **The 9 real gaps CHECK10 found, all FIXED in genlib (`scripts/genlib.py` → regenerated lib;
+  [STATIC] proven via CHECK8-GOOD + the parity check; [GAME] owner confirms in playtest).** Each is a
+  base-unit per-player Unit buff that never reached the counterpart (the recurring class):
+  - **Death Heads (`MercReaper`, parent=Reaper)** — missing Reaper's `Sight +2` (LTS),
+    `LifeRegenRate=2` (Combat Drugs), `LifeMax/LifeStart +10` (Ballistic Flightsuit). Added all four
+    (flat Add on top of the merc's elite 150 base keeps it ahead of the buffed base Reaper, rule 4).
+  - **Condor (`MercHellion`, parent=Hellion)** — missing Hellion's `LifeArmor +2` (Infernal Plating). Added.
+  - **Jotun (`MercThor`, parent=Thor)** — missing Thor's `Sight +2` (LTS). Added. (AA/ground range +
+    windup already reach it via inherited weapon ids; only the unit-keyed Sight was missing.)
+  - **Senior Ghost (`MercSeniorGhost`, parent=Ghost)** — missing Ghost's `Sight +2` (LTS). Added.
+    (Its 1.5× life/energy + the weapon-range LTS were already present; only Sight was missing.)
+  - **Hel's Angels (`HelsAngelFighter` + `HelsAngelAssault`, standalone Viking mercs)** — missing the
+    Viking's `Speed ×1.55` (Aesir Turbines). Added to both modes (Multiply preserves any % advantage).
+  These are CHECK8-GOOD scalar fields (Sight/LifeArmor/LifeRegenRate/LifeMax/Speed), player-only (the
+  ids are player-exclusive). **⚠ [GAME] owner confirms in playtest:** Death Heads regen + sight, Condor
+  armor, Jotun + Senior Ghost sight, and Hel's Angels move speed now match their base unit's buffs.
+
+- [x] **Confirmed NON-gaps (the audit's clean cases — no fix needed).** MercMedic/Stetmann: only
+  cost/Food differed (excepted — free calldown / map-placed). MercWraith: Wraith's buffs are on the
+  WraithA/G weapon ids (inherited via parent=) + cloak loops (already in the hand-lib) → no unit-field
+  gap. DuskWing: cloaks via `DuskWingBansheeCloakingField` (already in hand-lib; the class-collapse
+  recognizes it as `cloak-toggle`). DukesRevenge: uses its OWN `DukesRevenge*WoLU` ability clones +
+  has the def-matrix loop; no unit-field gap. WarPig/Raynor*/Swann/Tychus*/SpartanCompany/SiegeBreaker*/
+  Odin/Nova/Tosh: their functional field buffs were already present in genlib's parity sweep.
+
 ## v0.3.10 playtest bugs — reported, NOT yet fixed (→ v0.3.11)
 
 Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis pass was run on each but came back **too uncertain to ship** — each lead below was found unreliable, so these need rigorous investigation before a fix lands (do NOT ship the first-pass guesses):

@@ -26,5 +26,7 @@ jobs:
         run: python scripts/preview.py --check
       - name: Autocast/trigger CHECK9 (every autocast + reactive trigger matches its declared intent)
         run: python scripts/check_autocast.py
+      - name: Merc/hero parity CHECK10 (every base-unit per-player buff reaches its merc/hero counterpart)
+        run: python scripts/check_merc_parity.py
       - name: Dispatch-doctrine guard (CLAUDE.md PM/dispatch rules ↔ hook enforcement in sync)
         run: python scripts/check_dispatch_doctrine.py --quiet

@@ -362,6 +362,15 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyStart", p, "1.5", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyRegenRate", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy regen
+    CatalogFieldValueModify(c_gameCatalogUnit, "HelsAngelFighter", "Speed", p, "1.55", c_upgradeOperationMultiply);  // Hel's Angels: Viking Aesir Turbines +55% speed parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "HelsAngelAssault", "Speed", p, "1.55", c_upgradeOperationMultiply);
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercReaper", "Sight", p, "2", c_upgradeOperationAdd);  // Death Heads: Reaper LTS +2 sight parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercReaper", "LifeRegenRate", p, "2", c_upgradeOperationSet);  // Death Heads: Reaper Combat Drugs regen parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercReaper", "LifeMax", p, "10", c_upgradeOperationAdd);  // Death Heads: Reaper Ballistic Flightsuit +10 life parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercReaper", "LifeStart", p, "10", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercHellion", "LifeArmor", p, "2", c_upgradeOperationAdd);  // Condor: Hellion Infernal Plating +2 armor parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercThor", "Sight", p, "2", c_upgradeOperationAdd);  // Jotun: Thor LTS +2 sight parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "Sight", p, "2", c_upgradeOperationAdd);  // Senior Ghost: Ghost LTS +2 sight parity
 
     // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research3].Time", p, "30", c_upgradeOperationSet);

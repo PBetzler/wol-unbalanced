@@ -554,6 +554,37 @@ def emit():
         ("Unit", "MercSeniorGhost", "EnergyMax", "1.5", "Multiply", "Senior Ghost: 1.5x energy"),
         ("Unit", "MercSeniorGhost", "EnergyStart", "1.5", "Multiply", ""),
         ("Unit", "MercSeniorGhost", "EnergyRegenRate", "1.5", "Multiply", "Senior Ghost: 1.5x energy regen"),
+
+        # ========================================================================
+        # CHECK10 MERC/HERO-PARITY FIXES (rules 4/10). The per-player edits above are
+        # keyed to BASE unit ids; `parent=` elite mercs (Merc*) inherit the base's STATIC
+        # XML but NOT these per-player edits, and standalone mercs/heroes inherit nothing.
+        # So a base-keyed Unit buff silently SKIPS the counterpart (the recurring class
+        # scripts/check_merc_parity.py now guards). Mirror the FUNCTIONAL base buffs onto the
+        # counterparts that were missing them, scaled per rule 4 (keep the merc's % advantage)
+        # / rule 10 (mirror the base for heroes). Player-only (these ids are player-exclusive).
+        # ========================================================================
+        # -- Hel's Angels (Viking merc, both modes): Aesir Turbines +55% speed parity. Multiply
+        #    preserves any merc % advantage (= the base VikingFighter/VikingAssault edit). --
+        ("Unit", "HelsAngelFighter", "Speed", "1.55", "Multiply", "Hel's Angels: Viking Aesir Turbines +55% speed parity"),
+        ("Unit", "HelsAngelAssault", "Speed", "1.55", "Multiply", ""),
+        # -- Death Heads (Reaper merc, parent="Reaper"): inherit the Reaper's per-player buffs
+        #    the merc was missing (base Reaper edits don't reach a parent= clone). LTS sight,
+        #    Combat-Drugs regen (Set, same as base), Ballistic Flightsuit +10 life (flat Add on
+        #    top of the merc's elite 150 base — keeps it ahead of the buffed base Reaper, rule 4). --
+        ("Unit", "MercReaper", "Sight", "2", "Add", "Death Heads: Reaper LTS +2 sight parity"),
+        ("Unit", "MercReaper", "LifeRegenRate", "2", "Set", "Death Heads: Reaper Combat Drugs regen parity"),
+        ("Unit", "MercReaper", "LifeMax", "10", "Add", "Death Heads: Reaper Ballistic Flightsuit +10 life parity"),
+        ("Unit", "MercReaper", "LifeStart", "10", "Add", ""),
+        # -- Condor (Hellion merc, parent="Hellion"): Infernal Plating +2 armor parity. --
+        ("Unit", "MercHellion", "LifeArmor", "2", "Add", "Condor: Hellion Infernal Plating +2 armor parity"),
+        # -- Jotun (Thor merc, parent="Thor"): LTS +2 sight parity (the AA/ground range + windup
+        #    reach it via inherited weapon ids; only the unit-keyed Sight was missing). --
+        ("Unit", "MercThor", "Sight", "2", "Add", "Jotun: Thor LTS +2 sight parity"),
+        # -- Senior Ghost (Ghost merc, parent="Ghost"): LTS +2 sight parity (its 1.5x life/energy
+        #    is above; the Ghost weapon-range LTS reaches it via the inherited C10CanisterRifle id;
+        #    only the unit-keyed Sight was missing). --
+        ("Unit", "MercSeniorGhost", "Sight", "2", "Add", "Senior Ghost: Ghost LTS +2 sight parity"),
         # (Midnight Riders / Brynhilds removed per owner — their intended Liberator/Valkyrie
         #  models don't exist in WoL, so they only ever looked like a Viking/Wraith.)
     ]

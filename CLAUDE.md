@@ -23,6 +23,7 @@ python3 scripts/galaxy_lint.py   # MANDATORY before build — catches black-map 
 python3 scripts/audit.py         # static catalog/actor audit — catches sphere-no-model + dead calldowns
 python3 scripts/preview.py --check  # CHECK8: every per-player edit sits on a verified-applying field class (no no-op runtime edits). Plain `preview.py` writes build/preview/buff-manifest.md (every buff value)
 python3 scripts/check_autocast.py   # CHECK9: every autocast + reactive (DamageResponse) trigger matches its declared INTENT (edit the spec in scripts/check_autocast.py when intent changes)
+python3 scripts/check_merc_parity.py  # CHECK10: every base-unit per-player buff (genlib field + galaxy loop) reaches its merc/hero counterpart — guards the recurring "merc silently misses an upgrade" class (allowlist genuine N/A in the script's EXCEPTIONS). Run AFTER genlib.py (it parses the generated lib).
 python3 scripts/build.py build   # patch maps + assemble campaign into build/
 python3 scripts/build.py install # copy into /Applications/StarCraft II
 ```
