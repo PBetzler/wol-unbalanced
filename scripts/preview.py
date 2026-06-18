@@ -119,7 +119,7 @@ def classify(kind, field):
     if kind == "Unit" and re.match(r"CostResource\[", f):
         return GOOD, ""
     # Weapon scalars.
-    WEAPON_SCALARS = {"DamagePoint", "Period", "Backswing", "Range", "AllowedMovement"}
+    WEAPON_SCALARS = {"DamagePoint", "Period", "Backswing", "Range", "AllowedMovement", "Arc"}
     if kind == "Weapon" and f in WEAPON_SCALARS:
         return GOOD, ""
     # Effect scalars.
