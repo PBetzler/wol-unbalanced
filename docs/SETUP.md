@@ -194,23 +194,19 @@ Same caveat on the lib name/location and on whether `-lz -lbz2` are needed.
 | Thing | Windows (default) | macOS |
 |---|---|---|
 | SC2 install dir | `C:\Program Files (x86)\StarCraft II` | `/Applications/StarCraft II` |
-| Override env var (install target) | `WOLU_SC2_USER_DIR` (relocated/OneDrive Documents, or point at the install dir for the old behavior) | `WOLU_SC2_USER_DIR` |
+| Override env var | `WOLU_SC2_DIR` (set if SC2 is elsewhere, e.g. `D:\...`) | `WOLU_SC2_DIR` |
 | SC2 Editor exe | `…\StarCraft II\Support64\SC2Editor_x64.exe` (launch via Battle.net → SC2 → "Launch Editor", or directly) | crashes on startup on this Mac |
-| `install` target (the **user**-mods root CCM/Editor/game load from) | `…\Documents\StarCraft II\Maps\Campaign` + `…\Mods` | `~/Library/Application Support/Blizzard/StarCraft II/{Maps/Campaign,Mods}` |
+| `install` target | `…\StarCraft II\Maps\Campaign` + `…\Mods` | same, under `/Applications/StarCraft II` |
 | CCM (Custom Campaign Manager) | a portable `.NET` WinForms `.exe` (runs natively on Windows; point its file picker at the SC2 folder) | needs Wine; only used for end-user-parity checks |
 
-`build.py install` targets the **user** SC2 folder (Documents on Windows / Application Support on
-macOS) — the one CCM, the Editor, and the game all load user mods/maps from — so a single `install`
-can't be shadowed by a CCM-staged copy in that folder (the old install-dir target was). Override
-with `WOLU_SC2_USER_DIR` (relocated/OneDrive Documents, or point it at the install dir to restore
-the old behavior):
+`build.py`'s install path is now OS-aware (Windows default above, Mac default above, `WOLU_SC2_DIR`
+override on either). To install elsewhere:
 ```bat
-set WOLU_SC2_USER_DIR=D:\Games\StarCraft II
+set WOLU_SC2_DIR=D:\Games\StarCraft II
 python scripts\build.py install
 ```
-(`build`/`package` never touch this dir, so a wrong/missing path can't block a build — only
-`install`/`uninstall` use it. Don't keep a copy in BOTH the user folder and the install dir — the
-game/Editor search both and may open the stale one.)
+(`build`/`package` never touch the SC2 dir, so a wrong/missing path can't block a build — only
+`install`/`uninstall` use it.)
 
 ---
 

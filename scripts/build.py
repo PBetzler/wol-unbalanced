@@ -33,25 +33,20 @@ MPQPATCH = os.path.join(ROOT, "tools",
                         "mpqpatch.exe" if os.name == "nt" else "mpqpatch")
 
 
-def _default_user_dir() -> str:
-    r"""The StarCraft II USER folder — `Documents\StarCraft II` on Windows,
-    `~/Library/Application Support/Blizzard/StarCraft II` on macOS. This is the user
-    'Maps + Mods' root that the game, the Editor, AND CCM all load from, so `install`
-    targets it. (We used to install into the game's install dir — `…\Program Files (x86)\
-    StarCraft II\Maps|Mods` — but a CCM-staged copy in this user folder shadowed it, so we
-    could end up testing a stale build. One canonical home avoids that; point the override at
-    the install dir to restore the old behavior.) Override with $WOLU_SC2_USER_DIR (e.g. a
-    relocated/OneDrive Documents, or the install dir). Only `install`/`uninstall` touch this;
-    `build`/`package` do not, so a missing/wrong path never blocks a build."""
-    override = os.environ.get("WOLU_SC2_USER_DIR")
+def _default_sc2_dir() -> str:
+    """The StarCraft II install dir, OS-specific. Override with $WOLU_SC2_DIR (any OS)
+    if SC2 lives somewhere non-default — e.g. a D: drive on Windows, or an EU/region
+    folder. Only `install`/`uninstall` touch this; `build`/`package` do not, so a
+    missing/wrong SC2 dir never blocks a build."""
+    override = os.environ.get("WOLU_SC2_DIR")
     if override:
         return override
-    if os.name == "nt":  # Windows — Documents\StarCraft II (the user-mods root)
-        return os.path.join(os.path.expanduser("~"), "Documents", "StarCraft II")
-    return os.path.expanduser("~/Library/Application Support/Blizzard/StarCraft II")  # macOS
+    if os.name == "nt":  # Windows — default Battle.net install location
+        return r"C:\Program Files (x86)\StarCraft II"
+    return "/Applications/StarCraft II"  # macOS
 
 
-USER_DIR = _default_user_dir()
+SC2 = _default_sc2_dir()
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
@@ -352,8 +347,8 @@ def package() -> None:
 
 
 def install() -> None:
-    maps_dst = os.path.join(USER_DIR, "Maps", "Campaign")
-    mods_dst = os.path.join(USER_DIR, "Mods")
+    maps_dst = os.path.join(SC2, "Maps", "Campaign")
+    mods_dst = os.path.join(SC2, "Mods")
     os.makedirs(maps_dst, exist_ok=True)
     os.makedirs(mods_dst, exist_ok=True)
     for name in os.listdir(os.path.join(BUILD, "Campaign")):
@@ -366,16 +361,16 @@ def install() -> None:
             shutil.copytree(src, dst)
         else:
             shutil.copy2(src, dst)
-    print(f"installed -> {USER_DIR} (Maps/Campaign + Mods)")
+    print(f"installed -> {SC2} (Maps/Campaign + Mods)")
 
 
 def uninstall() -> None:
     for name in os.listdir(os.path.join(BUILD, "Campaign")):
-        p = os.path.join(USER_DIR, "Maps", "Campaign", name)
+        p = os.path.join(SC2, "Maps", "Campaign", name)
         if os.path.exists(p):
             os.unlink(p)
     for name in os.listdir(os.path.join(BUILD, "Mods")):
-        p = os.path.join(USER_DIR, "Mods", name)
+        p = os.path.join(SC2, "Mods", name)
         if os.path.isdir(p):
             shutil.rmtree(p)
         elif os.path.exists(p):
