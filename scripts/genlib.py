@@ -497,17 +497,9 @@ def emit():
         ("Weapon", "SpartanCompanyG", "Range", "1", "Add", ""),
         ("Weapon", "SpartanCompanyAUpgraded", "Range", "3", "Add", ""),
         ("Weapon", "SpartanCompanyGUpgraded", "Range", "1", "Add", ""),
-        # Spartan-from-bunker fire (v0.3.11 owner-test CANDIDATE — see open-issues "bunker"):
-        # the 4 SpartanCompany weapons have a ~30deg turret Arc; a STOWED (bunkered) unit can't
-        # swing its turret to aim, so an air target at any bearing falls outside the frozen
-        # wedge (ground often sits ahead of the bunker, so the AA fails first). Per-player
-        # Arc -> 360 lets them fire any direction WITHOUT turret aiming. Rule-9 safe: enemy
-        # Goliaths/Spartans keep 29.99. UNVERIFIED — may not work if the engine blocks a stowed
-        # unit's weapon ACQUISITION entirely; owner playtests whether a bunkered Spartan AAs.
-        ("Weapon", "SpartanCompanyA", "Arc", "360", "Set", "Spartan AA: fire any bearing (bunker turret-aim workaround)"),
-        ("Weapon", "SpartanCompanyG", "Arc", "360", "Set", ""),
-        ("Weapon", "SpartanCompanyAUpgraded", "Arc", "360", "Set", ""),
-        ("Weapon", "SpartanCompanyGUpgraded", "Arc", "360", "Set", ""),
+        # (Spartan-from-bunker AA: the per-player Arc=360 candidate was REVERTED v0.3.11 — owner
+        #  playtest confirmed a bunkered Spartan STILL won't fire AA, so it's an inherent SC2
+        #  turret-from-bunker limitation, not fixable by widening the weapon arc. open-issues "bunker".)
         # SpartanCompany (Goliath merc) parity (v0.3.8). Ground truth: SpartanCompany base
         # LifeMax=165 (liberty.sc2campaign), Goliath base 125 (libertystory layer wins) →
         # buffed Goliath = 125 + 25 (Shaped Hull) = 150. The merc's pre-buff advantage is

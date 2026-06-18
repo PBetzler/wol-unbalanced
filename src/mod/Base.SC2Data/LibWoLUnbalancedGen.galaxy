@@ -332,10 +332,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyG", "Range", p, "1", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyAUpgraded", "Range", p, "3", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyGUpgraded", "Range", p, "1", c_upgradeOperationAdd);
-    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyA", "Arc", p, "360", c_upgradeOperationSet);  // Spartan AA: fire any bearing (bunker turret-aim workaround)
-    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyG", "Arc", p, "360", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyAUpgraded", "Arc", p, "360", c_upgradeOperationSet);
-    CatalogFieldValueModify(c_gameCatalogWeapon, "SpartanCompanyGUpgraded", "Arc", p, "360", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeMax", p, "33", c_upgradeOperationAdd);  // Spartan Company: parity buff (165 -> 198 = buffed Goliath 150 × 1.32)
     CatalogFieldValueModify(c_gameCatalogUnit, "SpartanCompany", "LifeStart", p, "33", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogWeapon, "SiegeBreaker", "Range", p, "1", c_upgradeOperationAdd);  // Siege Breakers: LTS mobile range
