@@ -223,6 +223,13 @@
             <LayoutButtons index="11" AbilCmd="EMPWoLU,Execute"/>
             <LayoutButtons index="13" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="1" Column="1"/>
             <LayoutButtons index="14"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
+            <!-- Permanent-cloak: tombstone the Cloak On (idx 9, GhostCloak,On / CloakOnGhost) +
+                 Cloak Off (idx 10, GhostCloak,Off / CloakOff) pair. The unit stays free-cloaked
+                 by PersonalCloakingFree (galaxy periodic). Card buttons are player-UI-only -> the
+                 GhostCloak ABILITY is kept on the AbilArray so enemy ghosts still cloak (rule 9).
+                 Indices verified via the card-merge sim (audit CHECK5). -->
+            <LayoutButtons index="9" removed="1"/>
+            <LayoutButtons index="10" removed="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Spectre">
@@ -232,6 +239,12 @@
             <LayoutButtons index="12" AbilCmd="ObliterateWoLU,Execute"/>
             <LayoutButtons index="14" Face="Stim" Type="AbilCmd" AbilCmd="StimpackMarauderWoLU,Execute" Row="1" Column="0"/>
             <LayoutButtons index="15"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="4"/></LayoutButtons>
+            <!-- Permanent-cloak: tombstone the Cloak On (idx 4, RogueGhostCloak,On / CloakOnSpectre)
+                 + Cloak Off (idx 5, RogueGhostCloak,Off / CloakOff) pair. Free-cloaked by
+                 SpectreCloakingFree (galaxy periodic). The RogueGhostCloak ABILITY is kept so enemy
+                 spectres still cloak (rule 9). Indices verified via the card-merge sim (audit CHECK5). -->
+            <LayoutButtons index="4" removed="1"/>
+            <LayoutButtons index="5" removed="1"/>
         </CardLayouts>
     </CUnit>
 
@@ -288,6 +301,19 @@
                  display-only passives, AbilCmd=255 -> nothing functional changes.) -->
             <LayoutButtons index="8"><Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
             <LayoutButtons index="9"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+        </CardLayouts>
+    </CUnit>
+
+    <!-- Dusk Wings (Banshee merc, player-exclusive): the vanilla card carries a manual
+         Cloak On (CloakOnBanshee, idx 5) + Cloak Off (CloakOff, idx 6) pair. Owner wants NO
+         cloak buttons — the unit is permanently free-cloaked by PersonalCloakingFree (galaxy
+         periodic), so the toggle is redundant clutter. Tombstone both buttons; the galaxy
+         ToggleCloakOn(DuskWing,...) line is dropped in tandem. No later layer edits this card,
+         so the vanilla indices 5/6 are the effective indices (audit CHECK5 verifies the merge). -->
+    <CUnit id="DuskWing">
+        <CardLayouts index="0">
+            <LayoutButtons index="5" removed="1"/>
+            <LayoutButtons index="6" removed="1"/>
         </CardLayouts>
     </CUnit>
 
@@ -459,6 +485,23 @@
         <CardLayouts index="0">
             <LayoutButtons index="7"><Face value="WoLUUpgLaserTargeting"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
             <LayoutButtons index="8"><Face value="ShapedHull"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <!-- Permanent-cloak: tombstone the Cloak On (idx 5, BansheeCloak,On / CloakOnBanshee) +
+                 Cloak Off (idx 6, BansheeCloak,Off / CloakOff) pair. Free-cloaked by
+                 PersonalCloakingFree (galaxy periodic). The BansheeCloak ABILITY is kept so enemy
+                 banshees still cloak (rule 9). Indices verified via the card-merge sim (audit CHECK5). -->
+            <LayoutButtons index="5" removed="1"/>
+            <LayoutButtons index="6" removed="1"/>
+        </CardLayouts>
+    </CUnit>
+    <!-- Wraith: permanent-cloak. Tombstone the Cloak On (idx 5, WraithCloak,On / WraithCloakOn)
+         + Cloak Off (idx 6, WraithCloak,Off / WraithCloakOff) pair. The unit stays free-cloaked
+         by PersonalCloakingFree (galaxy periodic). Card buttons are player-UI-only -> the
+         WraithCloak ABILITY is kept (not touched) so enemy wraiths still cloak (rule 9). No prior
+         CUnit override existed for the Wraith; indices verified via the card-merge sim (audit CHECK5). -->
+    <CUnit id="Wraith">
+        <CardLayouts index="0">
+            <LayoutButtons index="5" removed="1"/>
+            <LayoutButtons index="6" removed="1"/>
         </CardLayouts>
     </CUnit>
     <CUnit id="Medivac">
@@ -607,6 +650,17 @@
         <ShieldRegenDelay value="10"/>
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
         <LifeArmorName value="Unit/LifeArmorName/TerranShipPlating"/>
+        <!-- Permanent-cloak: the merc's OWN merged card still shows the Wraith Cloak On (idx 5,
+             WraithCloak,On) + Cloak Off (idx 6, WraithCloak,Off) pair — the base Wraith tombstone
+             above does NOT propagate to a parent= clone's card (the clone re-resolves its parent's
+             vanilla card, then our base-Wraith override applies; but to be unambiguous the merc
+             tombstones its own indices). Free-cloaked by PersonalCloakingFree (galaxy periodic);
+             player-exclusive merc, so removing the buttons is rule-9-safe. Indices verified via the
+             card-merge sim for MercWraith specifically (audit CHECK5). -->
+        <CardLayouts index="0">
+            <LayoutButtons index="5" removed="1"/>
+            <LayoutButtons index="6" removed="1"/>
+        </CardLayouts>
     </CUnit>
 
     <!-- (Midnight Riders / Brynhilds removed per owner: their intended Liberator and Valkyrie
@@ -628,6 +682,17 @@
         <ShieldArmorName value="Unit/ShieldArmorName/WoLUDefensiveMatrix"/>
         <LifeArmorName value="Unit/LifeArmorName/TerranInfantryArmor"/>
         <BehaviorArray Link="WoLUSeniorGhostBoost"/>
+        <!-- Permanent-cloak: the merc inherits the base Ghost card via parent="Ghost", and the
+             base-Ghost cloak-button tombstones (idx 9/10) DO carry through the parent= resolve —
+             but the merc re-states them explicitly so the removal is unambiguous on its own merged
+             card (Cloak On idx 9 = GhostCloak,On / CloakOnGhost; Cloak Off idx 10 = GhostCloak,Off
+             / CloakOff). Free-cloaked by PersonalCloakingFree (galaxy periodic); player-exclusive
+             merc, rule-9-safe. Indices verified via the card-merge sim for MercSeniorGhost
+             specifically (audit CHECK5). -->
+        <CardLayouts index="0">
+            <LayoutButtons index="9" removed="1"/>
+            <LayoutButtons index="10" removed="1"/>
+        </CardLayouts>
     </CUnit>
 
     <!-- Merc Compound: the extra elite mercs live on a SECOND card page (a submenu), so

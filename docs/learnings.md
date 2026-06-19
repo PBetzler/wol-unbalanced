@@ -186,6 +186,26 @@ gotcha; authoritative details live in the code/plan, not here.
   (Reaper/Medivac/Predator) just keep the permanent buff. Map: Ghost=GhostCloak,
   Banshee=BansheeCloak, Wraith=WraithCloak, Spectre=RogueGhostCloak,
   DuskWing=DuskWingBansheeCloakingField; heroes/mercs inherit the base's id.
+- **The SIMPLER way to handle a permanently-cloaked unit's UI is to TOMBSTONE both Cloak
+  On/Off card buttons, not to sync the toggle ON** (owner preference, v0.3.11): with
+  PersonalCloakingFree/SpectreCloakingFree the unit is already cloaked for free, so a toggle
+  pair is just clutter. Tombstone via a `CUnit` override `<CardLayouts index="0"><LayoutButtons
+  index="N" removed="1"/>…`. **Rule 9 is preserved by tombstoning the BUTTONS only, never the
+  ABILITY:** cards are player-UI-only (enemies render no command card and keep their cloak via
+  AI), so removing the `GhostCloak`/etc ability would break enemy cloaking — keep it on the
+  AbilArray. When all cloaked units lose their buttons, the whole `libWoLU_ToggleCloakOn`
+  trigger becomes dead and goes away. **Merged cloak-button indices (verified via the audit.py
+  `merge_unit_card` sim — DON'T eyeball):** Ghost On=9/Off=10, Banshee On=5/Off=6, Wraith
+  On=5/Off=6, Spectre On=4/Off=5, MercWraith On=5/Off=6, MercSeniorGhost On=9/Off=10.
+  **Two non-obvious findings:** (1) **Nova and Tosh have NO Cloak On/Off button pair at all** —
+  the heroes show a *passive* `PermanentlyCloakedNova`/`…Tosh` display face (Type=Passive, no
+  AbilCmd) and never carry `GhostCloak`/`RogueGhostCloak` as a unit ability, so there is nothing
+  to tombstone for them (and they're player-exclusive, so rule 9 is moot regardless). (2) **A
+  `parent=`-merc's card still shows the base unit's cloak buttons on the merc's OWN merged card**
+  — `MercWraith parent="Wraith"` and `MercSeniorGhost parent="Ghost"` resolve the parent's
+  vanilla card, so the buttons reappear; tombstone them EXPLICITLY on the merc's own `CUnit`
+  (don't assume the base-unit tombstone propagates — re-state the indices on the merc to be
+  unambiguous). Same indices as the base because the card is inherited 1:1.
 - **`ShieldArmorName` (and `LifeArmorName`) must be a string-table KEY, not a literal** —
   vanilla uses `Unit/ShieldArmorName/ProtossPlasmaShields`. A raw value like
   `"Defensive Matrix"` shows **"unknown"** in the inspect panel. Add a `Unit/ShieldArmorName/<id>`
@@ -436,6 +456,24 @@ gotcha; authoritative details live in the code/plan, not here.
   counterpart's tech group — skip Locked mercs and rule 3 gating is preserved.
 - Lab research lives in `libCamp_gv_tSX_ResearchState[1..20]` as adjacent pairs
   (Raven/SV = 7/8, Predator/Hercules = 15/16); Ghost/Spectre are tech groups 20/21.
+- **In WoL the player-facing weapon/armor RESEARCHES are NOT the base `Terran*Weapons/ArmorsLevelN`
+  ids — they are the icon-only wrappers `Terran*WeaponsUltraCapacitorsLevelN` /
+  `Terran*ArmorsVanadiumPlatingLevelN`.** The campaign (libertystory) overrides
+  `EngineeringBayResearch` (and `ArmoryResearch`) to grant the UltraCapacitors/VanadiumPlating
+  ids (`libertystory.sc2campaign/AbilData.xml`; the wrapper upgrades are defined
+  `parent=`-chained off `…UltraCapacitors`/`…VanadiumPlating` in
+  `liberty.sc2campaign/UpgradeData.xml`). Those wrappers are display-only — the real
+  +damage/+level/+armor `EffectArray`s live on the **base** `Terran*Weapons/ArmorsLevelN` ids
+  (`libertystory.sc2campaign/UpgradeData.xml`: e.g. `TerranVehicleWeaponsLevel1` → `ThorsHammerDamage.Amount`,
+  `TerranShipWeaponsLevel1` → `WraithGU.Amount`, `TerranVehicle/ShipArmorsLevelN` → Diamondback/Hercules armor).
+  **So any trigger that keys off "did the player research weapons/armor?" must check the
+  UltraCapacitors/VanadiumPlating ids, NOT the base `Level` ids** — `TechTreeUpgradeCount`
+  on the base id stays 0 while the player researches the wrapper. This bit the Eng Bay
+  "combined upgrade" sync (`libWoLU_SyncWeaponArmorLevels`): it detected base
+  `TerranInfantryWeapons/ArmorsLevelN`, never matched, so vehicle+ship (factory + flying)
+  units never got the grant — infantry buffed, vehicles/ships didn't (owner playtest). Fixed
+  by OR-detecting both id families (an absent id just returns 0, harmless) while keeping the
+  base-`Level` ids as the GRANT targets (they carry the real effects).
 - Campaign upgrades already list **merc** units in their `EffectArray`s (e.g.
   `CombatShield` covers `WarPig`) but never heroes — extend via XML `CUpgrade`
   appends (`MarauderLifeBoost` = Kinetic Foam).

@@ -50,7 +50,7 @@ SC2 = _default_sc2_dir()
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
-VERSION = "0.3.11"
+VERSION = "0.3.12"
 
 # --- Optional Nightmare-difficulty base (LOCAL-ONLY) -------------------------------
 # `python3 scripts/build.py build nightmare` (or `package nightmare`) layers our mod on

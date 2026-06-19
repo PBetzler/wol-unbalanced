@@ -18,7 +18,6 @@ const int libWoLU_Player = 1;
 void libWoLU_SyncWeaponArmorLevels (int p);
 void libWoLU_DisableArmoryResearch (int p);
 void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
-void libWoLU_ToggleCloakOn (int p, string unitType, string cloakAbil);
 void libWoLU_GraduateSiegeRange (int p, string unitType);
 void libWoLU_SynthesizeVespene (int p);
 void libWoLU_ForceGrantAllTechRewards (int p);
@@ -219,19 +218,40 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // indexed-array edit is a no-op (top-level Amount applies, array element does not) and
     // the flatten needs the Shaped-Blast clone pattern instead (open-issues: damage display).
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag3: gAmt=" + CatalogFieldValueGet(c_gameCatalogEffect, "C10CanisterRifle", "Amount", libWoLU_Player) + " gLgt=" + CatalogFieldValueGet(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", libWoLU_Player)));
+    // TEMPORARY weapon/armor-sync diag (REMOVABLE once owner confirms the Eng Bay combined
+    // upgrades lift vehicle + ship units). infW = the infantry-weapon upgrade we now DETECT
+    // (UltraCapacitors L1, the campaign-granted id); vehW/shipW = the vehicle/ship weapon
+    // levels AFTER the sync grants. Healthy after researching weapons L1: infW>=1, vehW>=1,
+    // shipW>=1 (the sync fired and the grants landed). If infW>=1 but vehW=0/shipW=0 the
+    // grant didn't take; if infW=0 the detection still misses.
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diagUpg: infW=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranInfantryWeaponsUltraCapacitorsLevel1", c_techCountCompleteOnly)) + " vehW=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranVehicleWeaponsLevel1", c_techCountCompleteOnly)) + " shipW=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipWeaponsLevel1", c_techCountCompleteOnly))));
     return true;
 }
 
 // Engineering Bay rework: its infantry weapon/armor researches (30 s, see generated
 // lib) act as COMBINED upgrades — completing level N also grants the vehicle and ship
 // equivalents. The Armory building's own researches are disabled as redundant.
+//
+// DETECTION FIX (the buff-only-infantry bug): the campaign (libertystory) overrides
+// EngineeringBayResearch to grant the icon-only wrapper upgrades
+// TerranInfantryWeaponsUltraCapacitorsLevel{N} / TerranInfantryArmorsVanadiumPlatingLevel{N}
+// (liberty.sc2campaign UpgradeData.xml), NOT the base TerranInfantryWeapons/ArmorsLevel{N}.
+// So keying detection off the base Level ids never matched → the vehicle/ship grants below
+// never fired (factory + flying units stayed un-upgraded). We OR both id families: an
+// absent/incomplete id just returns 0 from TechTreeUpgradeCount, so checking the extra id is
+// harmless. The GRANT targets stay the base TerranVehicle/ShipWeapons/ArmorsLevel{N} ids —
+// those carry the real +damage/+level/+armor EffectArrays for Thor/Goliath/Diamondback/Siege
+// Tank/Wraith/BC/Hercules/etc (incl. mercs/heroes, libertystory UpgradeData.xml).
 void libWoLU_SyncWeaponArmorLevels (int p) {
     int n;
     string lvl;
     n = 1;
     while (n <= 3) {
         lvl = IntToString(n);
-        if (TechTreeUpgradeCount(p, "TerranInfantryWeaponsLevel" + lvl, c_techCountCompleteOnly) > 0) {
+        // Weapons: fire when EITHER the campaign's UltraCapacitors wrapper OR the base
+        // infantry-weapons Level upgrade is complete (OR-detection robust to the id ambiguity).
+        if (TechTreeUpgradeCount(p, "TerranInfantryWeaponsUltraCapacitorsLevel" + lvl, c_techCountCompleteOnly) > 0
+            || TechTreeUpgradeCount(p, "TerranInfantryWeaponsLevel" + lvl, c_techCountCompleteOnly) > 0) {
             if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsLevel" + lvl, c_techCountCompleteOnly) == 0) {
                 TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsLevel" + lvl, 1);
             }
@@ -239,7 +259,10 @@ void libWoLU_SyncWeaponArmorLevels (int p) {
                 TechTreeUpgradeAddLevel(p, "TerranShipWeaponsLevel" + lvl, 1);
             }
         }
-        if (TechTreeUpgradeCount(p, "TerranInfantryArmorsLevel" + lvl, c_techCountCompleteOnly) > 0) {
+        // Armor: fire when EITHER the campaign's VanadiumPlating wrapper OR the base
+        // infantry-armors Level upgrade is complete.
+        if (TechTreeUpgradeCount(p, "TerranInfantryArmorsVanadiumPlatingLevel" + lvl, c_techCountCompleteOnly) > 0
+            || TechTreeUpgradeCount(p, "TerranInfantryArmorsLevel" + lvl, c_techCountCompleteOnly) > 0) {
             if (TechTreeUpgradeCount(p, "TerranVehicleArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
                 TechTreeUpgradeAddLevel(p, "TerranVehicleArmorsLevel" + lvl, 1);
             }
@@ -279,34 +302,12 @@ void libWoLU_AddBehaviorToType (int p, string unitType, string behavior) {
 // (Scripted auto-stim removed: the StimpackWoLU clone abilities carry real engine
 // autocast — dashed circle included — defined in AbilData.xml.)
 
-// #7: show the DECLOAK button on units that spawn cloaked. We cloak via the
-// PersonalCloakingFree behavior, so each unit's toggle cloak ABILITY stays in the OFF
-// state → the card shows "Cloak On" (CloakOn), not "Cloak Off" (CloakOff). Issue the
-// cloak ability's ON command (CAbilBehavior command index 0 = "On") so the toggle reads
-// ON and the CloakOff button is ready. Cloak energy cost/drain is already 0 (rule 8), so
-// activating the toggle is free; the unit is already cloaked by PersonalCloakingFree, so
-// this is purely a UI sync. Idempotent: issuing "On" when already on is a no-op. Only for
-// units that HAVE a toggle cloak ability (Ghost/Banshee/Wraith/Spectre + heroes/mercs);
-// Reaper/Medivac/Predator have no toggle and keep the permanent behavior only.
-void libWoLU_ToggleCloakOn (int p, string unitType, string cloakAbil) {
-    unitgroup g;
-    unit u;
-    int i;
-    g = UnitGroup(unitType, p, RegionEntireMap(), UnitFilter(0, 0, 0, (1 << (c_targetFilterDead - 32))), 0);
-    i = UnitGroupCount(g, c_unitCountAll);
-    for ( ; i >= 1; i -= 1 ) {
-        u = UnitGroupUnitFromEnd(g, i);
-        // Only toggle IDLE units so we never interrupt a moving/attacking unit's order
-        // queue (the periodic re-checks, so a freshly-spawned cloaked unit gets toggled the
-        // first tick it's idle). Issue the cloak's "On" command (CAbilBehavior cmd index 0)
-        // via Order(AbilityCommand(...)) + AddToFront — the exact pattern liberty's own
-        // triggers use for GhostCloak/BansheeCloak/WraithCloak. Instant + free (rule 8), so
-        // it fires immediately; if already on it's a no-op.
-        if ((u != null) && (UnitOrderCount(u) == 0)) {
-            UnitIssueOrder(u, Order(AbilityCommand(cloakAbil, 0)), c_orderQueueAddToFront);
-        }
-    }
-}
+// (Removed: libWoLU_ToggleCloakOn. Every permanently-cloaked player unit now has its
+// Cloak On/Off card buttons TOMBSTONED in UnitData.xml — the owner wants no cloak toggle
+// buttons at all. With the buttons gone there is no decloak button to surface, so the
+// trigger that issued the toggle's "On" command to sync the UI is obsolete and removed.
+// The units stay permanently free-cloaked via PersonalCloakingFree/SpectreCloakingFree in
+// the periodic above; the toggle ABILITY is kept on each base unit so enemies still cloak.)
 
 // Siege Tank Graduating Range: each call adds ONE stack of WoLUGraduatingRange
 // (+1 WeaponRange/stack) to the player's sieged tanks, up to 5. Fired on a 3 s
@@ -391,22 +392,20 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         // lines above never reach them (the recurring "merc misses the buff" class).
         libWoLU_AddBehaviorToType(libWoLU_Player, "HelsAngelFighter", "PersonalCloakingFree");
         libWoLU_AddBehaviorToType(libWoLU_Player, "HelsAngelAssault", "PersonalCloakingFree");
-        // #7: sync the toggle cloak ability to ON so the DECLOAK button is shown for units
-        // that have a toggle (the permanent PersonalCloakingFree leaves the toggle OFF →
-        // shows CloakOn). Unit -> its cloak ability id (from the reference catalogs):
-        // Ghost=GhostCloak, Banshee=BansheeCloak, Wraith=WraithCloak, Spectre=RogueGhostCloak,
-        // Dusk Wings=DuskWingBansheeCloakingField. Heroes/mercs inherit their base unit's
-        // cloak ability id (Nova/MercSeniorGhost=GhostCloak, Tosh=RogueGhostCloak,
-        // MercWraith=WraithCloak). Reaper/Medivac/Predator have no toggle → skipped.
-        libWoLU_ToggleCloakOn(libWoLU_Player, "Ghost", "GhostCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "Banshee", "BansheeCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "Wraith", "WraithCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "Spectre", "RogueGhostCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "Nova", "GhostCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "Tosh", "RogueGhostCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "DuskWing", "DuskWingBansheeCloakingField");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "MercWraith", "WraithCloak");
-        libWoLU_ToggleCloakOn(libWoLU_Player, "MercSeniorGhost", "GhostCloak");
+        // Raven + Science Vessel (owner): not normally cloak-capable, so they have NO toggle
+        // cloak ability → no card buttons to remove and none to add (behavior-only, exactly
+        // like Reaper/Medivac/Predator/Viking). Permanent free cloak via PersonalCloakingFree;
+        // per-player (rule-9-safe). Neither has a merc/hero counterpart, so no family fan-out.
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Raven", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "ScienceVessel", "PersonalCloakingFree");
+        // (Removed: the per-unit libWoLU_ToggleCloakOn(...) calls. The owner wants NO cloak
+        // toggle buttons on ANY permanently-cloaked player unit — every unit's Cloak On/Off
+        // card buttons are now tombstoned in UnitData.xml (Ghost/Banshee/Wraith/Spectre +
+        // mercs MercWraith/MercSeniorGhost; Nova/Tosh never had a toggle button pair — they
+        // show a passive PermanentlyCloaked* display only). With no decloak button to surface,
+        // the UI-sync trigger is gone. The units stay free-cloaked by the PersonalCloakingFree/
+        // SpectreCloakingFree behaviors added above; the cloak ABILITY is kept on each base unit
+        // so enemy ghosts/banshees/wraiths/spectres still cloak (rule 9).)
         // Predator Adaptive Defenses: permanent damage-halving buff (player-only).
         libWoLU_AddBehaviorToType(libWoLU_Player, "Predator", "WoLUAdaptiveDefenses");
         // Predator Charge (AP): permanent +120% move speed (player-only).
