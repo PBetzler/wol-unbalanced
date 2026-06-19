@@ -152,6 +152,14 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeStart", p, "0", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Cooldown.TimeUse", p, "0", c_upgradeOperationSet);
 
+    // --- Merc calldown cost parity: match the base unit's per-player cost cut ---
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Resource[Minerals]", p, "75", c_upgradeOperationSet);  // Devil Dogs (Firebat -25/-25): Minerals 100 -> 75
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train2].Resource[Vespene]", p, "50", c_upgradeOperationSet);  // Devil Dogs (Firebat -25/-25): Vespene 75 -> 50
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train3].Resource[Vespene]", p, "0", c_upgradeOperationSet);  // Spartan Company (Goliath -25/-25; no minerals): Vespene 25 -> 0
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train9].Resource[Minerals]", p, "75", c_upgradeOperationSet);  // Skibi's Angels / MercMedic (Medic -25/-25; no vespene): Minerals 100 -> 75
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Resource[Minerals]", p, "75", c_upgradeOperationSet);  // Death Heads / MercReaper (Reaper -25/-25; no vespene): Minerals 100 -> 75
+    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Resource[Minerals]", p, "75", c_upgradeOperationSet);  // Senior Ghost / MercSeniorGhost (Ghost -100/-50; no vespene): Minerals 175 -> 75
+
     // --- Per-unit stats (unit-table comments) ---
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeStart", p, "2", c_upgradeOperationMultiply);

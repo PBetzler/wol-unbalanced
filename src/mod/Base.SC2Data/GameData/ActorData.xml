@@ -175,4 +175,34 @@
     </CActorUnit>
 
     <!-- (MercLiberator/MercLiberatorAG/MercValkyrie actors removed with their units.) -->
+
+    <!-- Thor GROUND-attack muzzle + impact restore (base Thor, MercThor/Jotun).
+         The vanilla CActorAction id="ThorAttack" (mods/_reference/liberty.sc2mod/ActorData.xml)
+         binds effectAttack="ThorsHammerDamage" — the launch muzzle (ThorHandGunAttackLaunch) and
+         impact (ThorHandGunAttackImpact) fire only when an effect with that EXACT id fires.
+         WeaponData.xml reroutes weapon ThorsHammer's Effect to ThorsHammerWoLUSet (a CEffectSet);
+         that set fires two CHILDREN — ThorsHammerDamageVanillaWoLU (WoLUNoFlag -> enemies) and
+         ThorsHammerDamageWoLU (WoLUHasFlag -> player splash) — and NOBODY fires the bare
+         ThorsHammerDamage id anymore. The action matches the exact effect id (NOT parent-chain
+         descendants), so it stopped firing -> the ground muzzle/impact vanished for EVERY Thor.
+         Fix: re-bind the action to the two effect ids that are ACTUALLY fired, one CActorAction
+         per validator-gated branch. Each unit fires exactly ONE child (validator-gated), so one
+         action per child = exactly one muzzle/impact per shot per audience (NO double-muzzle).
+         Reuse the vanilla LaunchAttachQuery (AMFilterWeaponSetA0 AMPatternThor) + the vanilla
+         ThorHandGunAttackLaunch/ThorHandGunAttackImpact models + sounds verbatim (restated, not
+         only inherited, so the muzzle is unambiguous regardless of parent attribute-merge).
+         Cosmetic ONLY — no gameplay/damage change. (Odin uses the SEPARATE weapon "Odin" ->
+         effect "OdinDamage", which we never rerouted -> Odin's ground muzzle was never broken;
+         no Odin action needed. The AA attack still works: its launch effect id
+         JavelinMissileLaunchersLM was preserved, so ThorAAAttack's effectLaunch still matches.) -->
+    <CActorAction id="ThorAttackVanillaWoLU" parent="ThorAttack" effectAttack="ThorsHammerDamageVanillaWoLU">
+        <LaunchAttachQuery Methods="AMFilterWeaponSetA0 AMPatternThor"/>
+        <LaunchAssets Model="ThorHandGunAttackLaunch" Sound="Thor_HandGunAttackLaunch"/>
+        <ImpactMap index="None" Model="ThorHandGunAttackImpact" Sound="Thor_HandGunAttackImpact"/>
+    </CActorAction>
+    <CActorAction id="ThorAttackWoLU" parent="ThorAttack" effectAttack="ThorsHammerDamageWoLU">
+        <LaunchAttachQuery Methods="AMFilterWeaponSetA0 AMPatternThor"/>
+        <LaunchAssets Model="ThorHandGunAttackLaunch" Sound="Thor_HandGunAttackLaunch"/>
+        <ImpactMap index="None" Model="ThorHandGunAttackImpact" Sound="Thor_HandGunAttackImpact"/>
+    </CActorAction>
 </Catalog>

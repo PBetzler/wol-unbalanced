@@ -281,8 +281,13 @@
             <LayoutButtons index="5" AbilCmd="DukesRevengeYamatoWoLU,Execute"/>
             <LayoutButtons index="6" AbilCmd="DukesRevengeMissilePodsWoLU,Execute"/>
             <LayoutButtons index="7" AbilCmd="DukesRevengeDefensiveMatrixWoLU,Execute"/>
-            <LayoutButtons index="8"><Face value="WoLUUpgSmartServos"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
-            <LayoutButtons index="9"><Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
+            <!-- Passive upgrade icons aligned to the base Battlecruiser: Internal Tech Module
+                 (R1C0) + Optimized Logistics (R1C1). (Was Smart Servos + Internal Tech — Smart
+                 Servos = transform speed, nonsensical on a non-transforming BC; a copy-paste
+                 artifact, and the merc was missing Opt Logistics the base BC shows. Both are
+                 display-only passives, AbilCmd=255 -> nothing functional changes.) -->
+            <LayoutButtons index="8"><Face value="WoLUUpgInternalTech"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="0"/></LayoutButtons>
+            <LayoutButtons index="9"><Face value="WoLUUpgOptLogistics"/><Type value="Passive"/><AbilCmd value="255"/><Requirements value="WoLUHaveFlag"/><Row value="1"/><Column value="1"/></LayoutButtons>
         </CardLayouts>
     </CUnit>
 

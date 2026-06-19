@@ -1,2 +1,12 @@
 Button/Hotkey/MagrailWoLU=U
 Button/Hotkey/SpiderMineWoLU=Y
+# Elite-merc calldown hotkeys (Merc Compound). Letters chosen OUTSIDE the standard-merc
+# set (AP convention D/J/I/H/A/P/G/C) so they don't double-set on the compound card.
+# Owner to confirm no in-game collision. Mnemonic where free: M=Medic, R=Reaper, N=coNdor,
+# T=Thor/joTun, W=Wraith, S=Senior Ghost.
+Button/Hotkey/HireMercMedic=M
+Button/Hotkey/HireMercReaper=R
+Button/Hotkey/HireMercHellion=N
+Button/Hotkey/HireMercThor=T
+Button/Hotkey/HireMercWraith=W
+Button/Hotkey/HireMercSeniorGhost=S

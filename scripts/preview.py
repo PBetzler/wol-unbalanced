@@ -138,6 +138,11 @@ def classify(kind, field):
         # InfoArray[Train*/Research*].{Time, Charge.*, Cooldown.*} — nested scalars, apply.
         if re.match(r"InfoArray\[(Train|Research)\w*\]\.(Time|Charge\.\w+|Cooldown\.\w+)$", f):
             return GOOD, ""
+        # InfoArray[Train*].Resource[Minerals|Vespene] — the calldown's summon COST: an indexed
+        # SCALAR nested under the InfoArray entry (same applies-per-player class as the unit's
+        # CostResource[*] and the Charge/Cooldown nested scalars above). Verified-applying.
+        if re.match(r"InfoArray\[Train\w*\]\.Resource\[(Minerals|Vespene)\]$", f):
+            return GOOD, ""
 
     return UNCERTAIN, "field shape not in the GOOD/NOOP tables — confirm it's a per-player scalar"
 
@@ -228,6 +233,10 @@ def _field_from(el, field):
         sub = m.group(2)
         if sub == "Time":
             return _scalar(info, "Time")
+        # indexed scalar directly under the InfoArray entry: Resource[Minerals]/[Vespene]
+        rm = re.match(r"^([A-Za-z]\w*)\[([^\]]+)\]$", sub)
+        if rm:
+            return _indexed(info, rm.group(1), rm.group(2))
         parts = sub.split(".")  # Charge.CountMax / Cooldown.TimeStart
         if len(parts) == 2:
             child = info.find(parts[0])
@@ -423,6 +432,10 @@ def apply_override(el, field, value):
         if sub == "Time":
             _set_scalar(info, "Time", value)           # <Time value=..> (child form; _field_from
             return True                                #  reads attr-or-child, so this resolves)
+        rm = re.match(r"^([A-Za-z]\w*)\[([^\]]+)\]$", sub)
+        if rm:                                          # Resource[Minerals]/[Vespene] indexed scalar
+            _set_indexed(info, rm.group(1), rm.group(2), value)
+            return True
         parts = sub.split(".")                         # Charge.CountMax / Cooldown.TimeStart
         if len(parts) == 2:
             container = _ensure_child(info, parts[0])   # <Charge> / <Cooldown>

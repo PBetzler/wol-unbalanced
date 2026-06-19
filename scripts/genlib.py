@@ -196,6 +196,43 @@ def emit():
             lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train{n}].{field}", p, "{val}", c_upgradeOperationSet);')
 
     lines.append("")
+    lines.append("    // --- Merc calldown cost parity: match the base unit's per-player cost cut ---")
+    # Several base units get a per-player CostResource cut (AP Resource Efficiency etc. in
+    # stat_edits below). That edits the UNIT's TRAIN cost — it does NOT reach the merc
+    # counterpart, whose summon cost is the SummonMercenaries calldown's InfoArray[TrainN]
+    # Resource value (a DIFFERENT field; the merc UNIT's CostResource is inert — mercs are
+    # SUMMONED, not trained). Reduce each merc's calldown cost by the SAME amount its base unit
+    # got, floored at 0 (true parity). genlib knows the static base values, so we COMPUTE the
+    # final at build time as max(0, current - cut) and emit a Set (no negative-from-Subtract
+    # risk). Only emitted where the resource is actually present AND the value actually changes.
+    # The Resource path is InfoArray[TrainN].Resource[Minerals]/[Vespene] (verified vs the
+    # vanilla SummonMercenaries Train2 = Min 100 / Ves 75 and our static Train9-15). Heroes are
+    # map-PLACED (never trained) → their cost is moot, nothing to do.
+    #
+    # (Train index, current Min, current Ves, Min cut, Ves cut, merc label)
+    #   Vanilla mercs (Train1-8, reference catalog) + extra elite mercs (Train9-15, our XML).
+    #   Only mercs whose BASE unit gets a cost cut appear here; the rest stay unchanged.
+    MERC_COST_CUTS = [
+        # Train  curMin  curVes  cutMin  cutVes  label
+        ("Train2",  100,   75,     25,    25,   "Devil Dogs (Firebat -25/-25)"),
+        ("Train3",  None,  25,     25,    25,   "Spartan Company (Goliath -25/-25; no minerals)"),
+        ("Train9",  100,   None,   25,    25,   "Skibi's Angels / MercMedic (Medic -25/-25; no vespene)"),
+        ("Train10", 100,   None,   25,    25,   "Death Heads / MercReaper (Reaper -25/-25; no vespene)"),
+        ("Train15", 175,   None,  100,    50,   "Senior Ghost / MercSeniorGhost (Ghost -100/-50; no vespene)"),
+    ]
+    for train, cur_min, cur_ves, cut_min, cut_ves, label in MERC_COST_CUTS:
+        for res, cur, cut in (("Minerals", cur_min, cut_min), ("Vespene", cur_ves, cut_ves)):
+            if cur is None:        # resource not present on this calldown → nothing to cut
+                continue
+            final = max(0, cur - cut)
+            if final == cur:       # cut floored to no change (e.g. base unit got no cut here)
+                continue
+            lines.append(
+                f'    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", '
+                f'"InfoArray[{train}].Resource[{res}]", p, "{final}", c_upgradeOperationSet);  '
+                f'// {label}: {res} {cur} -> {final}')
+
+    lines.append("")
     lines.append("    // --- Per-unit stats (unit-table comments) ---")
     stat_edits = [
         # (catalog, entry, field, value, op, comment)

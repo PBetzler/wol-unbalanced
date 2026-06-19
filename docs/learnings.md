@@ -357,6 +357,35 @@ gotcha; authoritative details live in the code/plan, not here.
   (`WeaponStart.<id>`) break. Prefer overriding the **vanilla weapon's `Effect`** to a
   player-gated effect set (Thor does this): the weapon id stays, so the attack
   animation fires, and per-player isolation lives in the validator-gated effect set.
+- **…BUT rerouting a weapon's `Effect` to a clone `CEffectSet` silently kills the
+  effect-bound muzzle/impact actors, because a `CActorAction` binds `effectAttack`/
+  `effectImpact` to the EXACT damage effect id, not its parent-chain descendants.** The
+  Thor ground attack's muzzle+impact live on `CActorAction id="ThorAttack"`
+  `effectAttack="ThorsHammerDamage"` (LaunchAssets `ThorHandGunAttackLaunch` + ImpactMap
+  `ThorHandGunAttackImpact`). When WeaponData reroutes weapon `ThorsHammer`'s `Effect` to
+  `ThorsHammerWoLUSet` (a `CEffectSet` firing two validator-gated CHILDREN
+  `ThorsHammerDamageVanillaWoLU`/`…WoLU`, both `parent="ThorsHammerDamage"`), NOBODY fires
+  the bare `ThorsHammerDamage` id anymore → the action never matches → the ground muzzle
+  AND impact vanish for EVERY Thor (player AND enemy). The *air* attack survived because
+  its launch effect id (`JavelinMissileLaunchersLM`) was preserved, so `ThorAAAttack`'s
+  `effectLaunch` still matched. **Fix: re-bind a (cloned) action to the actually-fired
+  child effect id(s) — one `CActorAction parent="<vanilla action>"` per validator-gated
+  branch, overriding only `effectAttack`/`effectImpact`** (e.g. `ThorAttackVanillaWoLU`
+  → `ThorsHammerDamageVanillaWoLU` restores the ENEMY muzzle, `ThorAttackWoLU` →
+  `ThorsHammerDamageWoLU` restores the PLAYER muzzle). Each unit fires exactly ONE child
+  (validator-gated) → one action per child = exactly one muzzle per shot per audience, NO
+  double-firing. This is rule-9-NEUTRAL (restoring the enemy's vanilla appearance is
+  desired, not a buff) and cosmetic-only (no damage change). **Restate the
+  `LaunchAttachQuery`/`LaunchAssets`/`ImpactMap` verbatim on the clone** rather than
+  relying solely on `parent=` attribute-merge, so the muzzle is unambiguous. CHECK3/4 SKIP
+  actors (their parents are base-CASC `GenericUnit*`/vanilla actor ids the ref dump lacks),
+  so audit will NOT catch a typo'd effect id here — resolve each `effectAttack`/`effectImpact`
+  id against our `EffectData.xml` by hand. **Watch for a hero that fires a DIFFERENT
+  weapon/effect:** Odin (the Thor hero) attacks with weapon `Odin` → effect `OdinDamage`
+  (actors `OdinLeftAttack`/`OdinRightAttack`), NOT `ThorsHammer`/`ThorsHammerDamage` — we
+  never rerouted the `Odin` weapon, so Odin's ground muzzle was never broken and needs no
+  action clone. Always check the hero's actual weapon id before assuming the base-unit fix
+  covers it. [STATIC root-cause + fix; muzzle render is GAME-confirmed by the owner.]
 - **An elite-merc clone (`parent=<base unit>`) wears a bare `GenericUnitBase` actor that has
   ONLY the generic move/idle/death/basic-attack bracket — it carries NONE of the base unit's
   unit-specific anim events** (dual-weapon elevation poses, spell-cast poses, heal channel,
@@ -447,6 +476,24 @@ gotcha; authoritative details live in the code/plan, not here.
   `PersonalCloakingFree`, `SpectreCloakingFree`.
 - Merc calldown: `SummonMercenaries` `InfoArray[Train1..8]` with `Charge.CountMax/
   CountStart` and `Cooldown.TimeStart` (vanilla 300 = 5 min wait at mission start).
+- **A merc's RESOURCE cost is the CALLDOWN's, not the unit's — and IS per-player-editable.**
+  The merc UNIT's own `CostResource[Minerals]/[Vespene]` is INERT: mercs are SUMMONED via
+  `SummonMercenaries`, never trained, so the unit's train cost is never read (a per-player edit
+  on it is a no-op; heroes are likewise map-placed → moot). The cost the player actually pays is
+  the calldown's **`SummonMercenaries InfoArray[TrainN].Resource[Minerals]`** (and `[Vespene]`)
+  — an indexed SCALAR nested under the InfoArray entry (verified path; same applies-per-player
+  class as `InfoArray[TrainN].Charge.*`/`Cooldown.*` and the unit's own `CostResource[*]`), so
+  `CatalogFieldValueModify` on it DOES apply per player (preview CHECK8-GOOD once the classifier
+  knows the shape — see `scripts/preview.py classify()`). So **cost parity for a merc goes
+  through the calldown, keyed to `SummonMercenaries` + the merc's Train index — NOT the merc
+  unit id.** v0.3.11 reduces each merc's summon cost by the same amount its base unit's
+  per-player cost cut, floored at 0 (genlib's "merc calldown cost parity" block; computes the
+  final at build time as `max(0, current − cut)` and emits a `Set`). Train-index ↔ merc map:
+  Train2=Devil Dogs, Train3=Spartan Company, Train4=Hammer Securities, Train5=Siege Breakers (no
+  Resource = free), Train9=Skibi's/MercMedic, Train10=Death Heads/MercReaper, Train11=Condor,
+  Train12=Jotun, Train13=Winged Nightmares, Train15=Senior Ghost/MercSeniorGhost. (This is also
+  why CHECK10 correctly EXCLUDES the merc/hero UNIT cost field from unit-field parity — that
+  field is inert; the real cost lives on the calldown and is handled separately in genlib.)
 - **Firebat damage chain (and "Infernal Pre-Igniter" is NOT a Firebat upgrade).** The Firebat's
   attack damage is the `FirebatUFull` `CEffectDamage` (`Amount=8`, `AttributeBonus[Light]=4`) — fired
   both directly (`FirebatSet`=[`Firebat` persistent, `FirebatUFull`]) AND repeatedly by the persistent

@@ -93,7 +93,7 @@ Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis 
     is the cloak toggle's On/Off pair (mutually exclusive by toggle state — vanilla, not a real collision).
     No other clear gaps found.
 - [ ] **(PARKED — known cosmetic limitation, owner decision 2026-06-18) Elite mercs show the "heart" placeholder portrait in-game.** Recurring (v0.2.4 / v0.3.7#4 / v0.3.8). It is a **PRELOAD** failure — the portrait model isn't loaded into memory for the merc *calldown* identity — **NOT a path/reference problem.** Verified via git that v0.2.4's local `Merc*Portrait` CModels used the EXACT correct `.m3` paths (`Assets\Portraits\Terran\<Unit>Portrait\<Unit>Portrait.m3`, identical to the moebius `SCVPortrait` pattern) **and still hearted**; the current base-token references also heart. So **both** the base-token AND correct-path-local-CModel approaches fail → the model reference is not the lever. The SC2 Editor only shows the portrait *resolving* (it always did), never the in-game preload, so it **cannot validate a candidate** — any test is owner-in-game-only. Remaining untried levers, both uncertain: (a) re-parent each merc actor to its base unit's actor (likely inherits the same no-explicit-preload behavior → probably still hearts); (b) a map-level model preload (touches the 30 campaign maps = map-affecting + fragile). Cosmetic; **parked** unless the owner wants to spend an in-game iteration on the re-parent shot.
-- [~] **Medic / Skibi's Angels (`MercMedic`) can't heal mechanical units (Goliath / `SpartanCompany`).**
+- [x] **Medic / Skibi's Angels (`MercMedic`) can't heal mechanical units (Goliath / `SpartanCompany`). ✅ RESOLVED — owner-confirmed in game 2026-06-19.**
   **REAL ROOT CAUSE FOUND (v0.3.11, [STATIC]; [GAME] confirm pending) — the prior diagnosis below was
   WRONG.** Owner playtest 2026-06-18: the player's Medic heals NO mechanical unit, **neither manual NOR
   autocast.** The earlier note claimed "manual already works, only autocast was the gap" — that was an
@@ -114,7 +114,7 @@ Three defects from the owner's v0.3.10 playthrough. A first read-only diagnosis 
   — `index="0"` REPLACES the inherited `Ground,Biological` slot 0 so only the broad filter remains.
   Now heals any Visible friendly non-structure unit: biological, mechanical, ground, AND air, both
   manually and on autocast. `src/mod/Base.SC2Data/GameData/AbilData.xml` (`HealWoLU`); gate green
-  (genlib/lint/audit/preview CHECK8/check_autocast CHECK9). **⚠ [GAME] owner confirms: a player Medic /
+  (genlib/lint/audit/preview CHECK8/check_autocast CHECK9). **✅ [GAME] CONFIRMED (owner, 2026-06-19): a player Medic /
   Skibi's Angels can now MANUALLY heal AND auto-heals a damaged Goliath / Spartan Company / tank /
   Viking; enemy Medics still heal only biological.**
 

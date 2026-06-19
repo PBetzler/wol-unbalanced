@@ -39,10 +39,18 @@ SCOPE (deliberate — keeps false positives near zero; documented in the brief's
     via `PersonalCloakingFree` or `SpectreCloakingFree`, and a cloak TOGGLE counts whether
     it uses `BansheeCloak` or `DuskWingBansheeCloakingField`. The CLASS map below collapses
     same-effect ids so a legitimate id difference isn't flagged.
-  * COST fields (`CostResource[*]`, `Food`) are EXCLUDED from the functional field set: mercs
-    are free unlimited CALLDOWN units (rule 6 — `SummonMercenaries` charges/cooldown zeroed
-    in genlib), so reducing a calldown's resource cost is inert; heroes are map-PLACED, never
-    trained, so cost edits never fire either. Cost parity is not a buff → not checked.
+  * COST fields (`CostResource[*]`, `Food`) on the merc/hero UNIT are EXCLUDED from the
+    functional field set, because the merc UNIT's own `CostResource` is INERT: mercs are
+    SUMMONED via the `SummonMercenaries` calldown, never trained, so the unit's train cost is
+    never read; heroes are map-PLACED, never trained, so their unit cost never fires either.
+    Excluding the merc/hero UNIT cost field is therefore correct — but note this is NOT the
+    same as "merc cost is unchangeable". The merc's REAL summon cost is the calldown's
+    `SummonMercenaries InfoArray[TrainN].Resource[*]` value, which IS per-player-editable and
+    DOES get reduced (genlib's "merc calldown cost parity" block matches each merc's summon cost
+    to its base unit's cost cut, floored at 0). That calldown-cost parity is handled separately
+    in genlib, keyed to the SummonMercenaries ability + Train index — NOT to the merc unit id —
+    so it's out of scope for THIS unit-field parity check by construction (we only diff Unit-
+    catalog fields here). Cost parity for mercs lives on the calldown, not the unit field.
 
 Run: python scripts/check_merc_parity.py   (exit non-zero on an un-excepted gap)
 Stdlib-only; UTF-8 stdout (Windows cp1252 console).
@@ -98,8 +106,12 @@ COUNTERPARTS = {
     "Spectre":         [("Tosh", "standalone")],
 }
 
-# Genlib Unit-catalog fields that are COST (free-calldown / map-placed → inert) — EXCLUDED
-# from the functional buff set so a missing cost-reduction isn't flagged as a gap.
+# Genlib Unit-catalog fields that are COST on the merc/hero UNIT (summoned / map-placed →
+# the UNIT's train cost is never read → inert) — EXCLUDED from the functional buff set so a
+# missing UNIT cost-reduction isn't flagged as a gap. The merc's REAL summon cost is the
+# SummonMercenaries calldown's InfoArray[TrainN].Resource[*] (editable per player, and reduced
+# to match the base cut in genlib's "merc calldown cost parity" block) — keyed to the ability,
+# not the unit id, so it's a separate concern handled outside this unit-field diff.
 COST_FIELDS = {"Food"}
 COST_FIELD_RE = re.compile(r"^CostResource\[")
 
@@ -134,10 +146,13 @@ LOOP_PLUMBING = {"TechTreeUnitAllow"}
 #     "loop:<class>"    a galaxy loop CLASS present on base but legitimately N/A on the cp
 # A gap whose (base, counterpart, what) is in this dict is reported INFO (excused), not FAIL.
 #
-# NOTE: cost reductions (CostResource[*]/Food) are NOT listed here — they're filtered out of
-# the functional field set wholesale by COST_FIELDS / COST_FIELD_RE (mercs are free calldowns,
-# heroes are map-placed → cost is never paid), which is the single mechanism for that class.
-# This dict is only for genuine per-pair FUNCTIONAL exceptions.
+# NOTE: UNIT cost fields (CostResource[*]/Food) are NOT listed here — they're filtered out of
+# the functional field set wholesale by COST_FIELDS / COST_FIELD_RE (the merc/hero UNIT's train
+# cost is inert: mercs are summoned, heroes are map-placed → that field is never read), which is
+# the single mechanism for that class. The merc's REAL summon cost (SummonMercenaries calldown
+# Resource) IS reduced to match the base cut — in genlib, keyed to the ability, not the unit —
+# so it's outside this unit-field diff entirely. This dict is only for genuine per-pair
+# FUNCTIONAL exceptions.
 #
 # DukesRevenge (Jackson's Revenge) note (not a checked dimension, kept for the audit record):
 # it intentionally uses its OWN merc-specific ability clones (DukesRevengeYamatoWoLU /

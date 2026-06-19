@@ -379,6 +379,18 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         // Death Heads weren't cloaked). Reaper has NO toggle cloak ability, so like the base
         // Reaper/Medivac/Predator it needs ONLY the permanent buff (no ToggleCloakOn entry).
         libWoLU_AddBehaviorToType(libWoLU_Player, "MercReaper", "PersonalCloakingFree");
+        // Viking family (owner, 0.3.11): the Viking is not normally cloak-capable, but the
+        // owner wants the whole family permanently free-cloaked. Both modes get the buff
+        // (VikingFighter=air, VikingAssault=ground) so cloak survives the in-place mode
+        // morph; the 2 s period re-adds after a transform. The Viking has NO toggle cloak
+        // ability, so like Reaper/Medivac/Predator it needs ONLY the permanent buff (no
+        // ToggleCloakOn entry below).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "VikingFighter", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "VikingAssault", "PersonalCloakingFree");
+        // Hel's Angels (Viking merc, both modes) — SEPARATE unit ids, so the base-Viking
+        // lines above never reach them (the recurring "merc misses the buff" class).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "HelsAngelFighter", "PersonalCloakingFree");
+        libWoLU_AddBehaviorToType(libWoLU_Player, "HelsAngelAssault", "PersonalCloakingFree");
         // #7: sync the toggle cloak ability to ON so the DECLOAK button is shown for units
         // that have a toggle (the permanent PersonalCloakingFree leaves the toggle OFF →
         // shows CloakOn). Unit -> its cloak ability id (from the reference catalogs):
