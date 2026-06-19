@@ -203,6 +203,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: base 15 -> 20
     CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "Amount", p, "35", c_upgradeOperationSet);  // Thor AA base -> 35 (player path uses the buffed clone)
     CatalogFieldValueModify(c_gameCatalogWeapon, "JavelinMissileLaunchers", "Range", p, "12", c_upgradeOperationSet);  // Thor AA range = HIP range 11 + 1
+    CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersPersistent", "PeriodCount", p, "2", c_upgradeOperationMultiply);  // Thor/Jotun AA: double missiles per attack (4 -> 8)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "JavelinMissileLaunchers", "DisplayAttackCount", p, "2", c_upgradeOperationMultiply);  // Thor/Jotun AA: panel count matches the real 8 (4 -> 8)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "JavelinMissileLaunchers", "Period", p, "0.6667", c_upgradeOperationMultiply);  // Thor/Jotun AA: attack interval to 2/3 (3 -> ~2.0)
     CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Period", p, "1.0", c_upgradeOperationSet);  // Thor Rapid Reload: faster ground attack (1.93->1.0)
     CatalogFieldValueModify(c_gameCatalogWeapon, "ThorsHammer", "Backswing", p, "0.1", c_upgradeOperationSet);  // Thor: minimal attack recovery
     CatalogFieldValueModify(c_gameCatalogWeapon, "Odin", "Period", p, "1.0", c_upgradeOperationSet);  // Odin mirrors Thor Rapid Reload
@@ -227,6 +230,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "DukesRevenge", "Speed", p, "1.25", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "Speed", p, "1.25", c_upgradeOperationMultiply);  // Banshee line: Hyperflight Rotors
     CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "Range", p, "12", c_upgradeOperationSet);  // Odin mirrors Thor AA range
+    CatalogFieldValueModify(c_gameCatalogEffect, "OdinAA", "PeriodCount", p, "2", c_upgradeOperationMultiply);  // Odin AA: double missiles per attack (4 -> 8)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "DisplayAttackCount", p, "2", c_upgradeOperationMultiply);  // Odin AA: panel count matches the real 8 (4 -> 8)
+    CatalogFieldValueModify(c_gameCatalogWeapon, "OdinAntiAir", "Period", p, "0.6667", c_upgradeOperationMultiply);  // Odin AA: attack interval to 2/3 (2.5 -> ~1.667)
     CatalogFieldValueModify(c_gameCatalogWeapon, "GuassRifle", "Range", p, "6", c_upgradeOperationSet);  // Marine Laser Targeting System: +1 range (id is Blizzard's typo)
     CatalogFieldValueModify(c_gameCatalogWeapon, "RaynorGaussRifle", "Range", p, "1", c_upgradeOperationAdd);  // Raynor01: Marine LTS +1 range parity
     CatalogFieldValueModify(c_gameCatalogWeapon, "CommandoRifle", "Range", p, "1", c_upgradeOperationAdd);  // RaynorCommando: +1 range parity
@@ -387,4 +393,10 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research7].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research8].Time", p, "30", c_upgradeOperationSet);
     CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research9].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research11].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research12].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research13].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research14].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research15].Time", p, "30", c_upgradeOperationSet);
+    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[Research16].Time", p, "30", c_upgradeOperationSet);
 }

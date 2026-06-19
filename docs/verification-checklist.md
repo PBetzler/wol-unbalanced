@@ -112,8 +112,11 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 ### M (Media Blitz) · Thor + Odin — splash & AA
 - [ ] [RISK] **Thor ground attack splashes like a sieged Siege Tank** (player only) — hits clusters; does **not** splash-damage your own units
 - [ ] Thor AA: **35 per rocket** (was 8 +4 vs light), AA **range 12**, ground **+1** range, **+2** sight
-- [ ] [RISK] **Odin (hero = Thor)** mirrors all of it: AA **range 12 / 35** dmg, ground range +1, sight +2, ground splash
-- [ ] ENEMY-VANILLA: enemy Thors (if any) unchanged
+- [ ] **(v0.3.13) Thor/Jotun/Odin AA fires 8 missiles per attack** (was 4) at a noticeably faster ~2/3 cadence; the unit-info panel's AA line reads **"×8"** (DisplayAttackCount doubled to match). Watch the rocket volley double.
+- [ ] **(v0.3.13) Thor/Jotun AA damage card reads flat 35** — **NO "+4 vs Light"** line (the panel was repointed to the buffed clone). If you still see "+4 vs Light", the DisplayEffect repoint didn't land.
+- [ ] **(v0.3.13) Thor/Jotun AA impact SOUND is back** — anti-air hits play their impact sound again (it had gone silent after the AA `ImpactEffect` reroute; launch sound + rocket trail were always fine).
+- [ ] [RISK] **Odin (hero = Thor)** mirrors all of it: AA **range 12 / 35** dmg, **8-missile barrage at 2/3 cadence**, ground range +1, sight +2, ground splash
+- [ ] ENEMY-VANILLA: enemy Thors (if any) unchanged — still 4 missiles, the vanilla AA card
 
 ### M (Maw of the Void) · Battlecruiser — the BC kit (highest mechanism risk)
 - [ ] BC **+2 armor**, **×1.25** speed
@@ -133,6 +136,8 @@ The 5 extra mercs now live on a **second card page (submenu)** so the vanilla ca
 - [ ] **Reaper** — Jet Pack Overdrive DROPPED (owner). Reaper keeps vanilla ground-only targeting (does NOT shoot air); no flight. Nothing to test here.
 - [ ] [RISK] **Raven free kit (v0.3.3)**: the player's Raven can place **Point Defense Drones, Auto-Turrets, and Hunter-Seeker Missiles for 0 energy** (spam them), and the PDDs/turrets are **permanent** (don't time out). ENEMY-VANILLA: enemy Ravens still pay full energy (100/50/125). This is the rule-9-safe "Raven self-point-defense" — free permanent drones rather than a hidden on-unit weapon.
 - [ ] [RISK] **Viking ground (Assault mode) attack SPLASHES** (Shredder Rounds): siege 2+ clustered enemy ground units, one shot damages several. **Anti-Mechanical**: ground attack does noticeably more to mechanical targets (+20 vs Mech). ENEMY-VANILLA: enemy Vikings' ground attack stays single-target. Hel's Angels merc shows bigger splash. (Wild Missiles air-salvo NOT shipped — don't expect it.)
+- [ ] **(v0.3.13) Viking ground attack shows IMPACT + BLOOD again** — the gatling launch sound, impact sound, and target blood-reaction are back (they had detached after the `TwinGatlingCannon` Effect reroute, which is what made the ground attack look like it "did nothing"). Confirm visible/audible hits on a ground target, on both the player Viking AND Hel's Angels.
+- [ ] **(v0.3.13) Viking/Hel's Angels ground damage card reads 14 "+20 vs Mechanical"** (was a bare 14 — repointed to the player-fired clone).
 
 ### Standard ↔ Nightmare interchangeability (v0.3.4+)
 - [ ] [RISK] Play the **standard** build, save on the **Hyperion (between missions)**. Import the
@@ -164,7 +169,13 @@ These are plain scalar edits the automated audit already confirmed resolve again
 - [ ] **SCV** (anywhere) — **+15** HP, faster attack (`FusionCutter` period 0.7)
 - [ ] **Predator / Hercules / Raven / Science Vessel** (lab-research units) — Predator: 1 supply, 0 gas, **10 s** build; Hercules: **+2 armor**, **20 s** build, no Fusion Core; Raven: permanent Auto-Turrets / Point-Defense Drones (3600 s)
 - [ ] **Build times** — nothing trains slower than **60 s** (BC 110→60, Banshee 60, Hercules 20)
-- [ ] **Engineering Bay** — combined Atk/Def upgrades research in **30 s** each and apply to infantry+vehicle+ship together; Armory researches disabled
+- [ ] **Engineering Bay** — combined Atk/Def upgrades research in **30 s** each (in BOTH lab states — before AND after the Ultra-Capacitors/Vanadium-Plating lab research) and apply to infantry+vehicle+ship together; Armory researches disabled
+
+### v0.3.13 · Flier/vehicle upgrade scaling + the diagUpg read
+The combined Eng Bay upgrade now lifts ALL player units (previously several fliers + base Thor/SiegeTank/Hellion armor were missing from the base-Level upgrades). Test in any mission where you can complete an Eng Bay weapon/armor upgrade and own the units.
+- [ ] **(v0.3.13) Flier weapon scaling** — after an Eng Bay **weapons** upgrade completes, **Banshee / Battlecruiser / Viking (air AND ground)** attack damage rises with each level (check the unit-info panel before/after). Previously these did not scale.
+- [ ] **(v0.3.13) Flier/vehicle armor scaling** — after an Eng Bay **armor** upgrade completes, **Banshee / BC / Viking / Medivac / Raven** and base **Thor / Siege Tank / Hellion** armor rises with each level. Elite mercs **Jotun / Condor / Winged Nightmares** scale too (rule-4 parity).
+- [ ] **(v0.3.13) diagUpg read** — the `WoLU diagUpg: infW=base/uc vehW=… shipW=…` subtitle: BEFORE the Ultra-Capacitors lab research it reads `infW=1/0` once you've researched infantry weapons L1; AFTER the lab it reads `infW=0/1`. Either way `vehW>=1 shipW>=1` once weapons L1 completes (the sync detected it and granted the vehicle/ship levels). If `infW` reads `1/0` or `0/1` but `vehW=0/shipW=0`, the grant didn't take — report it. (This temporary diag line is an owner-verification aid and is intentionally still present.)
 
 ---
 

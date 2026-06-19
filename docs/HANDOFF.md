@@ -12,7 +12,8 @@ server) may be ABSENT on Windows; everything you need is in the docs indexed bel
 
 **WoL Unbalanced** is a funnily-overpowered, **player-only** StarCraft II: Wings of Liberty
 campaign mod for GiantGrantGames' Custom Campaign Manager (CCM) — your army is buffed every which
-way, enemies stay vanilla (rule 9). **v0.3.9 is shipped** (committed on `main`; release published).
+way, enemies stay vanilla (rule 9). **v0.3.13 is the current batch** (on `main`; v0.3.12 was the last
+published release — the 0.3.13 changes are committed/uncommitted-pending-tag, gate green).
 The mechanism: the WoL campaign maps stay vanilla except one patched dependency line + a one-line
 `MapScript.galaxy` include, and a component-folder `.SC2Mod` whose Galaxy library applies every
 change **per player** at mission start (catalog modifications + the campaign's tech-granting
@@ -49,7 +50,34 @@ proven but still `[GAME]`-pending the owner's playthrough.
 
 ---
 
-## Pending `[GAME]` verification — v0.3.9 batch (awaiting the owner's playtest)
+## Pending `[GAME]` verification — v0.3.13 batch (awaiting the owner's playtest)
+
+These shipped in the v0.3.13 batch and are **statically settled/complete** (gate green: genlib +
+lint + audit + CHECK8 + CHECK9 + CHECK10 + CHECK11) but need in-game confirmation. Full root-cause
+notes in [open-issues.md](open-issues.md) §"v0.3.13"; the test steps are in
+[verification-checklist.md](verification-checklist.md) (Media Blitz AA section + the new "Flier/vehicle
+upgrade scaling" block + the Viking-ground items):
+
+1. **Flier/vehicle upgrade scaling** — Banshee/BC/Viking (air+ground) weapons + Banshee/BC/Viking/
+   Medivac/Raven/Thor/SiegeTank/Hellion armor + elite-merc armor now scale with the combined Eng Bay
+   upgrade. ⚠ owner confirms a Banshee/BC/Viking gains weapon/armor levels; reads the `diagUpg`
+   subtitle (`infW=1/0` before-lab, `0/1` after-lab, `vehW>=1 shipW>=1`).
+2. **Viking ground projectile/impact restored** — the gatling launch/impact sound + blood are back
+   (had detached after the `TwinGatlingCannon` Effect reroute). ⚠ owner confirms visible/audible
+   ground hits on the player Viking + Hel's Angels.
+3. **Thor/Jotun AA impact sound restored** — the AA impact sound is back (had detached after the
+   `JavelinMissileLaunchersLM` `ImpactEffect` reroute). ⚠ owner confirms.
+4. **Thor/Jotun/Odin AA barrage** — 8 missiles per attack (was 4) at ~2/3 cadence; card reads "×8".
+   ⚠ owner confirms the doubled volley + cadence.
+5. **Two card-number fixes** — Thor/Jotun AA card reads **flat 35** (no "+4 vs Light"); Viking/Hel's
+   Angels ground card reads **14 "+20 vs Mechanical"** (CHECK11-gated). ⚠ owner confirms the panels.
+
+> **Still OPEN — owner-decision-pending (not blockers):** Ghost/Spectre rifle "+vs Light/Armored"
+> flatten (a per-player `AttributeBonus` edit is a no-op class → needs a Shaped-Blast effect clone)
+> and Senior Ghost +50% panel under-show (needs a Senior-Ghost-specific weapon clone). See
+> [open-issues.md](open-issues.md) §"Damage display + values".
+
+## Pending `[GAME]` verification — v0.3.9 batch (older; still awaiting the owner's playtest)
 
 These shipped in v0.3.9 and are **statically settled/complete** but need in-game confirmation
 (from [open-issues.md](open-issues.md) §"v0.3.9 batch" — full root-cause notes there). A death/UI

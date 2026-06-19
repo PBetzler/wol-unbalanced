@@ -118,12 +118,20 @@ def classify(kind, field):
     # Unit indexed-scalar cost (CostResource[Minerals] / [Vespene]) — an indexed SCALAR, applies.
     if kind == "Unit" and re.match(r"CostResource\[", f):
         return GOOD, ""
-    # Weapon scalars.
-    WEAPON_SCALARS = {"DamagePoint", "Period", "Backswing", "Range", "AllowedMovement", "Arc"}
+    # Weapon scalars. DisplayAttackCount is the unit-info panel's "Nx" multiplier — a plain
+    # scalar value= child (same shape as Period/Range, verified vs the reference catalogs), so a
+    # per-player edit applies (Thor/Odin AA-barrage doubling). It's display-only (drives the panel
+    # total, not the real missile count — PeriodCount does that), and a constant multiplier on both
+    # sides of the CHECK11 panel↔actual compare, so editing it never breaks panel truth.
+    WEAPON_SCALARS = {"DamagePoint", "Period", "Backswing", "Range", "AllowedMovement", "Arc",
+                      "DisplayAttackCount"}
     if kind == "Weapon" and f in WEAPON_SCALARS:
         return GOOD, ""
-    # Effect scalars.
-    if kind == "Effect" and f in ("Amount", "ArmorReduction"):
+    # Effect scalars. PeriodCount on a CEffectCreatePersistent = how many periodic ticks (missiles)
+    # one attack fires — a plain scalar value= child (NOT the indexed PeriodicPeriodArray; that array
+    # IS a no-op class). Same applies-per-player shape as Amount/Period (verified vs the reference
+    # catalogs); drives the Thor/Odin AA-barrage missile-doubling.
+    if kind == "Effect" and f in ("Amount", "ArmorReduction", "PeriodCount"):
         return GOOD, ""
     # Behavior scalar.
     if kind == "Behavior" and f == "Duration":

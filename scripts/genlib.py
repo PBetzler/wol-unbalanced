@@ -305,6 +305,19 @@ def emit():
         # JavelinMissileLaunchersDamageBuffedWoLU effect clone (player branch), not this base edit.
         ("Effect", "JavelinMissileLaunchersDamage", "Amount", "35", "Set", "Thor AA base -> 35 (player path uses the buffed clone)"),
         ("Weapon", "JavelinMissileLaunchers", "Range", "12", "Set", "Thor AA range = HIP range 11 + 1"),
+        # Thor AA barrage (owner): DOUBLE the missiles per attack AND cut the attack interval to 2/3.
+        #  PeriodCount on the CEffectCreatePersistent = how many missiles a single attack fires; the
+        #  weapon's DisplayAttackCount is the panel's "Nx" multiplier (kept honest = same ×2 so the panel
+        #  total matches the real 8). Period is the attack interval. All three are plain scalar value=
+        #  children (NOT array elements) → CHECK8-GOOD per-player class, same shape as Range/Period above.
+        #  Multiply (not Set) so they scale whatever upgrades/edits leave the live value at.
+        #  Reaches MercThor (Jotun) for free: parent="Thor", no WeaponArray override → shares these ids.
+        #  PeriodicPeriodArray has 4 entries [0,0.125,0.25,0.125]; PeriodCount=8 overruns it, so SC2
+        #  repeats the last entry (0.125) for missiles 5-8 → barrage spans 0+0.125+0.25+0.125+0.125*4 = 1.0s,
+        #  which fits inside the new ~2.0s weapon Period (no overlap).
+        ("Effect", "JavelinMissileLaunchersPersistent", "PeriodCount", "2", "Multiply", "Thor/Jotun AA: double missiles per attack (4 -> 8)"),
+        ("Weapon", "JavelinMissileLaunchers", "DisplayAttackCount", "2", "Multiply", "Thor/Jotun AA: panel count matches the real 8 (4 -> 8)"),
+        ("Weapon", "JavelinMissileLaunchers", "Period", "0.6667", "Multiply", "Thor/Jotun AA: attack interval to 2/3 (3 -> ~2.0)"),
         # Thor "Rapid Reload" (AP, unit-table) — the ground attack's slow Period (1.93 s)
         # + 0.25 s backswing read as a long "windup" even though DamagePoint is already
         # capped to 0.1. Speed up the attack rate and trim the recovery (Odin mirrors it).
@@ -353,6 +366,13 @@ def emit():
         ("Unit", "DukesRevenge", "Speed", "1.25", "Multiply", ""),
         ("Unit", "DuskWing", "Speed", "1.25", "Multiply", "Banshee line: Hyperflight Rotors"),
         ("Weapon", "OdinAntiAir", "Range", "12", "Set", "Odin mirrors Thor AA range"),
+        # Odin AA barrage (rule 10 — Odin = Thor hero): same DOUBLE-missiles + 2/3-interval as the base
+        #  Thor, on Odin's SEPARATE AA chain (weapon OdinAntiAir -> persistent OdinAA). Same CHECK8-GOOD
+        #  scalar fields. OdinAA's PeriodicPeriodArray is [0,0.2,0.2,0.2]; PeriodCount=8 repeats the last
+        #  (0.2) for missiles 5-8 → barrage spans 0+0.2*7 = 1.4s, fitting inside the new ~1.667s Period.
+        ("Effect", "OdinAA", "PeriodCount", "2", "Multiply", "Odin AA: double missiles per attack (4 -> 8)"),
+        ("Weapon", "OdinAntiAir", "DisplayAttackCount", "2", "Multiply", "Odin AA: panel count matches the real 8 (4 -> 8)"),
+        ("Weapon", "OdinAntiAir", "Period", "0.6667", "Multiply", "Odin AA: attack interval to 2/3 (2.5 -> ~1.667)"),
         # --- AP ports, direct-field batch ---
         # (Super Stimpack lives in the StimpackWoLU clone abilities now — see AbilData.xml
         #  and the clone link swaps emitted below.)
@@ -631,7 +651,14 @@ def emit():
 
     lines.append("")
     lines.append("    // --- Engineering Bay: combined upgrades research in 30 s (weapon/armor levels) ---")
-    for idx in ("Research3", "Research4", "Research5", "Research7", "Research8", "Research9"):
+    # The Eng Bay buttons the player clicks differ by LAB state: BEFORE the Ultra-Capacitors /
+    # Vanadium-Plating lab research, Research3/4/5 (weapons) + Research7/8/9 (armors) grant the
+    # BASE Level ids (liberty.sc2mod AbilData.xml:1699-1734); AFTER it, those hide and
+    # Research11/12/13 (weapons) + Research14/15/16 (armors) grant the UltraCapacitors/
+    # VanadiumPlating wrappers (libertystory.sc2campaign AbilData.xml:172-201). Set 30 s on ALL
+    # of them so the "30 s each" feature holds in BOTH lab states.
+    for idx in ("Research3", "Research4", "Research5", "Research7", "Research8", "Research9",
+                "Research11", "Research12", "Research13", "Research14", "Research15", "Research16"):
         lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "EngineeringBayResearch", "InfoArray[{idx}].Time", p, "30", c_upgradeOperationSet);')
 
     # NOTE: hero stim abilities/buttons are NOT granted here — CatalogFieldValueModify

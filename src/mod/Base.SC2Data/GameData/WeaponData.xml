@@ -35,6 +35,17 @@
         <Options index="LinkedCooldown" value="0"/>
         <Options index="OnlyFireWhileInAttackOrder" value="0"/>
         <Options index="OnlyFireAtAttackOrderTarget" value="0"/>
+        <!-- Panel truth (CHECK11): the AA reroute lives on the missile's ImpactEffect
+             (JavelinMissileLaunchersLM → …WoLUSet in EffectData.xml), but the unit-info panel
+             reads THIS weapon's DisplayEffect, vanilla-pinned to JavelinMissileLaunchersDamage
+             (per-player Amount Set to 35 in genlib, but AttributeBonus[Light]=4 unchanged → the
+             panel shows "+4 vs Light"). The player actually fires JavelinMissileLaunchersDamageBuffedWoLU
+             = flat 35, Light bonus 0. Repoint DisplayEffect to that buffed clone so the panel
+             shows the flat 35 (no phantom +4 Light) the player really deals. DisplayEffect is
+             DISPLAY-ONLY → rule-9-safe (enemy damage/panels untouched). DisplayAttackCount=4 is a
+             constant multiplier applied identically to the old and new DisplayEffect, so the
+             per-rocket repoint keeps the panel's ×4 total correct. -->
+        <DisplayEffect value="JavelinMissileLaunchersDamageBuffedWoLU"/>
     </CWeaponLegacy>
     <!-- #2 parity (rule 10): Odin (= hero Thor) gets the same simultaneous air+ground fire.
          Odin's weapons are OdinAntiAir (AA) + Odin (AG). -->
@@ -56,6 +67,14 @@
          via a clone (runtime array-create is a no-op). Enemy Vikings hit the vanilla branch. -->
     <CWeaponLegacy id="TwinGatlingCannon">
         <Effect value="TwinGatlingCannonsWoLUSet"/>
+        <!-- Panel truth (CHECK11): the unit-info damage panel reads the weapon's DisplayEffect,
+             which vanilla pins to TwinGatlingCannons (14, no bonus) — but the PLAYER fires the
+             buffed clone TwinGatlingCannonsWoLU (14 + AttributeBonus[Mechanical]=20). Repoint
+             DisplayEffect to the player-fired clone so the panel shows the +20 vs Mechanical the
+             player actually deals. DisplayEffect is DISPLAY-ONLY (never changes damage dealt), so
+             this is rule-9-safe: enemy actual damage is untouched and enemy panels are never
+             rendered to the player. (Splash radius is never panel-shown — out of scope.) -->
+        <DisplayEffect value="TwinGatlingCannonsWoLU"/>
     </CWeaponLegacy>
 
     <!-- Hel's Angels (Viking merc, player-exclusive): same Shredder + Anti-Mech as the base

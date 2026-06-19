@@ -234,6 +234,20 @@ gotcha; authoritative details live in the code/plan, not here.
   so the space bar (and per-unit `CargoSize`) is what binds. Both `MaxCargoCount` and
   `TotalCargoSpace`/`MaxCargoSize` are scalar `CAbilTransport` fields editable per player; only
   the per-UNIT `CargoSize` is the load-time no-op.
+- **A weapon's `DisplayAttackCount` and a `CEffectCreatePersistent`'s `PeriodCount` are plain scalar
+  `value=` children → both apply per player** (added to the CHECK8 GOOD tables, v0.3.x). They are NOT
+  the indexed-array no-op class: `PeriodCount` is the COUNT of periodic ticks (e.g. AA missiles a single
+  attack fires), distinct from the sibling `PeriodicPeriodArray` (the per-tick delay list), which IS an
+  indexed array and so a per-player edit on it WOULD no-op. So to multiply a multi-missile barrage
+  per-player, edit `PeriodCount` (real count) — leave the period array alone. **When `PeriodCount` overruns
+  the period array, SC2 repeats the LAST array entry for the extra ticks** (e.g. Thor AA `PeriodCount` 4→8
+  over `[0,0.125,0.25,0.125]` → missiles 5-8 each at +0.125 s, barrage spans ~1.0 s). Keep the doubled
+  barrage shorter than the weapon's `Period` so attacks don't overlap. `DisplayAttackCount` is DISPLAY-ONLY
+  (drives the unit-info panel's "Nx" total, not the real fire count) and is a constant multiplier on BOTH
+  sides of CHECK11's panel↔actual compare, so editing it never breaks panel truth — but you must scale it
+  with `PeriodCount` to keep the panel honest (Thor/Jotun + Odin AA: ×2 both). Reaches a `parent=` merc
+  (MercThor/Jotun) for free via the shared weapon/effect ids; the hero (Odin) uses a SEPARATE chain
+  (`OdinAntiAir`/`OdinAA`) → edit it explicitly (rule 10). [STATIC field-class; barrage feel is GAME-only.]
 - **A TURRET-mounted weapon with a narrow `Arc` cannot fire from a bunker; an omni weapon (no
   turret, default 360° `Arc`) can.** The engine fires a bunkered passenger's OWN weapons from the
   bunker (the passenger stays the caster — `BunkerTransport.LoadCargoBehavior=BunkerWeaponRangeBonus`
@@ -406,6 +420,114 @@ gotcha; authoritative details live in the code/plan, not here.
   never rerouted the `Odin` weapon, so Odin's ground muzzle was never broken and needs no
   action clone. Always check the hero's actual weapon id before assuming the base-unit fix
   covers it. [STATIC root-cause + fix; muzzle render is GAME-confirmed by the owner.]
+- **The SAME reroute-detaches-the-action trap bit the VIKING ground gatling and the Hel's
+  Angels merc — fixed identically.** The vanilla `CActorAction id="VikingAssaultAttack"`
+  `effectAttack="TwinGatlingCannons"` carries the ground launch sound (`VikingAssault_AttackLaunch`),
+  impact sound (`Viking_AssaultAttackImpact`) and flesh blood-reaction (`BloodTargetImpact`).
+  Rerouting weapon `TwinGatlingCannon`'s `Effect` to `TwinGatlingCannonsWoLUSet` (children
+  `TwinGatlingCannonsVanillaWoLU`/`…WoLU`, both `parent="TwinGatlingCannons"`) meant nobody fires the
+  bare `TwinGatlingCannons` id → those assets detached for EVERY Viking (player AND enemy). NB the
+  Viking ground gatling is NOT a missile/beam (no `CActorMissile`/`CActorBeam` keyed to
+  `TwinGatlingCannons` in the dump) — the visual is purely launch-sound + impact-sound + blood, so
+  "no projectile" really meant "those assets stopped firing." Fix = the Thor pattern: two
+  `CActorAction parent="VikingAssaultAttack"` clones (`VikingAssaultAttackVanillaWoLU` → enemy child,
+  `VikingAssaultAttackWoLU` → player child), each restating the vanilla `LaunchAttachQuery`/both
+  `ImpactMap` entries/`LaunchAssets` verbatim. The merc weapon `WreckingCrewAssault` is rerouted to a
+  SINGLE un-gated clone `WreckingCrewAssaultWoLU` (player-exclusive, no flag gate), so its
+  `CActorAction id="WreckingCrewAssaultAttack"` (vanilla body identical to VikingAssaultAttack) needs
+  only ONE clone `WreckingCrewAssaultAttackWoLU`. (v0.3.x — `ActorData.xml`.)
+- **And it bit the THOR/JOTUN ANTI-AIR impact — the third instance, found by a full reroute-universe
+  sweep.** An `ImpactEffect` reroute on a `CEffectLaunchMissile` detaches the same way a weapon-`Effect`
+  reroute does, but ONLY the `effectImpact`-bound asset: our `EffectData.xml` reroutes
+  `CEffectLaunchMissile id="JavelinMissileLaunchersLM"`'s `ImpactEffect` to `JavelinMissileLaunchersDamageWoLUSet`
+  (children `JavelinMissileLaunchersDamageVanillaWoLU` WoLUNoFlag / `…BuffedWoLU` WoLUHasFlag, both
+  `parent="JavelinMissileLaunchersDamage"`), so the vanilla `CActorAction id="ThorAAAttack"`'s
+  `effectImpact="JavelinMissileLaunchersDamage"` stopped matching → the AA impact sound
+  (`Thor_AntiAirAttackImpact`) went silent for EVERY Thor. The `effectLaunch="JavelinMissileLaunchersLM"`
+  binding (launch sound `Thor_AntiAirAttackLaunch`) and the `CActorMissile unitName="ThorAAWeapon"` rocket
+  trail were PRESERVED — the launch-missile id + `AmmoUnit` are unchanged. Fix = the two-clone pattern
+  (`ThorAAAttackVanillaWoLU`/`ThorAAAttackWoLU`, `parent="ThorAAAttack"`, override ONLY `effectImpact`,
+  restate `LaunchAttachQuery`+`ImpactMap` verbatim) but **OMIT `LaunchAssets`** — the launch sound rides
+  `effectLaunch` (un-rerouted), so it still fires once via the unmodified parent; restating it would
+  double the launch sound. (Contrast the Viking case, which restates `LaunchAssets` because the Viking
+  launch sound rides the *rerouted* `effectAttack`.) Note the player child carries a **`Buffed` infix**
+  (`…DamageBuffedWoLU`, unlike the ground `ThorsHammerDamageWoLU`) — a copy-paste from the ground template
+  drops it and silently re-detaches; resolve the exact child ids by hand. (v0.3.x — `ActorData.xml`.)
+- **THE COMPLETE REROUTE UNIVERSE (audited v0.3.x — check this list before adding any new reroute).** Every
+  place our static XML reroutes a weapon `<Effect>` / missile `ImpactEffect` to a `*WoLU(Set)` clone, and
+  whether an effect-bound actor detached:
+  | Reroute (id → target) | File | Clone children | Actor DETACHED? | Fix |
+  |---|---|---|---|---|
+  | `ThorsHammer.Effect` → `ThorsHammerWoLUSet` | WeaponData | `…DamageVanillaWoLU`/`…DamageWoLU` (parent=`ThorsHammerDamage`) | YES — `ThorAttack effectAttack` (ground muzzle+impact) | `ThorAttack{Vanilla,}WoLU` |
+  | `TwinGatlingCannon.Effect` → `TwinGatlingCannonsWoLUSet` | WeaponData | `…VanillaWoLU`/`…WoLU` (parent=`TwinGatlingCannons`) | YES — `VikingAssaultAttack effectAttack` (ground launch+impact sound+blood) | `VikingAssaultAttack{Vanilla,}WoLU` |
+  | `WreckingCrewAssault.Effect` → `WreckingCrewAssaultWoLU` | WeaponData | single un-gated (parent=`WreckingCrewAssault`) | YES — `WreckingCrewAssaultAttack effectAttack` (merc, player-only) | `WreckingCrewAssaultAttackWoLU` (one clone) |
+  | `JavelinMissileLaunchersLM.ImpactEffect` → `JavelinMissileLaunchersDamageWoLUSet` | EffectData | `…DamageVanillaWoLU`/`…DamageBuffedWoLU` (parent=`JavelinMissileLaunchersDamage`) | YES — `ThorAAAttack effectImpact` (AA impact sound only; launch sound+trail preserved) | `ThorAAAttack{Vanilla,}WoLU` |
+  | `WraithA.Effect` → `WraithATriggerOverrideSet` | WeaponData | set = `[WraithAPersistent, WoLUWraithTriggerOverrideApply]` | **NO** — set WRAPS the vanilla `WraithAPersistent` (kept as element 0); the whole sub-chain (`WraithA{Left,Right}LaunchMissile`→`WraithAU`, missiles `WraithAirWeapon{Left,Right}`) is unchanged → all actors (`WraithAirAttack{Left,Right}`, the two missiles) fire | none needed |
+  | `WraithG.Effect` → `WraithGTriggerOverrideSet` | WeaponData | set = `[WraithGLaunchMissile, WoLUWraithTriggerOverrideApply]` | **NO** — set WRAPS the vanilla `WraithGLaunchMissile` (kept as element 0); sub-chain (`→WraithGU`, missile `WraithGroundWeapon`) unchanged → `WraithGroundAttack`+missile fire | none needed |
+  | `EMPShockwaveLaunchWoLU`/`…SearchWoLU` (SV BW EMP) | EffectData | new player-only ability, NOT a vanilla reroute | **NO** — reuses `AmmoUnit="EMP2Weapon"` so `CActorMissile id="GhostEMPAttackMissile" unitName="EMP2Weapon"` (bound by unit-name, not effect id) fires | none needed |
+  **The decisive distinction:** a reroute SET that includes the original delivery effect as a member
+  (`WraithAPersistent`/`WraithGLaunchMissile` — the Wraith "trigger-override" pattern, which only ADDS an
+  on-fire buff alongside the unchanged delivery) does NOT detach anything — every actor below that id still
+  fires. A reroute SET whose members are `parent=`-CLONES of the damage/impact id (the Thor/Viking "Shaped-
+  Blast" pattern, which REPLACES the fired id) DOES detach the `effectAttack`/`effectImpact`-bound actor.
+  And a `CActorMissile`'s `unitName=` binds to the spawned `AmmoUnit`, NEVER to the impact/launch effect id —
+  so rerouting an `ImpactEffect` never detaches the rocket trail, only the `effectImpact`-bound `CActorAction`.
+  **Before adding any new `*WoLU(Set)` reroute, ask: does the player end up firing a clone of the id an actor
+  binds to? If yes, add the per-validator-branch action/actor clone(s) restating the vanilla assets verbatim.**
+- **The unit-info DAMAGE PANEL reads a weapon's `<DisplayEffect>` (or `<Effect>` if `DisplayEffect` is
+  absent), NOT the actually-fired effect — so rerouting `<Effect>`/`ImpactEffect` to a clone leaves the panel
+  showing the WRONG number, and you must REPOINT `DisplayEffect` to the player's fired clone to make it
+  honest. CHECK11 (`scripts/check_panel_damage.py`) now gates this.** The panel computes
+  `DisplayEffect.Amount + Σ AttributeBonus[...]` (× `DisplayAttackCount`), resolved PER PLAYER for a
+  player-owned unit. Our clone architecture reroutes the weapon's `<Effect>` (or a missile's `ImpactEffect`)
+  to a `*WoLU(Set)` clone but leaves `DisplayEffect` pinned to the vanilla effect — so the panel is
+  display-NEUTRAL to the reroute and DIVERGES exactly when the player's fired `WoLUHasFlag`-gated clone child
+  carries an `Amount`/`AttributeBonus` the vanilla `DisplayEffect` id does not. Two real divergences this
+  caught: **Thor/Jotun AA** panel read `JavelinMissileLaunchersDamage` (per-player `Amount`=35 via genlib,
+  but `AttributeBonus[Light]`=4 unchanged → "+4 vs Light"), player fired
+  `JavelinMissileLaunchersDamageBuffedWoLU` = flat 35 no light → panel OVER-showed +4 Light; **Viking/Hel's
+  Angels ground** panel read `TwinGatlingCannons` (14), player fired `TwinGatlingCannonsWoLU` (14
+  +`AttributeBonus[Mechanical]`=20) → panel UNDER-showed +20. **Fix = a STATIC `<DisplayEffect>` repoint to
+  the player's fired clone** (`JavelinMissileLaunchersDamageBuffedWoLU` / `TwinGatlingCannonsWoLU`). This is
+  **rule-9-safe** because `DisplayEffect` is DISPLAY-ONLY (it never changes damage dealt): enemy ACTUAL damage
+  is untouched, and enemy command cards / damage panels are never rendered to the player, so showing the
+  buffed number globally harms nothing. (A per-player `DisplayEffect` LINK edit would NOT work — weapon/effect
+  link edits are the known no-op class; the static repoint is the only mechanism.) **Non-divergent cases the
+  check correctly leaves alone:** (a) a reroute where the weapon has NO `DisplayEffect` → the panel falls back
+  to `<Effect>`, which we already rerouted to the clone, so it reads the player's value directly (Hel's Angels
+  `WreckingCrewAssault`); (b) the Thor GROUND clone adds only splash, no `Amount`/`AttributeBonus` delta →
+  panel 45 == actual 45; (c) the Wraith trigger-override sets WRAP the unchanged vanilla delivery effect (no
+  damage clone) → the real damage stays the vanilla `WraithAU`/`WraithGU` the panel already shows. `DisplayAttackCount`
+  is a constant multiplier applied identically to old and new `DisplayEffect`, so a per-hit repoint keeps the
+  ×N total correct — the check compares the per-hit `Amount`+`AttributeBonus` tuple. **OUT of scope (panel
+  already == actual, or no per-unit fix exists):** Ghost/Spectre rifle "+vs Light/Armored" (display already
+  equals actual — both show the bonus); Senior Ghost +50% via `DamageDealtFraction` (touches no displayed
+  field and the Ghost weapon is SHARED → would need a Senior-Ghost-specific weapon clone to make exact —
+  surface as a decision, don't build). [STATIC mechanism; panel render is GAME-confirmed by the owner.]
+- **PROVEN: an upgrade `EffectArray Reference="Effect,<vanilla-parent>,Amount"` modification DOES
+  propagate to a `parent=`-inheriting CHILD clone that does NOT override `<Amount>`.** This was the
+  open "unverified statically" caveat on the rerouted weapons (see the CampaignLib §"Extending a
+  weapon/armor LEVEL upgrade" note's in-game caveat). The proof is the SHIPPED Thor case treated as a
+  natural experiment: the vanilla `TerranVehicleWeaponsLevel{1,2,3}` upgrade modifies
+  `Effect,ThorsHammerDamage,Amount` (+2/level); our mod fires the player child `ThorsHammerDamageWoLU`
+  (`parent="ThorsHammerDamage"`, splash only, no `<Amount>` → inherits the parent's 45); the owner
+  confirms Thor GROUND damage scales with the upgrade. Because catalog-field inheritance resolves the
+  child's `Amount` THROUGH the parent at read time (distinct from the runtime-`CatalogFieldValueModify`
+  clone-detachment, which can't reach an already-loaded clone), the upgrade's parent-`Amount` modify
+  reaches the child. **Implication:** the Viking ground case is identical — `TerranShipWeaponsLevel{N}`
+  modifies `Effect,TwinGatlingCannons,Amount` (+1/level), the player fires `TwinGatlingCannonsWoLU`
+  (`parent="TwinGatlingCannons"`, no `<Amount>`), so the player's ground gatling ALREADY scales; keep
+  the upgrade targeting the PARENT (retargeting to the child, or adding a child `Amount` entry, would
+  double-count). The owner's "Viking ground doesn't scale" report was a PERCEPTION artifact of the
+  detached launch/impact above (no visible ground hits to read), not a real scaling gap. **Merc reach
+  via the VANILLA layer:** the Hel's Angels merc (standalone `HelsAngelAssault`/`HelsAngelFighter`,
+  inherits nothing from the base Viking) does NOT need a parity entry because the VANILLA libertystory
+  `TerranShipWeaponsLevel{N}` already lists `Effect,WreckingCrewAssault,Amount` (ground) +
+  `Effect,WreckingCrewFighterU,Amount` (air, un-rerouted) in its own EffectArray — and our genlib
+  grants that base-Level upgrade per-player, so the merc scales through the vanilla definition. Lesson:
+  before adding a "missing" merc-weapon parity entry, grep the MERGED vanilla upgrade (libertystory +
+  liberty.sc2mod) — a grep of only OUR `UpgradeData.xml` will miss vanilla coverage and tempt a
+  double-counting duplicate. [STATIC mechanism proof via the GAME-confirmed Thor precedent.]
 - **An elite-merc clone (`parent=<base unit>`) wears a bare `GenericUnitBase` actor that has
   ONLY the generic move/idle/death/basic-attack bracket — it carries NONE of the base unit's
   unit-specific anim events** (dual-weapon elevation poses, spell-cast poses, heal channel,
@@ -466,17 +588,70 @@ gotcha; authoritative details live in the code/plan, not here.
   +damage/+level/+armor `EffectArray`s live on the **base** `Terran*Weapons/ArmorsLevelN` ids
   (`libertystory.sc2campaign/UpgradeData.xml`: e.g. `TerranVehicleWeaponsLevel1` → `ThorsHammerDamage.Amount`,
   `TerranShipWeaponsLevel1` → `WraithGU.Amount`, `TerranVehicle/ShipArmorsLevelN` → Diamondback/Hercules armor).
-  **So any trigger that keys off "did the player research weapons/armor?" must check the
-  UltraCapacitors/VanadiumPlating ids, NOT the base `Level` ids** — `TechTreeUpgradeCount`
-  on the base id stays 0 while the player researches the wrapper. This bit the Eng Bay
-  "combined upgrade" sync (`libWoLU_SyncWeaponArmorLevels`): it detected base
-  `TerranInfantryWeapons/ArmorsLevelN`, never matched, so vehicle+ship (factory + flying)
-  units never got the grant — infantry buffed, vehicles/ships didn't (owner playtest). Fixed
-  by OR-detecting both id families (an absent id just returns 0, harmless) while keeping the
-  base-`Level` ids as the GRANT targets (they carry the real effects).
+  **…BUT the family the player actually researches depends on the LAB STATE, and BOTH must be
+  detected.** The Eng Bay button differs by whether the lab's `UltraCapacitors`/`VanadiumPlating`
+  ROOT research is complete: BEFORE-lab (the default at every mission start — these ROOT upgrades
+  are NOT force-granted, so the player always begins before-lab) the Eng Bay shows Research3/4/5
+  (weapons) + Research7/8/9 (armors), which grant the **base** `TerranInfantryWeapons/ArmorsLevelN`
+  ids (`liberty.sc2mod/AbilData.xml:1699-1734`); completing the lab ROOT HIDES those (their
+  `.Show`) and reveals Research11/12/13 + Research14/15/16, which grant the **wrapper**
+  `…UltraCapacitorsLevelN`/`…VanadiumPlatingLevelN` ids
+  (`libertystory.sc2campaign/AbilData.xml:172-201`). **The two families are INDEPENDENT tech-tree
+  entries** (`…UltraCapacitorsLevel1 parent="…UltraCapacitors"`, NOT `parent="…Level1"` —
+  `liberty.sc2campaign/UpgradeData.xml:1591`): researching one leaves the other's
+  `TechTreeUpgradeCount` at 0. So a trigger keying off "did the player research weapons/armor?"
+  must **OR-detect BOTH families per level** — checking only one misses the other lab state. This
+  bit the Eng Bay "combined upgrade" sync (`libWoLU_SyncWeaponArmorLevels`): detecting only the
+  base ids worked before-lab but missed after-lab; a later fix detecting only the wrapper ids did
+  the reverse (and made the diag read `infW=0` before-lab, falsely implying the sync hadn't fired
+  — the diag now prints `base/uc` so the owner reads the effective state in EITHER scenario).
+  **Robust rule: per level n in 1..3, detect `…WeaponsLevel{n}` OR `…WeaponsUltraCapacitorsLevel{n}`
+  (armor likewise with `…ArmorsLevel{n}` OR `…ArmorsVanadiumPlatingLevel{n}`); on a hit, grant ONLY
+  the base vehicle/ship `TerranVehicle/ShipWeapons/ArmorsLevel{n}` ids** (those carry the real
+  effects; the vehicle/ship UltraCapacitors/VanadiumPlating variants are icon-only — granting them
+  adds no damage and any duplicate-effect grant would double-apply) **guarded by a per-target
+  `TechTreeUpgradeCount(... ) == 0` check so the periodic re-run is idempotent.** An absent id just
+  returns 0, so OR-ing the extra id is harmless.
 - Campaign upgrades already list **merc** units in their `EffectArray`s (e.g.
   `CombatShield` covers `WarPig`) but never heroes — extend via XML `CUpgrade`
   appends (`MarauderLifeBoost` = Kinetic Foam).
+- **Extending a weapon/armor LEVEL upgrade's affected-unit list — and the two-family trap.**
+  The weapon/armor upgrade tree splits into TWO families per level: the **base**
+  `Terran{Ship,Vehicle}{Weapons,Armors}LevelN` ids (which our Eng Bay sync grants — they
+  carry the REAL `Level`/`Amount`/`LifeArmor` effects) vs. the **wrapper**
+  `…UltraCapacitorsLevelN`/`…VanadiumPlatingLevelN` ids (icon-only display variants the sync
+  does NOT grant). **Gotcha:** the base-Level `EffectArray`s do NOT cover every player combat
+  unit — several base fliers (Banshee, Battlecruiser, Viking) + base Thor/SiegeTank/Hellion
+  armor + Medivac/Raven armor have their scaling entries ONLY in the bare **wrapper**
+  `…UltraCapacitors`/`…VanadiumPlating` upgrades (the `default="1"` ids at
+  `liberty.sc2campaign/UpgradeData.xml`: `TerranShipWeaponsUltraCapacitors` :394,
+  `TerranVehicleArmorsVanadiumPlating` :318, `TerranShipArmorsVanadiumPlating` :467). In the
+  base-Level upgrades those same units appear ONLY as cosmetic `Actor,<id>,LifeArmorIcon` /
+  `Weapon,<id>,Icon` Set entries — NOT real scaling. So if you grant only the base-Level ids
+  (as our sync does), those units don't scale. **Fix = mirror the missing units into the
+  base-Level upgrades** via same-id `<CUpgrade>` overrides with **index-less new-key
+  `EffectArray` APPENDS** (the CombatShield pattern — no explicit `index=` for NEW keys; that
+  discipline is only for OVERRIDING an existing slot's Value). Resolve the mirror values
+  against the wrapper, and re-state each LevelN identically (the per-level deltas are all `1`).
+  **Two reach rules:** (1) **armor is a per-unit-id `Unit` field** → it does NOT propagate to a
+  `parent=` merc, so `MercThor`/`MercHellion`/`MercWraith` need EXPLICIT armor entries; **weapons
+  reach `parent=` mercs via shared effect ids** (the merc inherits the base weapon's `Effect`),
+  so no merc-weapon entry is needed. (2) **Omit the wrapper's `LifeMax`/`LifeStart` `Operation=
+  "Multiply" Value="1.05"` entries** — that +5% HP is a separate perk; the base-Level armor
+  upgrades intentionally carry only `LifeArmor`+`LifeArmorLevel`. Before adding any unit, grep the
+  base-Level upgrade's MERGED contents (libertystory + liberty.sc2mod layers) — standalone
+  mercs/heroes (Wraith/Hercules/Odin/Predator/SpartanCompany/SiegeBreaker*/HelsAngel*/DukesRevenge/
+  DuskWing/ScienceVessel) usually ALREADY have base-Level entries; don't duplicate. (Done v0.3.x:
+  added the base fliers + Thor/SiegeTank/Hellion armor + Medivac/Raven armor + MercThor/MercHellion/
+  MercWraith to `TerranShip{Weapons,Armors}LevelN` + `TerranVehicleArmorsLevelN` —
+  `src/mod/Base.SC2Data/GameData/UpgradeData.xml`.) **One in-game caveat:** an upgrade entry
+  modifying a weapon `Effect`'s `Amount` (e.g. `Effect,TwinGatlingCannons,Amount`) when our mod has
+  rerouted that weapon's `Effect` to a `*WoLUSet` whose children are `parent="<that effect>"` —
+  whether the bump reaches the already-loaded child clones is unverified statically, but it's the
+  SAME class as the shipped Thor case (`Effect,ThorsHammerDamage,Amount` vs. the rerouted
+  `ThorsHammerWoLUSet`), which works per owner. Flag it for playtest, don't block on it. Rule-9:
+  these are global EffectArray edits but the player gets the upgrades per-player via the sync, and
+  WoL never grants these exact base-Level ids to enemies → effectively player-only.
 - **You can also CHANGE a vanilla CUpgrade's existing `EffectArray` *Value* (not just
   append new keys), and the safe way is by EXPLICIT `index=`.** A same-id `<CUpgrade>` in
   our static XML merges onto the vanilla definition. New `Reference=` keys append (the

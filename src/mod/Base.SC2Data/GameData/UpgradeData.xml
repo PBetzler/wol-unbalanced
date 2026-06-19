@@ -114,4 +114,194 @@
         <EffectArray index="54" Operation="Set" Reference="Unit,MercHellion,LifeRegenDelay"        Value="3.000000"/>
         <EffectArray index="55" Operation="Set" Reference="Unit,MercHellion,LifeRegenRate"         Value="20"/>
     </CUpgrade>
+
+    <!-- ================================================================================
+         Weapon/armor LEVEL scaling reach: add the base fliers + Thor/SiegeTank +
+         Medivac/Raven + the elite mercs (MercThor/MercHellion/MercWraith) to the base
+         Terran{Ship,Vehicle}{Weapons,Armors}LevelN upgrades that the Eng Bay sync grants.
+
+         WHY: WoL splits weapon/armor research into TWO upgrade families per level:
+           * the BASE  Terran{Ship,Vehicle}{Weapons,Armors}LevelN  ids, and
+           * the WRAPPER …UltraCapacitorsLevelN / …VanadiumPlatingLevelN ids.
+         Our sync (libWoLU_SyncWeaponArmorLevels) grants ONLY the base-Level ids (they
+         carry the real effects; the wrappers are icon-only display variants). But the
+         base-Level upgrades' EffectArrays MISS several player combat units — Banshee,
+         Battlecruiser, Viking, Medivac, Raven, base Thor/SiegeTank armor, and the elite
+         mercs — whose scaling entries live ONLY in the …UltraCapacitors/…VanadiumPlating
+         WRAPPERS (liberty.sc2campaign/UpgradeData.xml: TerranShipWeaponsUltraCapacitors
+         :394, TerranVehicleArmorsVanadiumPlating :318, TerranShipArmorsVanadiumPlating
+         :467). The sync never grants those wrappers, so those units did not scale with
+         the player's research. (Wraith, Hercules, the standalone fliers/mercs, and all
+         ground vehicle weapons + Odin ALREADY have base-Level entries — verified — so
+         they are intentionally NOT re-stated below.)
+
+         FIX: a same-id <CUpgrade> here MERGES onto the vanilla definition; NEW Reference=
+         keys in an EffectArray APPEND (the CombatShield/MarauderLifeBoost pattern above —
+         no explicit index= for new keys). Below we append ONLY the missing unit keys,
+         mirroring the wrapper Values exactly. We deliberately OMIT the wrappers'
+         LifeMax/LifeStart ×1.05 Multiply entries — that +5% HP perk is separate from the
+         armor-LEVEL scaling, and the base-Level upgrades carry only LifeArmor+LifeArmorLevel.
+
+         MERC REACH (rule 4): armor is a per-unit-id Unit field, so it does NOT reach a
+         parent= merc — MercThor/MercHellion/MercWraith need explicit Unit entries (added).
+         Weapons reach parent= mercs via shared effect ids, so no merc-weapon entry is
+         needed. Standalone mercs/heroes already have their own base-Level entries (verified).
+
+         RULE 9: this is a global EffectArray edit, but (a) owner-approved, (b) same risk
+         class as the base-Wraith coverage already present in these upgrades, (c) the
+         player gets these upgrades per-player via the sync — enemies scale only if a
+         mission grants them that exact base-Level upgrade, which WoL does not.
+
+         IN-GAME VERIFY ITEM (single): our mod reroutes the Viking ground weapon
+         TwinGatlingCannon's Effect to TwinGatlingCannonsWoLUSet (children parent=
+         "TwinGatlingCannons"); whether the upgrade's Effect,TwinGatlingCannons,Amount bump
+         propagates to the already-loaded child clones is unverified statically — but this
+         is the SAME class as the shipped Thor case (vehicle-weapon upgrade modifies
+         Effect,ThorsHammerDamage,Amount while the Thor weapon is rerouted to a *WoLUSet
+         with children parent="ThorsHammerDamage"), which works per owner. Mirroring it is
+         consistent with that precedent. Flag Viking-ground-damage-scaling for playtest.
+         ================================================================================ -->
+
+    <!-- Ship WEAPONS — mirror TerranShipWeaponsUltraCapacitors (base fliers' weapon scaling). -->
+    <CUpgrade id="TerranShipWeaponsLevel1">
+        <EffectArray Reference="Weapon,BacklashRockets,Level" Value="1"/>          <!-- Banshee -->
+        <EffectArray Reference="Effect,BacklashRocketsU,Amount" Value="1"/>
+        <EffectArray Reference="Weapon,ATSLaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-ground -->
+        <EffectArray Reference="Effect,ATSLaserBatteryU,Amount" Value="1.000000"/>
+        <EffectArray Reference="Weapon,ATALaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-air -->
+        <EffectArray Reference="Effect,ATALaserBatteryU,Amount" Value="1.000000"/>
+        <EffectArray Reference="Weapon,LanzerTorpedoes,Level" Value="1"/>          <!-- Viking air mode -->
+        <EffectArray Reference="Effect,LanzerTorpedoesDamage,Amount" Value="1.000000"/>
+        <EffectArray Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="1.000000"/>
+        <EffectArray Reference="Weapon,TwinGatlingCannon,Level" Value="1"/>        <!-- Viking ground mode (see verify note) -->
+        <EffectArray Reference="Effect,TwinGatlingCannons,Amount" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranShipWeaponsLevel2">
+        <EffectArray Reference="Weapon,BacklashRockets,Level" Value="1"/>          <!-- Banshee -->
+        <EffectArray Reference="Effect,BacklashRocketsU,Amount" Value="1"/>
+        <EffectArray Reference="Weapon,ATSLaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-ground -->
+        <EffectArray Reference="Effect,ATSLaserBatteryU,Amount" Value="1.000000"/>
+        <EffectArray Reference="Weapon,ATALaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-air -->
+        <EffectArray Reference="Effect,ATALaserBatteryU,Amount" Value="1.000000"/>
+        <EffectArray Reference="Weapon,LanzerTorpedoes,Level" Value="1"/>          <!-- Viking air mode -->
+        <EffectArray Reference="Effect,LanzerTorpedoesDamage,Amount" Value="1.000000"/>
+        <EffectArray Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="1.000000"/>
+        <EffectArray Reference="Weapon,TwinGatlingCannon,Level" Value="1"/>        <!-- Viking ground mode (see verify note) -->
+        <EffectArray Reference="Effect,TwinGatlingCannons,Amount" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranShipWeaponsLevel3">
+        <EffectArray Reference="Weapon,BacklashRockets,Level" Value="1"/>          <!-- Banshee -->
+        <EffectArray Reference="Effect,BacklashRocketsU,Amount" Value="1"/>
+        <EffectArray Reference="Weapon,ATSLaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-ground -->
+        <EffectArray Reference="Effect,ATSLaserBatteryU,Amount" Value="1.000000"/>
+        <EffectArray Reference="Weapon,ATALaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-air -->
+        <EffectArray Reference="Effect,ATALaserBatteryU,Amount" Value="1.000000"/>
+        <EffectArray Reference="Weapon,LanzerTorpedoes,Level" Value="1"/>          <!-- Viking air mode -->
+        <EffectArray Reference="Effect,LanzerTorpedoesDamage,Amount" Value="1.000000"/>
+        <EffectArray Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="1.000000"/>
+        <EffectArray Reference="Weapon,TwinGatlingCannon,Level" Value="1"/>        <!-- Viking ground mode (see verify note) -->
+        <EffectArray Reference="Effect,TwinGatlingCannons,Amount" Value="1"/>
+    </CUpgrade>
+
+    <!-- Ship ARMOR — mirror TerranShipArmorsVanadiumPlating LifeArmor/LifeArmorLevel (NOT the
+         LifeMax/LifeStart ×1.05 perk). Wraith/Hercules/ScienceVessel/DukesRevenge/DuskWing/
+         HelsAngel* already have base ship-armor entries — not duplicated. -->
+    <CUpgrade id="TerranShipArmorsLevel1">
+        <EffectArray Reference="Unit,Banshee,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Banshee,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Battlecruiser,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Battlecruiser,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Medivac,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Medivac,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Raven,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Raven,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,VikingFighter,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,VikingFighter,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,VikingAssault,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,VikingAssault,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercWraith,LifeArmor" Value="1.000000"/>       <!-- rule-4 merc parity (Winged Nightmares) -->
+        <EffectArray Reference="Unit,MercWraith,LifeArmorLevel" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranShipArmorsLevel2">
+        <EffectArray Reference="Unit,Banshee,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Banshee,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Battlecruiser,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Battlecruiser,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Medivac,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Medivac,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Raven,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Raven,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,VikingFighter,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,VikingFighter,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,VikingAssault,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,VikingAssault,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercWraith,LifeArmor" Value="1.000000"/>       <!-- rule-4 merc parity (Winged Nightmares) -->
+        <EffectArray Reference="Unit,MercWraith,LifeArmorLevel" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranShipArmorsLevel3">
+        <EffectArray Reference="Unit,Banshee,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Banshee,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Battlecruiser,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Battlecruiser,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Medivac,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Medivac,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Raven,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Raven,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,VikingFighter,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,VikingFighter,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,VikingAssault,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,VikingAssault,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercWraith,LifeArmor" Value="1.000000"/>       <!-- rule-4 merc parity (Winged Nightmares) -->
+        <EffectArray Reference="Unit,MercWraith,LifeArmorLevel" Value="1"/>
+    </CUpgrade>
+
+    <!-- Vehicle ARMOR — mirror TerranVehicleArmorsVanadiumPlating LifeArmor/LifeArmorLevel (NOT
+         the LifeMax/LifeStart ×1.05 perk). Diamondback/Vulture/Goliath/SpartanCompany/
+         SiegeBreaker*/Odin/Predator already have base vehicle-armor entries — not duplicated.
+         MercThor (parent Thor) / MercHellion (parent Hellion) are SEPARATE unit ids — armor is a
+         Unit field, so it does NOT reach them via parent=; explicit entries added. MercWraith
+         handled in the Ship block above. (genlib also adds a flat one-time +armor to some of
+         these — additive and independent of this per-level scaling; both stack, no conflict.) -->
+    <CUpgrade id="TerranVehicleArmorsLevel1">
+        <EffectArray Reference="Unit,Thor,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Thor,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,SiegeTank,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,SiegeTank,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Hellion,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Hellion,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercThor,LifeArmor" Value="1.000000"/>        <!-- rule-4 merc parity (Jotun) -->
+        <EffectArray Reference="Unit,MercThor,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
+        <EffectArray Reference="Unit,MercHellion,LifeArmorLevel" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranVehicleArmorsLevel2">
+        <EffectArray Reference="Unit,Thor,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Thor,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,SiegeTank,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,SiegeTank,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Hellion,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Hellion,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercThor,LifeArmor" Value="1.000000"/>        <!-- rule-4 merc parity (Jotun) -->
+        <EffectArray Reference="Unit,MercThor,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
+        <EffectArray Reference="Unit,MercHellion,LifeArmorLevel" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranVehicleArmorsLevel3">
+        <EffectArray Reference="Unit,Thor,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Thor,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,SiegeTank,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,SiegeTank,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,Hellion,LifeArmor" Value="1.000000"/>
+        <EffectArray Reference="Unit,Hellion,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercThor,LifeArmor" Value="1.000000"/>        <!-- rule-4 merc parity (Jotun) -->
+        <EffectArray Reference="Unit,MercThor,LifeArmorLevel" Value="1"/>
+        <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
+        <EffectArray Reference="Unit,MercHellion,LifeArmorLevel" Value="1"/>
+    </CUpgrade>
 </Catalog>
