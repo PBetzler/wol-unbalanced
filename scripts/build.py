@@ -12,7 +12,13 @@ so we strip their mod dependency and insert ours as the only custom one.
 """
 import os, re, shutil, subprocess, sys, tempfile
 
-import mpyq
+# mpyq is only needed by the map-patching build path (patch_* / build / package). The version
+# helpers (version_file_blobs) used by the CI repack path don't need it, and the CI release job
+# doesn't install it — so import lazily, letting `import build` succeed without mpyq present.
+try:
+    import mpyq
+except ImportError:
+    mpyq = None
 
 # Windows: the default console codepage (cp1252) can't encode the non-ASCII glyphs
 # (→ ✓ — ×) we print, raising UnicodeEncodeError. Force UTF-8 stdout/stderr.
