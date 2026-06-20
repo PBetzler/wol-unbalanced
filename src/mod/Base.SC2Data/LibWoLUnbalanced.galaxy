@@ -227,33 +227,12 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
     // 10 s one is the canary you'll actually see after skipping the intro).
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced v__WOLU_VERSION__: data applied, upgrades & mercs granted."));
-    // Runtime diagnostic (read this back when testing). Expected when healthy:
-    // clone=5 (StimpackWoLU AutoCastRange from our XML), fx=WoLUStimSet (the effect
-    // actually wired — index-less Effect assignment was the old manual-cast killer),
-    // flag=1, m3=StimpackWoLU (Marine slot-3 index-override), t1=ThorsHammer
-    // (vanilla weapon kept — splash now via its overridden Effect, not a clone swap).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag: clone=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "AutoCastRange", libWoLU_Player) + " fx=" + CatalogFieldValueGet(c_gameCatalogAbil, "StimpackWoLU", "Effect[0]", libWoLU_Player) + " flag=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "WoLUnbalancedFlag", c_techCountCompleteOnly)) + " m3=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[3].Link", libWoLU_Player) + " t1=" + CatalogFieldValueGet(c_gameCatalogUnit, "Thor", "WeaponArray[1].Link", libWoLU_Player)));
-    // Append diagnostic: does a STATIC-XML indexless AbilArray append actually apply?
-    // Vanilla Marine has 4 abils (stop/attack/move/Stimpack); we append MagrailWoLU.
-    // Healthy => acount=5, m4=MagrailWoLU. If acount=4 / m4 empty, appends are dropped
-    // (then new abilities must use explicit indices, not indexless appends).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag2: acount=" + IntToString(CatalogFieldValueCount(c_gameCatalogUnit, "Marine", "AbilArray", libWoLU_Player)) + " m4=" + CatalogFieldValueGet(c_gameCatalogUnit, "Marine", "AbilArray[4].Link", libWoLU_Player) + " bcount=" + IntToString(CatalogFieldValueCount(c_gameCatalogUnit, "Marine", "CardLayouts[0].LayoutButtons", libWoLU_Player))));
-    // Damage-flatten diagnostic: does a per-player indexed-ARRAY effect edit apply?
-    // We set C10CanisterRifle (Ghost rifle) Amount 10->20 and AttributeBonus[Light] 10->0.
-    // Healthy => gAmt=20 gLgt=0 (flatten worked: 20 flat, no "+vs light"). If gLgt=10 the
-    // indexed-array edit is a no-op (top-level Amount applies, array element does not) and
-    // the flatten needs the Shaped-Blast clone pattern instead (open-issues: damage display).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diag3: gAmt=" + CatalogFieldValueGet(c_gameCatalogEffect, "C10CanisterRifle", "Amount", libWoLU_Player) + " gLgt=" + CatalogFieldValueGet(c_gameCatalogEffect, "C10CanisterRifle", "AttributeBonus[Light]", libWoLU_Player)));
-    // TEMPORARY weapon/armor-sync diag (REMOVABLE once owner confirms the Eng Bay combined
-    // upgrades lift vehicle + ship units). infW is shown as base/uc — base = the BEFORE-lab
-    // infantry-weapons Level1 id (Eng Bay Research3), uc = the AFTER-lab UltraCapacitors
-    // wrapper id (Research11). EXACTLY ONE family is researchable per lab state, so a healthy
-    // read is infW=1/0 BEFORE the Ultra-Capacitors lab research and infW=0/1 AFTER it — either
-    // way the sync detects it (OR-detection). vehW/shipW = the vehicle/ship weapon levels the
-    // sync GRANTS. Healthy after researching weapons L1 in EITHER state: vehW>=1, shipW>=1.
-    // If infW reads >=1 on a side but vehW=0/shipW=0 the grant didn't take; if infW=0/0 the
-    // weapons research hasn't completed yet (so there is nothing to detect).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU diagUpg: infW=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranInfantryWeaponsLevel1", c_techCountCompleteOnly)) + "/" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranInfantryWeaponsUltraCapacitorsLevel1", c_techCountCompleteOnly)) + " vehW=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranVehicleWeaponsLevel1", c_techCountCompleteOnly)) + " shipW=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipWeaponsLevel1", c_techCountCompleteOnly))));
+    // OPEN-POINTS diagnostic — keep ONLY the issues under active debug; REMOVE each marker
+    // once the owner confirms it in game (the "clean the markers up afterwards" rule). Reads
+    // our clones straight from the LIVE catalog, so empties = the loaded build lacks them.
+    // Healthy on v0.3.23: raven=PointDefenseLaserWoLU  svheal=SVHealInitialSwitchWoLU  hp=15.
+    // Any empty/old value (with the version line above) tells us the live build is stale.
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: raven=" + CatalogFieldValueGet(c_gameCatalogUnit, "Raven", "WeaponArray[0].Link", libWoLU_Player) + " svheal=" + CatalogFieldValueGet(c_gameCatalogAbil, "SVDoubleBeamHealWoLU", "Effect[0]", libWoLU_Player) + " hp=" + CatalogFieldValueGet(c_gameCatalogEffect, "SVHealModifyTargetLifeWoLU", "VitalArray[Life].Change", libWoLU_Player)));
     return true;
 }
 
