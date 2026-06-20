@@ -298,8 +298,15 @@ void libWoLU_SyncWeaponArmorLevels (int p) {
 
 void libWoLU_DisableArmoryResearch (int p) {
     int i;
-    i = 2;  // command indices of ArmoryResearch Research3..Research14
-    while (i <= 13) {
+    // The Armory ONLY researches vehicle/ship weapon+armor LEVELS, and every one is redundant:
+    // the Engineering Bay's infantry upgrades now grant the vehicle+ship equivalents
+    // (libWoLU_SyncWeaponArmorLevels) and rule 2 auto-purchases all armory tech anyway. The old
+    // loop covered only the BASE levels (Research3-14) and missed the post-lab UltraCapacitors /
+    // VanadiumPlating WRAPPER commands (Research16-27), which kept showing on the building.
+    // Disable EVERY ArmoryResearch command — 0..30 covers all of them regardless of the exact
+    // command-index offset; a disable on a non-existent index is a harmless no-op.
+    i = 0;
+    while (i <= 30) {
         TechTreeAbilityAllow(p, AbilityCommand("ArmoryResearch", i), false);
         i = i + 1;
     }
