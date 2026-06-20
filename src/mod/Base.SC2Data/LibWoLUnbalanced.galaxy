@@ -143,14 +143,16 @@ void libWoLU_GrantCampaignTech (int p) {
     // upgrade is the requirement gate that only the human player ever satisfies.
     TechTreeUpgradeAddLevel(p, "WoLUnbalancedFlag", 1);
 
-    // Smart Servos (AP): faster Viking transform. Morph durations are nested
-    // indexed-array fields (NOOP for per-player runtime edits) → delivered as a
-    // player-only CUpgrade EffectArray Subtract (UpgradeData.xml WoLUSmartServos,
-    // the rogue Kit@AISmartServos pattern). Granting it only to the human player
-    // makes the global static edit effectively player-only → rule-9-safe. Covers
-    // the base Viking AND the Hel's Angels merc (separate morph ids). The
-    // attack-while-moving half is a per-player Weapon.AllowedMovement edit in genlib.
-    TechTreeUpgradeAddLevel(p, "WoLUSmartServos", 1);
+    // Smart Servos (AP): faster Viking transform via the WoLUSmartServos CUpgrade.
+    // DISABLED v0.3.16 — prime suspect for the owner's "no canary / no mercs in mission" report.
+    // This TechTreeUpgradeAddLevel was the ONLY combat-path change since the mod last ran clean,
+    // and it sits just BEFORE the elite-merc TechTreeUnitAllow calls + the canary — so if applying
+    // this morph-duration upgrade errors at runtime it would halt GrantCampaignTech exactly there
+    // (elite mercs never allowed, canary never prints). Its EffectArray Reference paths DO resolve
+    // statically, but applying a Subtract to a CAbilMorph DurationArray via upgrade is unverified
+    // in-game. Left commented (not deleted) pending the owner's diagnostic; the fire-while-moving
+    // half of Smart Servos (Weapon.AllowedMovement, genlib) is unaffected and still active.
+    // TechTreeUpgradeAddLevel(p, "WoLUSmartServos", 1);
 
     // Extra elite-merc calldowns (Field Engineer Zeta / Grim Reaper / Condor) are added
     // in static XML as SummonMercenaries Train9-11. They're not in the campaign merc-panel
@@ -221,6 +223,11 @@ void libWoLU_EnableCurrentMissionUnits (int p) {
 }
 
 bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
+    // DIAGNOSTIC (v0.3.16, TEMP): an EARLY canary printed BEFORE the grant runs. If the owner sees
+    // this "pre-grant" line but NOT the "data applied" line below, GrantCampaignTech is halting
+    // mid-way (a runtime error inside it). If NEITHER line shows, the library/timer isn't running at
+    // all (install/load issue). If BOTH show, the grant completes and mercs should be owned.
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU: lib running (pre-grant) — if you see this but not 'data applied', the grant is crashing."));
     libWoLU_GrantCampaignTech(libWoLU_Player);
     // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
     // 10 s one is the canary you'll actually see after skipping the intro).

@@ -43,6 +43,12 @@ def main(base_zip: str, tag: str) -> None:
                 full = os.path.join(dirpath, fn)
                 rel = os.path.relpath(full, MOD_SRC)
                 dst.write(full, f"{TITLE}/{MOD_NAME}/{rel}")
+        # src/mod has no .version files (build.py generates them at build time) — emit them here
+        # too so the repacked release mod matches a local build.py build (parity gap fix: prior
+        # CI releases shipped a mod missing DocumentInfo/GameData/GameText.version).
+        import build
+        for fname, blob in build.version_file_blobs().items():
+            dst.writestr(f"{TITLE}/{MOD_NAME}/{fname}", blob)
     print(f"repacked -> {out_path}")
 
 
