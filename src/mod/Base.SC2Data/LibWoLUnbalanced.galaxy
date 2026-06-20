@@ -226,7 +226,7 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     libWoLU_GrantCampaignTech(libWoLU_Player);
     // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
     // 10 s one is the canary you'll actually see after skipping the intro).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced: data applied, upgrades & mercs granted."));
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced v__WOLU_VERSION__: data applied, upgrades & mercs granted."));
     // Runtime diagnostic (read this back when testing). Expected when healthy:
     // clone=5 (StimpackWoLU AutoCastRange from our XML), fx=WoLUStimSet (the effect
     // actually wired — index-less Effect assignment was the old manual-cast killer),

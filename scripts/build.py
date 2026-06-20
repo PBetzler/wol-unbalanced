@@ -74,7 +74,7 @@ SC2 = _default_sc2_dir()
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
-VERSION = "0.3.22"
+VERSION = "0.3.23"
 
 # --- Optional Nightmare-difficulty base (LOCAL-ONLY) -------------------------------
 # `python3 scripts/build.py build nightmare` (or `package nightmare`) layers our mod on
@@ -304,6 +304,20 @@ def write_version_files(mod_dir: str) -> None:
             f.write(blob)
 
 
+def _stamp_version(mod_dir: str) -> None:
+    """Replace the __WOLU_VERSION__ token in the built galaxy lib with VERSION so the in-mission
+    canary subtitle reads back the EXACT live build — a definitive load-proof. The source carries
+    the literal token (so `git` never churns the version), and the shipped/installed copy carries
+    the real number; if the owner sees an OLD number (or none) in game, the install/load is stale,
+    not the code. Token lives only inside a string literal, so galaxy_lint on the source is happy."""
+    lib = os.path.join(mod_dir, "Base.SC2Data", "LibWoLUnbalanced.galaxy")
+    with open(lib, "r", encoding="utf-8") as f:
+        text = f.read()
+    if "__WOLU_VERSION__" in text:
+        with open(lib, "w", encoding="utf-8") as f:
+            f.write(text.replace("__WOLU_VERSION__", VERSION))
+
+
 def build() -> None:
     preflight()
     maps_out = os.path.join(BUILD, "Campaign")
@@ -325,6 +339,7 @@ def build() -> None:
         # the source campaign's own mod and metadata are reference-only, not shipped
 
     shutil.copytree(MOD_SRC, os.path.join(mods_out, MOD_NAME))
+    _stamp_version(os.path.join(mods_out, MOD_NAME))
     write_version_files(os.path.join(mods_out, MOD_NAME))
     if NIGHTMARE_BASE:
         # Bundle Rhyme's difficulty mod alongside ours (it's a 132 KB MPQ file).

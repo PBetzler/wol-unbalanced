@@ -378,8 +378,17 @@
          vanilla life-restore effect is untouched so the Medivac is unaffected). -->
     <CEffectSet id="SVHealModifySetWoLU">
         <EditorCategories value="Race:Terran"/>
-        <EffectArray value="MedivacHealModifyTargetLife"/>
+        <EffectArray value="SVHealModifyTargetLifeWoLU"/>
     </CEffectSet>
+
+    <!-- Stronger per-tick heal (owner: "more HP"): vanilla MedivacHealModifyTargetLife restores
+         only 1 Life/tick (≈9 HP/s at the 0.111 s period). Clone it to 15/tick (≈135 HP/s per beam,
+         ×2 beams) so the SV is a real field-healer. Player-only: only SVHealModifySetWoLU (gated by
+         WoLUHaveFlag upstream) references this clone; the vanilla effect is untouched (Medivac safe).
+         The heal is still FREE (no caster-energy effect in this set). -->
+    <CEffectModifyUnit id="SVHealModifyTargetLifeWoLU" parent="MedivacHealModifyTargetLife">
+        <VitalArray index="Life" Change="15"/>
+    </CEffectModifyUnit>
 
     <!-- The channeled scan that periodically auto-acquires a SECOND heal target. Clone the
          vanilla scan-persistent and repoint its periodic effect (slot 0) to our search;
