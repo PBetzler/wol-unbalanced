@@ -12,17 +12,20 @@ server) may be ABSENT on Windows; everything you need is in the docs indexed bel
 
 **WoL Unbalanced** is a funnily-overpowered, **player-only** StarCraft II: Wings of Liberty
 campaign mod for GiantGrantGames' Custom Campaign Manager (CCM) — your army is buffed every which
-way, enemies stay vanilla (rule 9). **v0.3.15 is the current batch** (on `main`; v0.3.14 was the last
-published release before it). v0.3.14 = a passive-icon truth pass (Smart Servos / Shaped Hull /
-Medivac logistics made real), the either/or train-button collision fix, the Senior Ghost panel clone,
-AND a new one-time **Skip Prophecy (Zeratul) missions** button on the `tstory01` Hyperion hub.
-**v0.3.15** = two owner-playtest fixes on that batch: (1) Siege Breakers (and any merc) stayed
-*buyable* on the Hyperion after its unlock mission — the campaign's `UpdateMercStatus` flips a
-newly-unlocked merc back to purchasable, so we now re-assert all mercs `Purchased` on the hub; (2) the
-Skip-Prophecy button never appeared — a gate bug (`== Available` vs `!= Locked`) plus the suspicion
-that game-time timers don't advance on the story-mode hub, so hub triggers now also fire on
-`c_timeReal`, with a temporary `WoLU hub:` diagnostic subtitle to confirm. Both [GAME]-pending the
-owner's next playtest (and the diag read). See [open-issues.md](open-issues.md) §v0.3.15.
+way, enemies stay vanilla (rule 9). **v0.3.18 is the current batch** (on `main`). The headline of the
+v0.3.14–v0.3.18 arc: v0.3.14 added the **Skip Prophecy (Zeratul) missions** button (+ a passive-icon
+truth pass / train-button collision fix / Senior Ghost clone), then **v0.3.15–v0.3.17 chased a phantom**
+— the owner reported "nothing works / no canary", and I shipped speculative fixes assuming a code bug.
+**The REAL root cause (found in v0.3.18): `build.py install` was writing to `Program Files\StarCraft II`
+instead of the SC2 USER folder `Documents\StarCraft II`** (regression a4ab52b), so the mod never loaded
+and the owner played the vanilla campaign. Fixed the install target; re-enabled `WoLUSmartServos` (a
+false suspect I'd disabled in v0.3.16); removed the pre-grant diagnostic canary. So the mod's FEATURES
+(Skip-Prophecy button, merc behaviour, faster Viking transform) are now installed correctly and
+**[GAME]-pending the owner's FIRST real (loading) playtest** — none were ever actually tested because
+the mod wasn't loading. Process guards added so this can't recur: **CHECK12** (never re-identify a
+vanilla unit), a **SessionStart engram hook** (load cross-session memory first), and CLAUDE.md Hard
+Rules ("verify the mod is LOADED before debugging the code"). See [open-issues.md](open-issues.md)
+§v0.3.18.
 The mechanism: the WoL campaign maps stay vanilla except one patched dependency line + a one-line
 `MapScript.galaxy` include, and a component-folder `.SC2Mod` whose Galaxy library applies every
 change **per player** at mission start (catalog modifications + the campaign's tech-granting

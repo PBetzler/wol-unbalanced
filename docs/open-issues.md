@@ -6,6 +6,33 @@ Format: `- [ ]` open, `- [x]` resolved. Newest at the top of each section. When 
 
 Running gate: `python3 scripts/audit.py` catches the structural classes statically (missing/malformed actors, dead calldowns) before a build ships; the rest below need in-game observation.
 
+## v0.3.18 — ROOT CAUSE found (install path) + correcting the v0.3.15–v0.3.17 record (2026-06-20)
+
+**The real bug behind the whole "nothing works" spiral was NOT in the mod — it was the install
+TARGET.** `build.py install` wrote to `C:\Program Files (x86)\StarCraft II` instead of the SC2 USER
+folder `C:\Users\<user>\Documents\StarCraft II` (regression commit a4ab52b), so the files landed where
+the game never looks → `Documents\…\Maps\Campaign` stayed EMPTY → the owner played the VANILLA WoL
+campaign with no mod attached. Fixed in `scripts/build.py` `_default_sc2_dir()` + reinstalled correctly;
+guarded by a new CLAUDE.md Hard Rule ("verify the mod is LOADED before debugging the code") and the
+SessionStart engram hook.
+
+Correcting the record — several v0.3.15/v0.3.16 "bugs" were the **not-loading symptom**, not real defects:
+- [x] **Siege Breakers / mercs "still buyable"** was vanilla merc behaviour (mod not loaded). The
+  all-mercs-from-start grant already works (engram #74). The v0.3.15 hub merc re-purchase + the
+  `c_timeReal` hub timers are KEPT as low-risk belt-and-suspenders (UpdateMercStatus genuinely flips a
+  newly-unlocked merc back to buyable; story-mode game-time is genuinely uncertain), but they were
+  addressing a phantom at the time — re-validate in a real (loading) playtest.
+- [x] **WoLUSmartServos "crashed the grant" — FALSE SUSPECT, RE-ENABLED (v0.3.18).** I disabled the
+  `TechTreeUpgradeAddLevel(p,"WoLUSmartServos",1)` grant in v0.3.16 suspecting it halted GrantCampaignTech;
+  the real cause was the install path. Its EffectArray references all resolve (AssaultMode/FighterMode +
+  Hel's Angels WreckingCrew*Mode), so it's re-enabled. The standard "data applied" canary completing
+  confirms it doesn't crash.
+- [x] **Removed the temporary "pre-grant" diagnostic canary** (it was for a grant-crash hypothesis that
+  was wrong). The `WoLU hub:` diag stays until the owner confirms the Skip-Prophecy button in-game.
+
+**Now genuinely [GAME]-pending their FIRST real (loading) playtest:** the canary + buffs show; the
+Skip-Prophecy button on the Hyperion (tstory01); Siege Breakers/elite mercs owned; faster Viking transform.
+
 ## v0.3.16 — owner playtest: the WHOLE mod stopped running in-mission (no canary, no mercs) (2026-06-20)
 
 Owner on v0.3.15: **no canary subtitle at all in mission**, Siege Breakers + all elite mercs unbuyable, no Hyperion diag. The canary + the merc grants both come from `libWoLU_OnGrantTech` → `libWoLU_GrantCampaignTech` (canary prints AFTER the grant returns; the elite-merc `TechTreeUnitAllow` calls are LATE in that function), so "no canary AND elite mercs unbuyable" = **the grant is halting partway / the library isn't running**. Static investigation: the **released artifact is correct** — verified the released maps carry our injection (`include "LibWoLUnbalanced"` + `libWoLU_InitLib()`) and the released mod is the right galaxy version; `WoLUSmartServos`' EffectArray `Reference=` paths all resolve. Two changes shipped to localize + likely-fix:
