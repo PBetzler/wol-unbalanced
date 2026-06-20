@@ -12,8 +12,8 @@ server) may be ABSENT on Windows; everything you need is in the docs indexed bel
 
 **WoL Unbalanced** is a funnily-overpowered, **player-only** StarCraft II: Wings of Liberty
 campaign mod for GiantGrantGames' Custom Campaign Manager (CCM) — your army is buffed every which
-way, enemies stay vanilla (rule 9). **v0.3.14 is the current batch** (on `main`; v0.3.12 was the last
-published release — v0.3.13 + v0.3.14 ship together on the v0.3.14 tag, gate green). v0.3.14 = a
+way, enemies stay vanilla (rule 9). **v0.3.14 is the current batch** (on `main`; v0.3.13 was the last
+published release — v0.3.14 ships on the v0.3.14 tag, gate green). v0.3.14 = a
 passive-icon truth pass (Smart Servos / Shaped Hull / Medivac logistics made real), the either/or
 train-button collision fix, the Senior Ghost panel clone, AND a new one-time **Skip Prophecy
 (Zeratul) missions** button on the `tstory01` Hyperion hub (marks the 4 Zeratul missions complete +
