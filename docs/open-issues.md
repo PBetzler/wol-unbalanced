@@ -6,14 +6,20 @@ Format: `- [ ]` open, `- [x]` resolved. Newest at the top of each section. When 
 
 Running gate: `python3 scripts/audit.py` catches the structural classes statically (missing/malformed actors, dead calldowns) before a build ships; the rest below need in-game observation.
 
-## v0.3.18 — ROOT CAUSE found (install path) + correcting the v0.3.15–v0.3.17 record (2026-06-20)
+## v0.3.18 — ROOT CAUSE found (install path = the GAME INSTALL dir) + correcting the spiral record (2026-06-20)
 
 **The real bug behind the whole "nothing works" spiral was NOT in the mod — it was the install
-TARGET.** `build.py install` wrote to `C:\Program Files (x86)\StarCraft II` instead of the SC2 USER
-folder `C:\Users\<user>\Documents\StarCraft II` (regression commit a4ab52b), so the files landed where
-the game never looks → `Documents\…\Maps\Campaign` stayed EMPTY → the owner played the VANILLA WoL
-campaign with no mod attached. Fixed in `scripts/build.py` `_default_sc2_dir()` + reinstalled correctly;
-guarded by a new CLAUDE.md Hard Rule ("verify the mod is LOADED before debugging the code") and the
+TARGET, and it was mis-diagnosed TWICE before CCM's source settled it.** AUTHORITATIVE (CCM source
+github.com/7thAce/SC2CCM `CCM/FormMain.cs`): CCM installs custom campaigns/mods into the GAME INSTALL
+dir — `sc2BasePath` = the SC2.exe directory from the registry (`C:\Program Files (x86)\StarCraft II`),
+maps → `sc2BasePath\Maps\Campaign`, mods → `sc2BasePath\Mods\`. So `build.py install` MUST target
+`C:\Program Files (x86)\StarCraft II`, NOT `Documents\StarCraft II`. Mid-spiral, a session (commit
+867a718) wrongly flipped `_default_sc2_dir()` to Documents on a verbal "it works on the Documents
+files" — that put the mod where CCM/the game never look → CCM reported **"no mod installed"**, the
+campaign loaded VANILLA (no canary). Re-pointed to the install dir (CCM-source-confirmed) +
+reinstalled correctly (mod in `Program Files\…\Mods`, maps in `…\Maps\Campaign` beside the
+nova/swarm/void slots); guarded by a CLAUDE.md Hard Rule ("verify the mod is LOADED before debugging
+the code") and the
 SessionStart engram hook.
 
 Correcting the record — several v0.3.15/v0.3.16 "bugs" were the **not-loading symptom**, not real defects:

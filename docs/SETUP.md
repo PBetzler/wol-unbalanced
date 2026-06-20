@@ -375,10 +375,14 @@ dead end** on retail 5.x (documented in both) — don't re-chase it.
   via the user `Documents\StarCraft II\Mods\` folder; merc model/portrait/armor verified — see
   [open-issues.md](open-issues.md) §"Editor verification pass").
 
-### Still pending real Windows confirmation (local-build only — not needed to ship)
-- **`build.py install` to `C:\Program Files (x86)\StarCraft II`** — not run (that dir needs admin;
-  a non-admin alternative is to copy `build/Mods` + `build/Campaign` into
-  `Documents\StarCraft II\{Mods,Maps\Campaign}`, which the Editor/game also read — done this round).
+### Install target — CONFIRMED `C:\Program Files (x86)\StarCraft II` (the GAME INSTALL dir)
+- **`build.py install` targets `C:\Program Files (x86)\StarCraft II`** — this is CCM's `sc2BasePath`
+  (the SC2.exe dir from the registry; maps → `…\Maps\Campaign`, mods → `…\Mods`; verified in CCM's
+  source github.com/7thAce/SC2CCM `CCM/FormMain.cs`, and matched by every working campaign/mod on the
+  dev box). Writing succeeds without an admin prompt on this setup. **DO NOT install into
+  `Documents\StarCraft II` for in-game/CCM play** — only the SC2 **Editor Previewer** reads
+  `Documents\StarCraft II\Mods\`; CCM and the launched game do NOT. Confusing the Editor-Previewer path
+  (Documents) with the CCM/game path (install dir) caused the v0.3.14–v0.3.18 "no mod installed" spiral.
 - **Editor `Test Document` (Ctrl+F9) in-game run** — not attempted: our mod loads via a
   hand-injected `MapScript.galaxy` include, and the Editor may recompile the map script on test and
   drop it (false-negative risk), plus a possible campaign-license guard. The reliable in-game path

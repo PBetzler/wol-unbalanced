@@ -16,9 +16,12 @@ way, enemies stay vanilla (rule 9). **v0.3.18 is the current batch** (on `main`)
 v0.3.14–v0.3.18 arc: v0.3.14 added the **Skip Prophecy (Zeratul) missions** button (+ a passive-icon
 truth pass / train-button collision fix / Senior Ghost clone), then **v0.3.15–v0.3.17 chased a phantom**
 — the owner reported "nothing works / no canary", and I shipped speculative fixes assuming a code bug.
-**The REAL root cause (found in v0.3.18): `build.py install` was writing to `Program Files\StarCraft II`
-instead of the SC2 USER folder `Documents\StarCraft II`** (regression a4ab52b), so the mod never loaded
-and the owner played the vanilla campaign. Fixed the install target; re-enabled `WoLUSmartServos` (a
+**The REAL root cause (found in v0.3.18, settled by CCM's source): the install TARGET.** CCM installs
+custom content into the GAME INSTALL dir — `sc2BasePath` = the SC2.exe dir from the registry
+(`C:\Program Files (x86)\StarCraft II`), maps → `sc2BasePath\Maps\Campaign`, mods → `sc2BasePath\Mods\`
+(github.com/7thAce/SC2CCM `CCM/FormMain.cs`). Mid-spiral a session flipped `build.py install` to
+`Documents\StarCraft II` on a verbal hunch (commit 867a718) → CCM reported "no mod installed" and the
+campaign loaded vanilla. Re-pointed to the install dir + reinstalled correctly; re-enabled `WoLUSmartServos` (a
 false suspect I'd disabled in v0.3.16); removed the pre-grant diagnostic canary. So the mod's FEATURES
 (Skip-Prophecy button, merc behaviour, faster Viking transform) are now installed correctly and
 **[GAME]-pending the owner's FIRST real (loading) playtest** — none were ever actually tested because

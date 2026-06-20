@@ -864,20 +864,24 @@ gotcha; authoritative details live in the code/plan, not here.
 
 ## Verification tooling
 
-- **`build.py install` MUST target the SC2 USER folder (`Documents\StarCraft II` on Windows),
-  NOT the game install dir (`Program Files (x86)\StarCraft II`).** The game, Editor, and CCM all
-  load CUSTOM campaign maps + mods from the user folder (`Documents\StarCraft II\Maps\Campaign` +
-  `…\Mods`). Installing into the Program Files dir drops the files where the game never looks for
-  custom content → `Documents\…\Maps\Campaign` stays empty → you play the **vanilla** WoL campaign
-  with NO mod (no canary, no buffs, no mercs) and reinstalling "changes nothing". This cost a
-  multi-session debugging spiral (v0.3.14–v0.3.17): the released zips + the mod galaxy were all
-  byte-correct, but `_default_sc2_dir()` had been wrongly pointed at Program Files (regression in
-  commit a4ab52b, "direct launch reads it" — but the OWNER plays via CCM/the campaign list, which
-  reads Documents). **The mod being 100% correct does not mean it is being loaded — verify WHERE the
-  files land before suspecting the code.** A fast static load-proof: a `Unit/Name/Marine=…` override
-  in the mod's GameStrings shows in mission 1 the instant the mod's DATA loads, with zero dependence
-  on the trigger lib — distinguishes "mod not loaded at all" (install/path) from "lib not running"
-  (galaxy/trigger). Override the path with `$WOLU_SC2_DIR` if SC2's user folder is relocated.
+- **`build.py install` MUST target the SC2 GAME INSTALL dir (`C:\Program Files (x86)\StarCraft II`
+  on Windows), NOT the `Documents\StarCraft II` user folder.** AUTHORITATIVE per CCM's own source
+  (github.com/7thAce/SC2CCM, `CCM/FormMain.cs`): CCM resolves `sc2BasePath = Path.GetDirectoryName`
+  of the SC2.exe from the registry (`Software\Classes\Blizzard.SC2Save\shell\open\command`, fallback
+  `C:\Program Files (x86)\StarCraft II\StarCraft II.exe`) — i.e. the install dir — then copies maps to
+  `sc2BasePath\Maps\Campaign` (WoL; `\swarm`/`\void`/`\nova` for the others) and mods to
+  `sc2BasePath\Mods\`, and detects the active campaign via `sc2BasePath\Maps\Campaign\metadata.txt`.
+  GROUND TRUTH on the dev box matched: every working campaign/mod (Archipelago*/NightmareMod/
+  RaynorRogue + the nova/swarm/void/voidprologue slots) lives under `Program Files (x86)\StarCraft II`;
+  `Documents\StarCraft II\Mods\` was EMPTY. **Installing into Documents drops the files where CCM/the
+  game never look → CCM shows "no mod installed", the campaign loads VANILLA (no canary, no buffs, no
+  mercs), and reinstalling "changes nothing".** This was the v0.3.14–v0.3.18 spiral: a session pointed
+  `_default_sc2_dir()` at Documents (commit 867a718), trusting a verbal "it works on the Documents
+  files" over the evidence; commit a4ab52b ("direct launch reads it, not Documents") had been CORRECT.
+  **The mod being 100% byte-correct does not mean it is being loaded — verify WHERE the files land
+  (CCM's `sc2BasePath` = the install dir) before suspecting the code.** A fast static load-proof MUST
+  NOT rename a vanilla unit (CHECK12) — use a NEW GameStrings key or a subtitle. Override the path with
+  `$WOLU_SC2_DIR` only if SC2 is installed on a non-default drive/region.
 
 - **SC2 client API live reads are a HARD BLOCK on retail 5.x** (this Mac). `scripts/verify_api.py`
   can `RequestPing` + `RequestCreateGame` (campaign map loads, mod deps resolve — a "mod loads via

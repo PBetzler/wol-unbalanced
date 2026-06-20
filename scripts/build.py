@@ -40,21 +40,34 @@ MPQPATCH = os.path.join(ROOT, "tools",
 
 
 def _default_sc2_dir() -> str:
-    r"""The StarCraft II USER folder — `Documents\StarCraft II` on Windows,
-    `~/Library/Application Support/Blizzard/StarCraft II` on macOS. This is the user
-    Maps + Mods root that the game, the Editor, AND CCM load CUSTOM campaigns from — NOT the
-    game install dir. Installing into `…\Program Files (x86)\StarCraft II` drops the files
-    where the game never looks for custom content, so the mod silently doesn't load (its
-    `Documents\StarCraft II\Maps\Campaign` stays empty → you play the vanilla campaign with no
-    canary). That regression (commit a4ab52b) was the cause of "I install it but nothing
-    changes". Override with $WOLU_SC2_DIR. Only `install`/`uninstall` touch this; `build`/
-    `package` do not, so a missing/wrong path never blocks a build."""
+    r"""The StarCraft II GAME INSTALL dir — `C:\Program Files (x86)\StarCraft II` on Windows,
+    `/Applications/StarCraft II` on macOS. This is where CCM and the game load CUSTOM campaigns
+    + mods from (`sc2BasePath`), NOT the Documents user folder.
+
+    AUTHORITATIVE — from CCM's own source (github.com/7thAce/SC2CCM, CCM/FormMain.cs):
+    `sc2BasePath = Path.GetDirectoryName(<SC2.exe>)` resolved from the registry
+    (`Software\Classes\Blizzard.SC2Save\shell\open\command`, fallback
+    `C:\Program Files (x86)\StarCraft II\StarCraft II.exe`) — i.e. the GAME INSTALL DIR. CCM then
+    copies maps to `sc2BasePath\Maps\Campaign` (WoL; `\swarm`/`\void`/`\nova` for the others) and
+    mods to `sc2BasePath\Mods\`, and detects the active campaign via
+    `sc2BasePath\Maps\Campaign\metadata.txt`. So custom content goes in the INSTALL dir.
+    GROUND TRUTH (this machine, 2026-06-20) matches: `…\Program Files (x86)\StarCraft II\Mods\`
+    holds Archipelago*/NightmareMod/RaynorRogue/kit_liberty_story and `…\Maps\Campaign\` holds the
+    nova/swarm/void/voidprologue slots; `Documents\StarCraft II\Mods\` was EMPTY.
+    DO NOT change this to `Documents\StarCraft II` — that was the v0.3.14–v0.3.18 break: install put
+    the mod in Documents, CCM reported "no mod installed", and the campaign loaded vanilla (no
+    canary). a4ab52b ("direct launch reads it, not Documents") was CORRECT; the Documents detour
+    (867a718) was the regression.
+
+    Override with $WOLU_SC2_DIR if SC2 lives elsewhere (a different drive / EU region folder).
+    Only `install`/`uninstall` touch this; `build`/`package` do not, so a missing/wrong path never
+    blocks a build."""
     override = os.environ.get("WOLU_SC2_DIR")
     if override:
         return override
-    if os.name == "nt":  # Windows — Documents\StarCraft II (the user custom-content root)
-        return os.path.join(os.path.expanduser("~"), "Documents", "StarCraft II")
-    return os.path.expanduser("~/Library/Application Support/Blizzard/StarCraft II")  # macOS
+    if os.name == "nt":  # Windows — the Battle.net default game install location
+        return r"C:\Program Files (x86)\StarCraft II"
+    return "/Applications/StarCraft II"  # macOS
 
 
 SC2 = _default_sc2_dir()
