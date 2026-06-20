@@ -13,6 +13,14 @@ include "LibWoLUnbalancedGen"
 
 const int libWoLU_Player = 1;
 
+// --- Skip-Prophecy feature state (tstory01 Hyperion hub only) ----------------
+// File-scope handles for the one-time "Skip Prophecy (Zeratul) missions" button.
+// Both start as the engine's invalid sentinels so the deferred creator can detect
+// "not yet created" and the click handler can match the exact control. c_invalidDialogId
+// / c_invalidDialogControlId are base-game constants (used throughout CampaignLib).
+int libWoLU_gv_skipProphecyDialog = c_invalidDialogId;
+int libWoLU_gv_skipProphecyButton = c_invalidDialogControlId;
+
 // Forward declarations — Galaxy is single-pass; anything called before its
 // definition in this file must be prototyped here.
 void libWoLU_SyncWeaponArmorLevels (int p);
@@ -22,6 +30,11 @@ void libWoLU_GraduateSiegeRange (int p, string unitType);
 void libWoLU_SynthesizeVespene (int p);
 void libWoLU_ForceGrantAllTechRewards (int p);
 void libWoLU_EnableCurrentMissionUnits (int p);
+// Skip-Prophecy feature (definitions below; forward-declared for the single-pass
+// compiler because libWoLU_InitLib and the deferred handler reference them earlier).
+bool libWoLU_ShouldOfferSkipProphecy (int p);
+void libWoLU_CreateSkipProphecyButton ();
+void libWoLU_SkipProphecyMissions (int p);
 
 void libWoLU_ApplyPlayer (int p) {
     libWoLUGen_Apply(p);
@@ -127,6 +140,15 @@ void libWoLU_GrantCampaignTech (int p) {
     // Unlock the WoLU clone abilities (autocast Super Stimpack etc.) — the flag
     // upgrade is the requirement gate that only the human player ever satisfies.
     TechTreeUpgradeAddLevel(p, "WoLUnbalancedFlag", 1);
+
+    // Smart Servos (AP): faster Viking transform. Morph durations are nested
+    // indexed-array fields (NOOP for per-player runtime edits) → delivered as a
+    // player-only CUpgrade EffectArray Subtract (UpgradeData.xml WoLUSmartServos,
+    // the rogue Kit@AISmartServos pattern). Granting it only to the human player
+    // makes the global static edit effectively player-only → rule-9-safe. Covers
+    // the base Viking AND the Hel's Angels merc (separate morph ids). The
+    // attack-while-moving half is a per-player Weapon.AllowedMovement edit in genlib.
+    TechTreeUpgradeAddLevel(p, "WoLUSmartServos", 1);
 
     // Extra elite-merc calldowns (Field Engineer Zeta / Grim Reaper / Condor) are added
     // in static XML as SummonMercenaries Train9-11. They're not in the campaign merc-panel
@@ -438,6 +460,165 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
     return true;
 }
 
+//==================================================================================================
+// "Skip Prophecy (Zeratul) missions" — one-time on-screen button (tstory01 only)
+//
+// A convenience for players who want to skip the optional Zeratul "Prophecy" arc but still
+// receive its full research-point yield. Implemented PURELY in this trigger library (no XML,
+// no GameStrings) — UI text is StringToText(...) literals matching the diag lines above.
+//
+// Placement: ONLY on tstory01 (libCamp_ge_MapID_MapTStory01 = the interactive Hyperion hub /
+// star-map between missions). VERIFIED: libCamp_gv_tS_CurrentMap == libCamp_ge_MapID_MapTStory01
+// is the campaign's own "in story mode" test (CampaignLib.galaxy:6089). build.py injects this
+// library into every .SC2Map (incl. tstory01), so the gate below is what scopes it to the hub.
+//
+// The 4 Prophecy missions are libCamp_ge_MapID_MapTZeratul01..04 (= 22..25; CampaignLib_h.galaxy).
+//==================================================================================================
+
+// Gate: should the Skip-Prophecy button be offered right now? True only when ALL hold:
+//   - we are on the tstory01 Hyperion hub, AND
+//   - the human player is Terran (the campaign hero faction; Protoss interludes are skipped), AND
+//   - the Prophecy arc is REACHABLE (TZeratul01 is Available) but NOT yet finished (TZeratul04
+//     not Completed). So the button is hidden before Tychus 02 unlocks the arc, and after all
+//     four are done.
+// libCamp_gf_MissionStatusCheck(mapID, status) (CampaignLib.galaxy:2781) and the
+// MissionStatus_* enums (Available=1, Completed=2) are in scope via the co-injected CampaignLib.
+bool libWoLU_ShouldOfferSkipProphecy (int p) {
+    if (libCamp_gv_tS_CurrentMap != libCamp_ge_MapID_MapTStory01) {
+        return false;
+    }
+    if (PlayerRace(p) != "Terr") {
+        return false;
+    }
+    if (libCamp_gf_MissionStatusCheck(libCamp_ge_MapID_MapTZeratul01, libCamp_ge_MissionStatus_Available) == false) {
+        return false; // arc not unlocked yet → nothing to skip
+    }
+    if (libCamp_gf_MissionStatusCheck(libCamp_ge_MapID_MapTZeratul04, libCamp_ge_MissionStatus_Completed) == true) {
+        return false; // arc already fully completed
+    }
+    return true;
+}
+
+// Create the one button + its host dialog (idempotent — only if not already created).
+// Standard Galaxy dialog GUI idiom, copied from CampaignLib's own button blocks
+// (e.g. CampaignLib.galaxy:13476-13505) and the Perpetual Randomizer's dialog triggers:
+// DialogCreate → store DialogLastCreated; DialogControlCreate(button) → store
+// DialogControlLastCreated; set text/size/position; DialogSetVisible. The text uses the
+// libNtve_gf_SetDialogItemText wrapper (the NativeLib idiom both CampaignLib and the rogue
+// kit use for button captions) — our lib includes TriggerLibs/NativeLib, so it resolves.
+//
+// Position: anchored top-center, pushed DOWN ~120 px so it sits below the star-map header and
+// doesn't cover the mission nodes. [GAME]-PENDING: exact placement is a guess; the owner may
+// relocate the offset / anchor after seeing it in the hub.
+void libWoLU_CreateSkipProphecyButton () {
+    if (libWoLU_gv_skipProphecyDialog != c_invalidDialogId) {
+        return; // already created this visit — never make a second one
+    }
+    // Small dialog: 420x44, anchored top-center, +120 px down from the top edge.
+    DialogCreate(420, 44, c_anchorTop, 0, 120, false);
+    libWoLU_gv_skipProphecyDialog = DialogLastCreated();
+    DialogSetVisible(libWoLU_gv_skipProphecyDialog, PlayerGroupAll(), true);
+    // The clickable button child, filling the dialog.
+    DialogControlCreate(libWoLU_gv_skipProphecyDialog, c_triggerControlTypeButton);
+    libWoLU_gv_skipProphecyButton = DialogControlLastCreated();
+    libNtve_gf_SetDialogItemText(libWoLU_gv_skipProphecyButton, StringToText("Skip Prophecy Missions (grant research)"), PlayerGroupAll());
+    DialogControlSetSize(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), 420, 44);
+    DialogControlSetPosition(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), c_anchorTop, 0, 0);
+}
+
+// The action: mark all 4 Prophecy missions complete and grant their full research yield,
+// then persist and remove the button. Player-1 / campaign-state only — never touches a unit,
+// so rule 9 is preserved trivially.
+//
+// RESEARCH-YIELD CORRECTION (verified against CampaignLib, differs from the brief's literal
+// formula — following the REAL semantics per the don't-guess discipline):
+//   The persistent array libCamp_gv_tSX_ResearchMissionProgress[mission][category]
+//   (CampaignLib_h.galaxy:784, shape [36][3], category 1=Protoss / 2=Zerg) stores ONLY the
+//   per-mission RESEARCH-OPPORTUNITY points. The Lab total (libCamp_gf_StoryResearchPoints,
+//   CampaignLib.galaxy:4853-4855) is computed, for each COMPLETED mission, as
+//       array[mission][cat]  +  libCamp_gf_TS_MissionRewardResearchPoints(mission, cat)
+//   i.e. the fixed mission-reward points are ADDED ON TOP of the array value once the mission is
+//   Completed (the battle-report code at :4202-4207 confirms the same split). So the 100%-clear
+//   yield = Opportunities (stored in the array) + Reward (added automatically when Completed).
+//   Writing Opportunities+Reward INTO the array AND marking Completed (as the brief's literal
+//   formula would) double-counts the Reward. We therefore store ONLY the OPPORTUNITY value
+//   (libCamp_gf_TS_StoryResearchMissionOpportunities, CampaignLib.galaxy:5000); marking the
+//   mission Completed below makes the engine add the Reward portion itself → exact 100% total,
+//   no double-count. Computed at runtime (never hardcoded).
+void libWoLU_SkipProphecyMissions (int p) {
+    int m;
+    int prot;
+    int zerg;
+
+    // Iterate the four Prophecy mission ids (22..25 inclusive are exactly TZeratul01..04).
+    m = libCamp_ge_MapID_MapTZeratul01;
+    while (m <= libCamp_ge_MapID_MapTZeratul04) {
+        // 1. Count the mission complete on EVERY difficulty (1..4), so it reads as cleared
+        //    regardless of the player's campaign difficulty (CampaignLib.galaxy:3097).
+        libCamp_gf_TS_SetMissionDifficultyCompleted(m, 1, true);
+        libCamp_gf_TS_SetMissionDifficultyCompleted(m, 2, true);
+        libCamp_gf_TS_SetMissionDifficultyCompleted(m, 3, true);
+        libCamp_gf_TS_SetMissionDifficultyCompleted(m, 4, true);
+        // 2. Flag the mission status as Completed (CampaignLib.galaxy:3059).
+        libCamp_gf_TS_MarkMissionAsStatus(m, libCamp_ge_MissionStatus_Completed);
+        // 3. Compute the 100%-clear OPPORTUNITY points per category at runtime (see header note;
+        //    the Reward portion is added by the engine once Completed, so do NOT add it here).
+        prot = libCamp_gf_TS_StoryResearchMissionOpportunities(m, libCamp_ge_StoryResearchCategory_ResearchCategoryProtoss);
+        zerg = libCamp_gf_TS_StoryResearchMissionOpportunities(m, libCamp_ge_StoryResearchCategory_ResearchCategoryZerg);
+        // 4. Write into the persistent array, never LOWERING an existing value (a partial
+        //    clear may already have banked some points). Lab total = SUM over missions.
+        if (libCamp_gv_tSX_ResearchMissionProgress[m][libCamp_ge_StoryResearchCategory_ResearchCategoryProtoss] < prot) {
+            libCamp_gv_tSX_ResearchMissionProgress[m][libCamp_ge_StoryResearchCategory_ResearchCategoryProtoss] = prot;
+        }
+        if (libCamp_gv_tSX_ResearchMissionProgress[m][libCamp_ge_StoryResearchCategory_ResearchCategoryZerg] < zerg) {
+            libCamp_gv_tSX_ResearchMissionProgress[m][libCamp_ge_StoryResearchCategory_ResearchCategoryZerg] = zerg;
+        }
+        m = m + 1;
+    }
+
+    // 5. Re-propagate the unlock chain so the now-complete missions don't leave downstream
+    //    missions locked (CampaignLib.galaxy:2967 — it re-evaluates every mission's gate).
+    libCamp_gf_UpdateMissionFlow();
+    // 6. Persist via the campaign's OWN story-mode save (opens the bank, SaveTransitionVars
+    //    Normal → writes all missions' research + completion, BankSave, SaveMissionBanks).
+    //    This is the supported persistence path — do NOT hand-roll BankSave (CampaignLib.galaxy:8474).
+    libCamp_gf_PrepareForStoryModeTransitionalSave();
+
+    // 7. Destroy the dialog so the button can't be re-clicked, reset the sentinels, and confirm.
+    if (libWoLU_gv_skipProphecyDialog != c_invalidDialogId) {
+        DialogDestroy(libWoLU_gv_skipProphecyDialog);
+    }
+    libWoLU_gv_skipProphecyDialog = c_invalidDialogId;
+    libWoLU_gv_skipProphecyButton = c_invalidDialogControlId;
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("Prophecy missions skipped - research points granted."));
+}
+
+// Deferred creator: fires on tstory01 at 2 s (and again at 11 s, after intro sequences),
+// AFTER CampaignLib has loaded its transition data — creating the button at the raw map-init
+// instant would race the campaign's own state load. The gate + the dialog-already-exists guard
+// in the creator make the double timer harmless (second pass is a no-op once created).
+bool libWoLU_OnStoryModeInit (bool testConds, bool runActions) {
+    if (libWoLU_ShouldOfferSkipProphecy(libWoLU_Player) == true) {
+        libWoLU_CreateSkipProphecyButton();
+    }
+    return true;
+}
+
+// Click handler: condition-gate on our exact button id first (the click event fires for ANY
+// dialog control in the map, so non-matching clicks must early-return false), then run the skip.
+bool libWoLU_OnSkipProphecyClicked (bool testConds, bool runActions) {
+    if (testConds) {
+        if (EventDialogControl() != libWoLU_gv_skipProphecyButton) {
+            return false;
+        }
+    }
+    if (!runActions) {
+        return true;
+    }
+    libWoLU_SkipProphecyMissions(libWoLU_Player);
+    return true;
+}
+
 void libWoLU_InitLib () {
     trigger t;
     TriggerAddEventMapInit(TriggerCreate("libWoLU_OnMapInit"));
@@ -450,4 +631,13 @@ void libWoLU_InitLib () {
     // Graduating Range ticks every 3 s (the spec's interval), independent of the 2 s
     // behavior-maintenance pass above.
     TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnGraduateRange"), 3.0, c_timeGame);
+
+    // Skip-Prophecy button (tstory01 hub only). The creator runs on a short deferred timer
+    // (2 s + an 11 s safety pass, so CampaignLib's transition data has finished loading and
+    // any intro sequence has cleared); the gate inside scopes it to the hub. The click handler
+    // listens for ANY dialog-control click and matches our stored button id internally.
+    t = TriggerCreate("libWoLU_OnStoryModeInit");
+    TriggerAddEventTimeElapsed(t, 2.0, c_timeGame);
+    TriggerAddEventTimeElapsed(t, 11.0, c_timeGame);
+    TriggerAddEventDialogControl(TriggerCreate("libWoLU_OnSkipProphecyClicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
 }

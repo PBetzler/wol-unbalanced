@@ -9,11 +9,11 @@ Abil/Name/EMPWoLU=EMP Round (Autocast)
 Abil/Name/ObliterateWoLU=Psionic Lash (Autocast)
 Abil/Name/MagrailWoLU=Magrail Shot
 Button/Name/WoLUUpgLaserTargeting=Laser Targeting System
-Button/Tooltip/WoLUUpgLaserTargeting=<c val="00FF40">+1 weapon range, +2 sight</c>.<n/>WoL Unbalanced (Archipelago) — active.
+Button/Tooltip/WoLUUpgLaserTargeting=<c val="00FF40">Increased weapon range, +2 sight</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Button/Name/WoLUUpgOptLogistics=Optimized Logistics
 Button/Tooltip/WoLUUpgOptLogistics=<c val="00FF40">Faster training</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Button/Name/WoLUUpgInternalTech=Internal Tech Module
-Button/Tooltip/WoLUUpgInternalTech=<c val="00FF40">No Tech Lab / prerequisite needed</c>.<n/>WoL Unbalanced (Archipelago) — active.
+Button/Tooltip/WoLUUpgInternalTech=<c val="00FF40">Internalized tech module</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Button/Name/WoLUUpgSmartServos=Smart Servos
 Button/Tooltip/WoLUUpgSmartServos=<c val="00FF40">Faster transform, attack while moving</c>.<n/>WoL Unbalanced (Archipelago) — active.
 Abil/Name/YamatoWoLU=Yamato Cannon (Autocast)
@@ -23,20 +23,20 @@ Unit/Name/MercMedic=Skibi's Angels
 Unit/Name/MercReaper=Death Heads
 Unit/Name/MercHellion=Condor
 Button/Name/HireMercMedic=Skibi's Angels
-Button/Tooltip/HireMercMedic=Calls down <c val="FFFF00">2 Skibi's Angels</c> elite medics (+50 shields, +HP, +armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
+Button/Tooltip/HireMercMedic=Calls down <c val="FFFF00">2 Skibi's Angels</c> elite medics (+50 shields, +HP).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
 Button/Name/HireMercReaper=Death Heads
 Button/Tooltip/HireMercReaper=Calls down <c val="FFFF00">2 Death Heads</c> elite reapers (+50 shields, +HP, +armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
 Button/Name/HireMercHellion=Condor
 Button/Tooltip/HireMercHellion=Calls down <c val="FFFF00">2 Condor</c> elite hellions (+50 shields, +HP, +armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
 Unit/Name/MercThor=Jotun
 Button/Name/HireMercThor=Jotun
-Button/Tooltip/HireMercThor=Calls down a <c val="FFFF00">Jotun</c> elite Thor (+100 shields, +HP, +2 armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
+Button/Tooltip/HireMercThor=Calls down a <c val="FFFF00">Jotun</c> elite Thor (+100 shields, +HP, +1 armor).<n/>WoL Unbalanced: extra merc — unlimited charges, ready from start.
 Unit/Name/MercWraith=Winged Nightmares
 Button/Name/HireMercWraith=Winged Nightmares
 Button/Tooltip/HireMercWraith=Calls down <c val="FFFF00">2 Winged Nightmares</c> elite cloaked Wraiths (+50 shields, +HP, +armor).<n/>WoL Unbalanced: Archipelago merc — unlimited charges, ready from start.
 Unit/Name/MercSeniorGhost=Senior Ghost
 Button/Name/HireMercSeniorGhost=Senior Ghost
-Button/Tooltip/HireMercSeniorGhost=Calls down a <c val="FFFF00">Senior Ghost</c> — an elite Ghost with <c val="FFFF00">1.5x</c> life, energy, regen, armor and damage. Keeps Snipe / EMP / cloak.<n/>WoL Unbalanced: special merc — unlimited charges, ready from start.
+Button/Tooltip/HireMercSeniorGhost=Calls down a <c val="FFFF00">Senior Ghost</c> — an elite Ghost with <c val="FFFF00">1.5x</c> life, energy and damage, <c val="FFFF00">3 armor</c> and a <c val="FFFF00">75-point shield</c>. Keeps Snipe / EMP / cloak.<n/>WoL Unbalanced: special merc — unlimited charges, ready from start.
 Abil/Name/TacticalJumpWoLU=Tactical Jump
 Button/Name/TacticalJumpWoLU=Tactical Jump
 Button/Tooltip/TacticalJumpWoLU=<c val="FFFF00">Warp instantly</c> to a target location anywhere on the map.<n/>WoL Unbalanced ability — 10 s cooldown.

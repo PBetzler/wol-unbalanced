@@ -72,6 +72,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "NexusTrainMothership", "InfoArray[Train1].Time", p, "60.0", c_upgradeOperationSet);  // Mothership, was 160.0
     CatalogFieldValueModify(c_gameCatalogAbil, "RoboticsFacilityTrain", "InfoArray[Train3].Time", p, "60.0", c_upgradeOperationSet);  // Colossus, was 75.0
     CatalogFieldValueModify(c_gameCatalogAbil, "StargateTrain", "InfoArray[Train3].Time", p, "60.0", c_upgradeOperationSet);  // Carrier, was 120.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train1].Time", p, "31.0", c_upgradeOperationSet);  // Medivac, was 42.0
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train4].Time", p, "60.0", c_upgradeOperationSet);  // Battlecruiser, was 110.0
     CatalogFieldValueModify(c_gameCatalogAbil, "StarportTrain", "InfoArray[Train6].Time", p, "20.0", c_upgradeOperationSet);  // Hercules, was 70.0
 
@@ -190,6 +191,7 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "Food", p, "1", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTankSieged", "Food", p, "1", c_upgradeOperationAdd);  // Sieged tank: match mobile supply (no +1 on siege)
     CatalogFieldValueModify(c_gameCatalogUnit, "Raven", "CostResource[Minerals]", p, "25", c_upgradeOperationSubtract);  // AP Resource Efficiency (assumption)
     CatalogFieldValueModify(c_gameCatalogUnit, "Raven", "CostResource[Vespene]", p, "25", c_upgradeOperationSubtract);
     CatalogFieldValueModify(c_gameCatalogUnit, "Raven", "Food", p, "1", c_upgradeOperationAdd);
@@ -367,10 +369,33 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogEffect, "DRCannonsA", "ArmorReduction", p, "0", c_upgradeOperationSet);  // Jackson's Revenge cannons ignore armor (air)
     CatalogFieldValueModify(c_gameCatalogWeapon, "FusionCutter", "Period", p, "0.7", c_upgradeOperationSet);  // SCV: faster attack (Hostile Env Adaptation)
     CatalogFieldValueModify(c_gameCatalogWeapon, "Vulture", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Vulture Auto-Launchers: fire while moving
+    CatalogFieldValueModify(c_gameCatalogWeapon, "InfernalFlameThrower", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Hellion Smart Servos: fire while moving
+    CatalogFieldValueModify(c_gameCatalogWeapon, "LanzerTorpedoes", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Viking (fighter) Smart Servos: fire while moving
+    CatalogFieldValueModify(c_gameCatalogWeapon, "TwinGatlingCannon", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Viking (assault) Smart Servos: fire while moving
+    CatalogFieldValueModify(c_gameCatalogWeapon, "WreckingCrewFighter", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Hel's Angels (fighter): Smart Servos fire while moving parity
+    CatalogFieldValueModify(c_gameCatalogWeapon, "WreckingCrewAssault", "AllowedMovement", p, "Moving", c_upgradeOperationSet);  // Hel's Angels (assault): parity
     CatalogFieldValueModify(c_gameCatalogEffect, "WraithAU", "Amount", p, "2", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: air laser dmg x2 (5->10)
     CatalogFieldValueModify(c_gameCatalogEffect, "WraithGU", "Amount", p, "2", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: ground laser dmg x2 (8->16)
     CatalogFieldValueModify(c_gameCatalogWeapon, "WraithA", "Period", p, "0.8", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: faster air attack (1.25->1.0)
     CatalogFieldValueModify(c_gameCatalogWeapon, "WraithG", "Period", p, "0.8", c_upgradeOperationMultiply);  // Wraith Advanced Laser Tech: faster ground attack (1.694->1.355)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Thor", "LifeMax", p, "25", c_upgradeOperationAdd);  // AP Shaped Hull
+    CatalogFieldValueModify(c_gameCatalogUnit, "Thor", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercThor", "LifeMax", p, "25", c_upgradeOperationAdd);  // Jotun: Thor Shaped Hull +25 parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "MercThor", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Odin", "LifeMax", p, "25", c_upgradeOperationAdd);  // Odin: Thor Shaped Hull +25 parity (rule 10)
+    CatalogFieldValueModify(c_gameCatalogUnit, "Odin", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "LifeMax", p, "25", c_upgradeOperationAdd);  // AP Shaped Hull
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTank", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTankSieged", "LifeMax", p, "25", c_upgradeOperationAdd);  // Shaped Hull: match sieged form so morphing doesn't drop HP
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTankSieged", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreaker", "LifeMax", p, "25", c_upgradeOperationAdd);  // Siege Breakers: Shaped Hull +25 parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreaker", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreakerSieged", "LifeMax", p, "25", c_upgradeOperationAdd);  // Siege Breakers: match sieged form
+    CatalogFieldValueModify(c_gameCatalogUnit, "SiegeBreakerSieged", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "Banshee", "LifeMax", p, "25", c_upgradeOperationAdd);  // AP Shaped Hull
+    CatalogFieldValueModify(c_gameCatalogUnit, "Banshee", "LifeStart", p, "25", c_upgradeOperationAdd);
+    CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "LifeMax", p, "25", c_upgradeOperationAdd);  // Dusk Wings: Banshee Shaped Hull +25 parity
+    CatalogFieldValueModify(c_gameCatalogUnit, "DuskWing", "LifeStart", p, "25", c_upgradeOperationAdd);
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "LifeMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x life
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "LifeStart", p, "1.5", c_upgradeOperationMultiply);
     CatalogFieldValueModify(c_gameCatalogUnit, "MercSeniorGhost", "EnergyMax", p, "1.5", c_upgradeOperationMultiply);  // Senior Ghost: 1.5x energy

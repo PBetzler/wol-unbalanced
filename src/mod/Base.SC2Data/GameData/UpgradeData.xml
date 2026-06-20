@@ -304,4 +304,58 @@
         <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
         <EffectArray Reference="Unit,MercHellion,LifeArmorLevel" Value="1"/>
     </CUpgrade>
+
+    <!-- ================================================================================
+         Smart Servos (AP) — FASTER VIKING TRANSFORM half of the WoLUUpgSmartServos passive
+         face (the attack-while-moving half is a per-player Weapon.AllowedMovement=Moving edit
+         in genlib.py). Morph durations live in nested indexed-array fields
+         (Abil,<morph>,InfoArray[0].SectionArray[*].DurationArray[*]) → a per-player runtime
+         CatalogFieldValueModify on them is a NOOP (the indexed-array no-op class). The
+         rule-9-safe lever is a player-only CUpgrade EffectArray (Operation="Subtract"), the
+         VERIFIED rogue Kit@AISmartServos pattern (mods/_reference/rogue/GameData/UpgradeData.xml
+         CUpgrade Kit@AISmartServos). Granted ONLY to the human player by our library
+         (libWoLU_GrantCampaignTech, next to the WoLUnbalancedFlag grant), so this global static
+         EffectArray edit is effectively player-only → rule-9-safe (same class as
+         CombatShield/RegenerativeBioSteel above).
+
+         COVERAGE (rules 4/10): the base Viking (AssaultMode/FighterMode) AND the Hel's Angels
+         merc — which use SEPARATE morph ability ids WreckingCrewAssaultMode/WreckingCrewFighterMode
+         (standalone, inherit NOTHING from the base Viking morphs), so they need their OWN
+         EffectArray entries.
+
+         VALUES verified against the ACTUAL morph defs (cited durations from the reference dump),
+         each cut to leave the gameplay-relevant Stats.Duration (form-switch instant) + the
+         cosmetic Actor.Duration at ~1.0 s, and the Mover physics fields ≥ 0.2 s (never to 0 or
+         negative):
+           Base AssaultMode  (liberty.sc2mod/AbilData.xml:1410): Actor.Duration=2.34,
+             Mover.Delay=0.533, Mover.Duration=1.2, Stats.Duration=2.34 (no Collide section).
+           Base FighterMode  (liberty.sc2mod/AbilData.xml:1431): Actor.Duration=2.333,
+             Collide.Delay=1.5, Mover.Delay=0.6, Mover.Duration=0.85, Stats.Duration=2.333.
+           HelsAngels WreckingCrewAssaultMode (liberty.sc2campaign/AbilData.xml:2991):
+             Actor.Duration=2.334, Mover.Delay=0.9333, Mover.Duration=1.4, Stats.Duration=2.333.
+           HelsAngels WreckingCrewFighterMode (liberty.sc2campaign/AbilData.xml:3014):
+             Actor.Duration=2.333, Collide.Delay=1.5, Mover.Delay=0.666, Mover.Duration=1.667,
+             Stats.Duration=2.333.
+         (We cut only the Stats/Actor + the two base Mover fields the rogue kit cuts; we do NOT
+         touch Collide.Delay — leaving it preserves a clean physics transition. The Hel's Angels
+         entries cut only Stats+Actor → form-switch ~1.0 s, same proportion as the base Viking.) -->
+    <CUpgrade id="WoLUSmartServos">
+        <EditorCategories value="Race:Terran"/>
+        <!-- Base Viking → Assault (ground) mode -->
+        <EffectArray Operation="Subtract" Reference="Abil,AssaultMode,InfoArray[0].SectionArray[Actor].DurationArray[Duration]" Value="1.340000"/>   <!-- 2.34 -> 1.0 -->
+        <EffectArray Operation="Subtract" Reference="Abil,AssaultMode,InfoArray[0].SectionArray[Mover].DurationArray[Delay]" Value="0.333000"/>      <!-- 0.533 -> 0.2 -->
+        <EffectArray Operation="Subtract" Reference="Abil,AssaultMode,InfoArray[0].SectionArray[Mover].DurationArray[Duration]" Value="0.200000"/>   <!-- 1.2 -> 1.0 -->
+        <EffectArray Operation="Subtract" Reference="Abil,AssaultMode,InfoArray[0].SectionArray[Stats].DurationArray[Duration]" Value="1.340000"/>   <!-- 2.34 -> 1.0 (form-switch) -->
+        <!-- Base Viking → Fighter (air) mode -->
+        <EffectArray Operation="Subtract" Reference="Abil,FighterMode,InfoArray[0].SectionArray[Actor].DurationArray[Duration]" Value="1.333000"/>   <!-- 2.333 -> 1.0 -->
+        <EffectArray Operation="Subtract" Reference="Abil,FighterMode,InfoArray[0].SectionArray[Mover].DurationArray[Delay]" Value="0.300000"/>      <!-- 0.6 -> 0.3 -->
+        <EffectArray Operation="Subtract" Reference="Abil,FighterMode,InfoArray[0].SectionArray[Mover].DurationArray[Duration]" Value="0.150000"/>   <!-- 0.85 -> 0.7 -->
+        <EffectArray Operation="Subtract" Reference="Abil,FighterMode,InfoArray[0].SectionArray[Stats].DurationArray[Duration]" Value="1.333000"/>   <!-- 2.333 -> 1.0 (form-switch) -->
+        <!-- Hel's Angels (Viking merc) → Assault mode (separate morph id) -->
+        <EffectArray Operation="Subtract" Reference="Abil,WreckingCrewAssaultMode,InfoArray[0].SectionArray[Actor].DurationArray[Duration]" Value="1.333000"/>  <!-- 2.334 -> 1.001 -->
+        <EffectArray Operation="Subtract" Reference="Abil,WreckingCrewAssaultMode,InfoArray[0].SectionArray[Stats].DurationArray[Duration]" Value="1.333000"/>  <!-- 2.333 -> 1.0 -->
+        <!-- Hel's Angels (Viking merc) → Fighter mode (separate morph id) -->
+        <EffectArray Operation="Subtract" Reference="Abil,WreckingCrewFighterMode,InfoArray[0].SectionArray[Actor].DurationArray[Duration]" Value="1.333000"/>  <!-- 2.333 -> 1.0 -->
+        <EffectArray Operation="Subtract" Reference="Abil,WreckingCrewFighterMode,InfoArray[0].SectionArray[Stats].DurationArray[Duration]" Value="1.333000"/>  <!-- 2.333 -> 1.0 -->
+    </CUpgrade>
 </Catalog>

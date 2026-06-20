@@ -42,6 +42,7 @@ BUILD_TIME_OVERRIDES = {
     "Marine": 19.0,    # 25 * 0.75
     "Hellion": 22.0,   # 30 * 0.75 (rounded)
     "Goliath": 30.0,   # 40 * 0.75
+    "Medivac": 31.0,   # 42 * 0.75 (rounded) — Optimized Logistics, makes the WoLUUpgOptLogistics face true
 }
 
 # Rule 8: free cloak — ability ids with an energy activation cost, and buff
@@ -269,6 +270,10 @@ def emit():
         ("Unit", "SiegeTank", "CostResource[Minerals]", "25", "Subtract", "AP Resource Efficiency (assumption)"),
         ("Unit", "SiegeTank", "CostResource[Vespene]", "25", "Subtract", ""),
         ("Unit", "SiegeTank", "Food", "1", "Add", ""),
+        # The SIEGED form is a SEPARATE unit id — it must get the SAME -1 supply, or morphing to
+        # siege charges the missing +1 supply (regression that broke The Dig). Both forms are
+        # vanilla -3 -> -2 = 2 supply, so sieging stays supply-neutral.
+        ("Unit", "SiegeTankSieged", "Food", "1", "Add", "Sieged tank: match mobile supply (no +1 on siege)"),
         ("Unit", "Raven", "CostResource[Minerals]", "25", "Subtract", "AP Resource Efficiency (assumption)"),
         ("Unit", "Raven", "CostResource[Vespene]", "25", "Subtract", ""),
         ("Unit", "Raven", "Food", "1", "Add", ""),
@@ -595,6 +600,23 @@ def emit():
         # -- Vulture: Auto-Launchers — attack while moving (AP). Ion Thrusters speed
         #    + Jerry-Rigged + Cerberus mine count handled earlier. --
         ("Weapon", "Vulture", "AllowedMovement", "Moving", "Set", "Vulture Auto-Launchers: fire while moving"),
+        # -- Smart Servos (AP) — ATTACK-WHILE-MOVING half of the WoLUUpgSmartServos face
+        #    (Hellion + Viking). AllowedMovement is a vanilla scalar weapon field (BC pattern,
+        #    CHECK8-GOOD); the FASTER-TRANSFORM half is the WoLUSmartServos CUpgrade (UpgradeData).
+        #    Hellion: weapon InfernalFlameThrower has NO AllowedMovement (defaults Slowing).
+        #    MercHellion (Condor) is parent="Hellion" and SHARES InfernalFlameThrower → reached
+        #    automatically (no separate entry needed). --
+        ("Weapon", "InfernalFlameThrower", "AllowedMovement", "Moving", "Set", "Hellion Smart Servos: fire while moving"),
+        #    Viking air (LanzerTorpedoes, vanilla Slowing) + Viking ground (TwinGatlingCannon, no
+        #    AllowedMovement). AllowedMovement is an independent scalar field on the weapon —
+        #    unaffected by the TwinGatlingCannon Effect reroute in our WeaponData.xml.
+        ("Weapon", "LanzerTorpedoes", "AllowedMovement", "Moving", "Set", "Viking (fighter) Smart Servos: fire while moving"),
+        ("Weapon", "TwinGatlingCannon", "AllowedMovement", "Moving", "Set", "Viking (assault) Smart Servos: fire while moving"),
+        #    Hel's Angels (Viking merc, standalone — inherits NOTHING, separate weapon ids): air
+        #    WreckingCrewFighter (vanilla Slowing) + ground WreckingCrewAssault (no AllowedMovement;
+        #    its Effect is rerouted in WeaponData.xml but AllowedMovement is independent).
+        ("Weapon", "WreckingCrewFighter", "AllowedMovement", "Moving", "Set", "Hel's Angels (fighter): Smart Servos fire while moving parity"),
+        ("Weapon", "WreckingCrewAssault", "AllowedMovement", "Moving", "Set", "Hel's Angels (assault): parity"),
         # Wraith Advanced Laser Technology (AP): stronger air+ground lasers, faster fire.
         # Per-player; reaches MercWraith (Winged Nightmares) automatically — it's a
         # parent="Wraith" clone with no WeaponArray override, so it shares WraithA/G ids.
@@ -602,6 +624,41 @@ def emit():
         ("Effect", "WraithGU", "Amount", "2", "Multiply", "Wraith Advanced Laser Tech: ground laser dmg x2 (8->16)"),
         ("Weapon", "WraithA", "Period", "0.8", "Multiply", "Wraith Advanced Laser Tech: faster air attack (1.25->1.0)"),
         ("Weapon", "WraithG", "Period", "0.8", "Multiply", "Wraith Advanced Laser Tech: faster ground attack (1.694->1.355)"),
+
+        # ========================================================================
+        # AP Shaped Hull (+HP) — makes the ShapedHull passive face TRUE on Thor +
+        # SiegeTank + Banshee (it was already real on Goliath/SpartanCompany, +25 flat
+        # Add via LifeMax/LifeStart — match that established convention exactly; unit-table
+        # gives no different per-unit number). NONE of these units currently get any
+        # LifeMax/LifeStart edit (confirmed — no double-apply). Flat +25 Add (not Multiply)
+        # keeps each merc/hero AHEAD of its buffed base (rule 4). Per-player → rule-9 safe.
+        # ========================================================================
+        # -- Thor (base LifeMax 400) + family Jotun/Odin --
+        ("Unit", "Thor", "LifeMax", "25", "Add", "AP Shaped Hull"),
+        ("Unit", "Thor", "LifeStart", "25", "Add", ""),
+        #    Jotun (MercThor, parent="Thor") has its OWN explicit LifeMax=500 in our static XML
+        #    → the base Thor edit does NOT reach it; needs its own entry (rule 4).
+        ("Unit", "MercThor", "LifeMax", "25", "Add", "Jotun: Thor Shaped Hull +25 parity"),
+        ("Unit", "MercThor", "LifeStart", "25", "Add", ""),
+        #    Odin (standalone Thor hero, LifeMax 2500) — separate id, inherits nothing (rule 10).
+        ("Unit", "Odin", "LifeMax", "25", "Add", "Odin: Thor Shaped Hull +25 parity (rule 10)"),
+        ("Unit", "Odin", "LifeStart", "25", "Add", ""),
+        # -- SiegeTank — HP is PER-FORM (both SiegeTank and SiegeTankSieged define their own
+        #    LifeMax=150). Buff BOTH forms or sieging would DROP 25 HP. Family Siege Breakers
+        #    (SiegeBreaker + SiegeBreakerSieged, both standalone, LifeMax=200, per-form). --
+        ("Unit", "SiegeTank", "LifeMax", "25", "Add", "AP Shaped Hull"),
+        ("Unit", "SiegeTank", "LifeStart", "25", "Add", ""),
+        ("Unit", "SiegeTankSieged", "LifeMax", "25", "Add", "Shaped Hull: match sieged form so morphing doesn't drop HP"),
+        ("Unit", "SiegeTankSieged", "LifeStart", "25", "Add", ""),
+        ("Unit", "SiegeBreaker", "LifeMax", "25", "Add", "Siege Breakers: Shaped Hull +25 parity"),
+        ("Unit", "SiegeBreaker", "LifeStart", "25", "Add", ""),
+        ("Unit", "SiegeBreakerSieged", "LifeMax", "25", "Add", "Siege Breakers: match sieged form"),
+        ("Unit", "SiegeBreakerSieged", "LifeStart", "25", "Add", ""),
+        # -- Banshee (base LifeMax 140) + family Dusk Wings (DuskWing, standalone, LifeMax 175) --
+        ("Unit", "Banshee", "LifeMax", "25", "Add", "AP Shaped Hull"),
+        ("Unit", "Banshee", "LifeStart", "25", "Add", ""),
+        ("Unit", "DuskWing", "LifeMax", "25", "Add", "Dusk Wings: Banshee Shaped Hull +25 parity"),
+        ("Unit", "DuskWing", "LifeStart", "25", "Add", ""),
 
         # --- Special elite mercs (player-only clones; rule-9 safe) ---
         # Senior Ghost: 1.5x Life/Energy/regen via Multiply on the Ghost-clone's inherited

@@ -95,6 +95,20 @@
         <AreaArray Radius="2.5" Fraction="0.5"/>
     </CEffectDamage>
 
+    <!-- Senior Ghost (MercSeniorGhost, player-exclusive) rifle damage clone. The merc deals
+         +50% rifle damage via the WoLUSeniorGhostBoost behavior (DamageDealtFraction), which
+         touches NO displayed field, so the unit-info damage panel under-showed the real number.
+         Bake the +50% directly into this MercSeniorGhost-only weapon-effect clone instead, and
+         REMOVE the Ranged fraction from the boost behavior (BehaviorData.xml) so it isn't double-
+         counted. The player's base C10CanisterRifle is 20 (+10 Light) after genlib's Set; ×1.5 =
+         30 (+15 Light). parent="C10CanisterRifle" inherits Kind=Ranged etc. Single-shot direct
+         damage (no AreaArray) → NOT area damage, so no SearchFilters needed. Fired AND displayed
+         by the C10CanisterRifleWoLU weapon (WeaponData.xml), so panel == actual = 30 (CHECK11). -->
+    <CEffectDamage id="C10CanisterRifleWoLU" parent="C10CanisterRifle">
+        <Amount value="30"/>
+        <AttributeBonus index="Light" value="15"/>
+    </CEffectDamage>
+
     <!-- Viking ground (Assault) Shredder Rounds + Anti-Mechanical Munition. Same Shaped-Blast
          pattern as ThorsHammerWoLUSet above: vanilla branch (WoLUNoFlag) for enemy Vikings,
          buffed branch (WoLUHasFlag) for the player = radial splash + bonus vs Mechanical.

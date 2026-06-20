@@ -167,6 +167,28 @@ gotcha; authoritative details live in the code/plan, not here.
   `CValidatorCombine` (Or/And) — the toolkit for autocast gates.
 - **Attack-while-moving** is the weapon's `AllowedMovement` enum (`Slowing` default,
   `Moving` = fire on the move) — a vanilla field, no custom work.
+- **Faster TRANSFORM / morph DURATION is a nested indexed-array field → a per-player runtime
+  `CatalogFieldValueModify` on it is a NOOP; the rule-9-safe lever is a player-only CUpgrade
+  `EffectArray Operation="Subtract"` (the verified rogue `Kit@AISmartServos` pattern).** A
+  `CAbilMorph`'s timings live at `Abil,<morph>,InfoArray[0].SectionArray[<Section>].DurationArray[<Field>]`
+  (Section ∈ Actor/Mover/Collide/Stats; Field ∈ Delay/Duration) — an indexed array, the same no-op
+  class as `AbilArray`/`AttributeBonus[…]` for runtime edits. So speed-up of the Viking transform can't
+  go through genlib. Instead create a `CUpgrade` whose `EffectArray Operation="Subtract"` cuts each
+  duration (copy the rogue kit `mods/_reference/rogue/GameData/UpgradeData.xml` `Kit@AISmartServos`) and
+  grant it ONLY to the human player in `libWoLU_GrantCampaignTech` (next to the `WoLUnbalancedFlag`
+  grant) → the global static EffectArray edit is effectively player-only, rule-9-safe (same class as
+  `CombatShield`/`RegenerativeBioSteel`). The **gameplay-relevant** field is `Stats.Duration` (when the
+  unit becomes the new form); `Actor.Duration` is cosmetic; `Mover.*` is the physics glide. **VERIFY each
+  `Reference=` path against the ACTUAL morph def before subtracting** — the SectionArray indices differ
+  by morph (base `AssaultMode` has NO Collide section; `FighterMode` does) and you must not subtract a
+  field below ~0. Cite the durations: base Viking `AssaultMode` Stats/Actor.Duration=2.34 and
+  `FighterMode`=2.333 (`liberty.sc2mod/AbilData.xml`) → Subtract 1.34/1.333 leaves ~1.0 s. **The Hel's
+  Angels merc uses SEPARATE morph ability ids `WreckingCrewAssaultMode`/`WreckingCrewFighterMode`
+  (`liberty.sc2campaign/AbilData.xml`, standalone — inherit NOTHING from the base Viking morphs), so they
+  need their OWN EffectArray entries** (their Stats/Actor.Duration are also 2.333/2.334 → same 1.333 cut).
+  (Done v0.3.14: `WoLUSmartServos` CUpgrade. The ATTACK-WHILE-MOVING half of the same passive face is the
+  independent `Weapon.AllowedMovement=Moving` per-player edit above — two unrelated levers, one card.)
+  [STATIC field-class + verified rogue pattern; the in-game transform-feel is GAME-confirmed at playtest.]
 - **`PersonalCloakingFree` / `SpectreCloakingFree` are permanent-cloak BUFFS**, not
   cost-reducers: `CBehaviorBuff` with `Modification > StateFlags[Cloak]=1` and no energy
   drain. `UnitBehaviorAdd`-ing one makes the unit cloaked from that instant and stay cloaked
@@ -305,6 +327,37 @@ gotcha; authoritative details live in the code/plan, not here.
   (copy `DefaultButtonFace`/`State` verbatim, change only `Requirements`) + `<Unit>` + the element's
   `Time` so no sibling fields are blanked, and touch no other TrainN. (Done for the Hercules,
   v0.3.x — `src/mod/Base.SC2Data/GameData/AbilData.xml`.)
+- **EITHER/OR STORY-BRANCH train buttons COLLIDE on one production-building cell once you grant BOTH
+  sides — because the campaign APPENDS the second branch unit's train button index-less onto the SAME
+  Row/Column as the first.** In vanilla only one branch ever unlocks (Ghost xor Spectre, Raven xor
+  Science Vessel, Predator xor Hercules), so the base layer (`liberty.sc2mod`) and the story layer
+  (`libertystory`) deliberately place the two branch units' train buttons in the SAME cell — harmless
+  when only one renders. This mod grants BOTH sides ("every either/or grants both"), so the two
+  index-less-appended buttons land in one cell on the merged card and **only one renders** (owner
+  symptom: after Tosh's mission only the Spectre was buildable, the Ghost button hidden). Confirmed
+  collisions: **Barracks** Ghost `BarracksTrain,Train3` (base) + Spectre `BarracksTrain,Train7` (story)
+  both at R0C3; **Starport** Raven `StarportTrain,Train3` (base) + Science Vessel `StarportTrain,Train7`
+  (story) both at R0C2. **Predator/Hercules do NOT collide** — that pair lives on TWO DIFFERENT
+  buildings (Predator = `FactoryTrain,Train10` R0C3, Hercules = `StarportTrain,Train6` R1C1), each alone
+  in its cell; always resolve which building trains each branch unit before assuming a collision. **Fix
+  = a same-id `<CUnit>` override re-pointing ONE of the two buttons to a FREE cell, overriding ONLY
+  Row/Column** (the inherited `AbilCmd`/`Face`/`Type` survive by field-merge — same one-field-override
+  technique as the Medic heal-button `<LayoutButtons index="6" AbilCmd="HealWoLU,Execute"/>`). Two
+  merge-mechanics traps: (1) **these production cards are built ENTIRELY from index-less appends across
+  layers**, so a button's effective index = its position in the concatenated base→campaign→story stream
+  — Spectre is Barracks merged idx **15** (13 base buttons 0-12, then the 3rd story append), Science
+  Vessel is Starport merged idx **18** (14 base 0-13, then the 5th/last story append). DO NOT eyeball —
+  dump the merged card via `audit.py`'s `merge_unit_card(uid)` (CHECK5's oracle) and read the index off
+  it. (2) An explicit `index="N"` override DOES target the Nth slot of an index-less-built array (the
+  engine numbers index-less appends sequentially; the campaign itself targets them this way, cf. the
+  `<AbilArray index="3" removed="1"/>` tombstone) — so the override is reliable even though no source
+  layer wrote an explicit index. **Rule-9-safe**: command cards are player-UI-only (enemies render no
+  card), and the train tech for BOTH branch units is already granted in `libWoLU_GrantCampaignTech`
+  (Ghost+Spectre groups enabled + `TechTreeUnitAllow`; the lab-research loop grants both sides of every
+  Raven/SV + Predator/Hercules pair), so the now-visible button actually trains. Free-cell picks:
+  Barracks Spectre → R0C4 (beside Ghost on the train row); Starport Science Vessel → R1C2 (row 0 full,
+  R1C2 sits among Wraith R1C0 / Hercules R1C1). (Done v0.3.x —
+  `src/mod/Base.SC2Data/GameData/UnitData.xml` `CUnit id="Barracks"`/`"Starport"`.)
 - **A death-response RESURRECT chain has THREE links to clone for a merc clone to revive AS
   ITSELF, and the rebuild's gas cost lives on the REBUILT UNIT, not the morph ability.** The Thor
   Immortality Protocol is: `ThorDontDie` (`CBehaviorBuff`, `DamageResponse Fatal=1
@@ -501,9 +554,53 @@ gotcha; authoritative details live in the code/plan, not here.
   is a constant multiplier applied identically to old and new `DisplayEffect`, so a per-hit repoint keeps the
   ×N total correct — the check compares the per-hit `Amount`+`AttributeBonus` tuple. **OUT of scope (panel
   already == actual, or no per-unit fix exists):** Ghost/Spectre rifle "+vs Light/Armored" (display already
-  equals actual — both show the bonus); Senior Ghost +50% via `DamageDealtFraction` (touches no displayed
-  field and the Ghost weapon is SHARED → would need a Senior-Ghost-specific weapon clone to make exact —
-  surface as a decision, don't build). [STATIC mechanism; panel render is GAME-confirmed by the owner.]
+  equals actual — both show the bonus). **The Senior Ghost +50% panel under-show — RESOLVED via the
+  SHARED-weapon clone pattern below** (the "surface as a decision" item; owner approved it for accuracy).
+  [STATIC mechanism; panel render is GAME-confirmed by the owner.]
+- **A panel-INVISIBLE damage multiplier (`DamageDealtFraction` behavior) on a unit that SHARES its weapon
+  with a base unit is made panel-honest by a per-unit WEAPON-EFFECT clone — NOT a `DisplayEffect` repoint.**
+  `MercSeniorGhost` (`parent="Ghost"`, player-exclusive) deals +50% via `WoLUSeniorGhostBoost`
+  (`DamageDealtFraction[Ranged/Spell/Melee/Splash]=0.5`), which touches no displayed field, so the unit-info
+  panel under-showed (~20 vs ~30 real). Its rifle `C10CanisterRifle` is SHARED with the base Ghost, so you
+  CAN'T per-player-edit just the merc's number, and there's no reroute → CHECK11 never saw it. **Fix pattern
+  (the "bake-the-multiplier-into-a-merc-only-weapon-clone" recipe):** (1) clone the damage effect
+  `C10CanisterRifleWoLU parent="C10CanisterRifle"` with the boosted numbers HARDCODED (`Amount=30`,
+  `AttributeBonus[Light]=15` = the player's post-genlib `20`/`+10` × 1.5); (2) clone the weapon
+  `C10CanisterRifleWoLU parent="C10CanisterRifle"` setting BOTH `<Effect>` and `<DisplayEffect>` to the clone
+  (fires==displays → can't diverge); (3) repoint ONLY the merc's `WeaponArray index="0"` to the clone so the
+  base Ghost keeps the vanilla weapon (rule-9-safe — grep the new ids to confirm no other referrer); (4)
+  REMOVE the now-double-counting `DamageDealtFraction` kind that the clone bakes (`Ranged` here), and KEEP the
+  other kinds whose abilities aren't weapon-cloned (`Spell` → Snipe `SnipeWoLU`→`SnipeDamage` Kind=Spell keeps
+  its +50%; verify the ability's damage `Kind` before dropping its fraction, or you silently de-buff it).
+  **Three gotchas:** (a) the per-player genlib edit keyed to the PARENT weapon (`C10CanisterRifle.Range=7`
+  LTS) reaches the `parent=` clone via read-time inheritance (the Thor-precedent) — do NOT add a genlib edit
+  for the clone id, and do NOT override `Range` on the clone, or you detach it from the LTS scaling. (b) The
+  clone HARDCODES the ×1.5 result, so a future change to the genlib base (`20`) won't auto-track — acceptable
+  because the +50% is a fixed design intent, but note it inline. (c) A single-shot hitscan rifle is NOT area
+  damage → do NOT add `SearchFilters`/`AreaArray` (those are only for the cloned-splash class). This is the
+  general remedy whenever an accuracy fix needs the panel to reflect a multiplier the engine applies
+  invisibly AND the weapon is shared. [STATIC; panel render GAME-pending owner confirm.]
+- **Card/tooltip ACCURACY is a distinct bug class from card STRUCTURE — sweep the NUMBERS, not just the
+  ids.** audit.py (face↔capability, merge indices) and CHECK11 (panel==fired) guard STRUCTURE; neither reads
+  the literal NUMBERS in our `GameStrings.txt` tooltips. A full accuracy pass (2026-06) found these false
+  numeric claims, all in strings we OWN (cheap to fix): a merc "+armor"/"+N armor" tooltip whose merc
+  `LifeArmor` equals (or is only +1 over) the base unit's vanilla armor (Skibi's/`MercMedic` = base Medic 1 →
+  "+armor" was false; Jotun/`MercThor` = 2 vs base Thor 1 → "+2 armor" was really +1) — **always compute the
+  delta against the BASE unit's vanilla `LifeArmor` (resolve it in the reference dump), the tooltip's
+  parenthetical reads as a delta**; and a "1.5x … armor" claim where the armor is actually a FLAT clone value
+  (base Ghost has 0 armor → ×1.5 is meaningless; Senior Ghost is a flat `LifeArmor=3`). **Surface-don't-fix
+  class:** a SHARED tooltip string (`Button/Tooltip/WoLUUpgLaserTargeting` = "+1 weapon range") that's true
+  for most units but wrong for one (Banshee `BacklashRockets` is genlib-Set to +2 range) — fixing needs
+  either a per-unit string or a genlib value change (a design call), so report it, don't unilaterally rewrite
+  a shared string. **Out of scope (a known design convention, NOT false info):** the decorative
+  `WoLUUpg*`/`ShapedHull` passive faces (`AbilCmd=255`, display-only) advertising an armory-upgrade THEME on a
+  unit that gets the stat differently or not at all — these are deliberate flavor cards (open-issues §"the
+  cosmetic … card faces"), and rebalancing/removing them is owner-gated, not an accuracy fix. **A future
+  tooltip-number gate is tractable but bounded:** you'd regex each numeric token out of our owned strings and
+  cross-check the few that map cleanly to a single resolvable field (merc `LifeArmor`/`ShieldsMax`, a
+  cooldown `TimeUse`, a heal `Change`) — but most tooltip prose (multi-unit "+1 range", "faster training",
+  "1.5x damage") has no single field to bind to, so such a gate would cover only the merc-stat subset; treat
+  it as a nice-to-have, not a CHECK11-grade invariant.
 - **PROVEN: an upgrade `EffectArray Reference="Effect,<vanilla-parent>,Amount"` modification DOES
   propagate to a `parent=`-inheriting CHILD clone that does NOT override `<Amount>`.** This was the
   open "unverified statically" caveat on the rerouted weapons (see the CampaignLib §"Extending a
@@ -674,6 +771,23 @@ gotcha; authoritative details live in the code/plan, not here.
   (the lab-research path our lib drives, never to AI), so editing the upgrade's Value in
   static XML is effectively player-only → rule-9-safe.
 - State persists via ConversationState values and mission banks.
+- **Granting a mission's research yield by hand: write ONLY the OPPORTUNITY points into
+  `libCamp_gv_tSX_ResearchMissionProgress[mission][cat]` — the REWARD points are added by the
+  engine automatically once the mission is `Completed`, so adding them to the array double-counts.**
+  The Lab total (`libCamp_gf_StoryResearchPoints`, CampaignLib.galaxy:4853-4855) sums, per COMPLETED
+  mission, `array[mission][cat] + libCamp_gf_TS_MissionRewardResearchPoints(mission,cat)`; the battle
+  report (:4202-4207) splits the same way. The array (`CampaignLib_h.galaxy:784`, shape `[36][3]`,
+  category 1=Protoss/2=Zerg) holds the per-mission OPPORTUNITY value only (= `libCamp_gf_TS_StoryResearch
+  MissionOpportunities(mission,cat)`, :5000), NOT opportunities+reward. So a "100%-clear" hand-grant is:
+  set the four difficulties complete (`libCamp_gf_TS_SetMissionDifficultyCompleted`, :3097) → mark
+  `Completed` (`libCamp_gf_TS_MarkMissionAsStatus`, :3059) → store ONLY Opportunities in the array
+  (guarded `if existing < new` so a partial clear isn't lowered) → `libCamp_gf_UpdateMissionFlow()`
+  (:2967, re-propagates the unlock chain) → `libCamp_gf_PrepareForStoryModeTransitionalSave()` (:8474,
+  the supported persistence path: opens bank, SaveTransitionVars Normal, BankSave, SaveMissionBanks —
+  do NOT hand-roll BankSave). Used by the "Skip Prophecy missions" tstory01 button (v0.3.14,
+  `LibWoLUnbalanced.galaxy`). Note the brief's literal `Opportunities+Reward` into the array would have
+  double-counted the reward — the engine's add-on-completion is the gotcha. [STATIC mechanism; in-game
+  Lab-total render GAME-pending owner confirm.]
 
 ## Data sources
 

@@ -85,6 +85,20 @@
         <Effect value="WreckingCrewAssaultWoLU"/>
     </CWeaponLegacy>
 
+    <!-- Senior Ghost (MercSeniorGhost) rifle clone — player-exclusive, NO flag gate (no enemy
+         uses MercSeniorGhost; same single-un-gated-clone pattern as WreckingCrewAssault above).
+         parent="C10CanisterRifle" inherits Range/Period/etc., so the merc keeps the base Ghost's
+         +1 LTS range (genlib's per-player C10CanisterRifle.Range=7 reaches this child via read-
+         time parent inheritance — the GAME-confirmed Thor precedent). Both Effect and
+         DisplayEffect point at C10CanisterRifleWoLU (30, +15 Light = the player's 20×1.5 baked),
+         so the unit FIRES 30 and the panel SHOWS 30 — they can't diverge (CHECK11 GREEN). The
+         MercSeniorGhost unit overrides its WeaponArray to this clone (UnitData.xml). Do NOT add a
+         genlib Range edit for this id — the parent edit already covers it. -->
+    <CWeaponLegacy id="C10CanisterRifleWoLU" parent="C10CanisterRifle">
+        <Effect value="C10CanisterRifleWoLU"/>
+        <DisplayEffect value="C10CanisterRifleWoLU"/>
+    </CWeaponLegacy>
+
     <!-- Wraith Trigger Override: redirect both Wraith weapons' Effect to the stacking sets
          (keeps the weapon ids → attack animations bind). The added on-fire buff is
          WoLUHasFlag-gated at the effect level, so enemy Wraiths stay vanilla. -->

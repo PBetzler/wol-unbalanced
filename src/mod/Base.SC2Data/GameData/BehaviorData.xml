@@ -55,15 +55,19 @@
          an ADDITIVE, per-damage-Kind INDEXED array (CONFIRMED: liberty's DoubleDamage =
          DamageDealtFraction index="Ranged" value="1" => x2; default 0 => x1). The earlier
          scalar <Modification DamageDealtFraction="0.5"/> had no Kind index and didn't apply.
-         0.5 on every kind = +50% (the rifle is Ranged, Snipe is Spell). Innate + hidden, on
-         the MercSeniorGhost clone only (player-exclusive). -->
+         Innate + hidden, on the MercSeniorGhost clone only (player-exclusive).
+         The RANGED fraction was REMOVED and BAKED into the rifle weapon-effect clone
+         C10CanisterRifleWoLU (EffectData/WeaponData/UnitData) instead, so the damage panel
+         reads the real fired number (30 / +15 Light) — keeping it here too would DOUBLE-COUNT
+         the rifle. Spell stays (so Snipe — SnipeWoLU → SnipeDamage, Kind=Spell — keeps its
+         +50%); Melee/Splash are harmless (the ghost has no melee/splash attack) but preserve
+         the "1.5x damage" theme for any inherited ability. -->
     <CBehaviorBuff id="WoLUSeniorGhostBoost">
         <Alignment value="Positive"/>
         <BehaviorFlags index="Permanent" value="1"/>
         <InfoFlags index="Hidden" value="1"/>
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <Modification>
-            <DamageDealtFraction index="Ranged" value="0.5"/>
             <DamageDealtFraction index="Spell" value="0.5"/>
             <DamageDealtFraction index="Melee" value="0.5"/>
             <DamageDealtFraction index="Splash" value="0.5"/>

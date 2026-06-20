@@ -349,6 +349,37 @@
         </CardLayouts>
     </CUnit>
 
+    <!-- Either/or STORY-BRANCH train-button collision fix (design grants BOTH sides of every
+         lab/story branch, but vanilla overlaps the two branch units' train buttons on ONE cell
+         because only one branch ever unlocks in vanilla). The campaign (libertystory) APPENDS the
+         second branch unit's train button index-less onto the SAME Row/Column as the first → on a
+         merged card both buttons land in one cell and only one renders. Fix = re-point ONE of the
+         two onto a FREE cell. Indices are the EFFECTIVE MERGED indices (all these cards are built
+         entirely from index-less appends, so the merged index = position in the concatenated
+         base→story stream — verified with the audit.py CHECK5 merge sim, do NOT eyeball). Override
+         only Row/Column; the inherited AbilCmd/Face/Type are kept by field-merge (same technique as
+         the Medic heal-button repoint below). Card edits are player-UI-only → rule-9-safe (enemies
+         render no command card); the train tech for BOTH branch units is already granted in
+         libWoLU_GrantCampaignTech (Ghost+Spectre groups, both Raven/SV + Predator/Hercules lab
+         pairs), so the now-visible button works.
+         • Barracks: base Ghost (BarracksTrain,Train3) and story Spectre (BarracksTrain,Train7) both
+           landed at R0C3 → move Spectre to the free R0C4 (stays on the train row, beside Ghost).
+         • Starport: base Raven (StarportTrain,Train3) and story Science Vessel (StarportTrain,Train7)
+           both landed at R0C2 → move Science Vessel to the free R1C2 (row 0 is full C0-C4; R1C2 sits
+           among the other R1 trains: Wraith R1C0, Hercules R1C1).
+         Predator/Hercules need NO fix: they're on DIFFERENT buildings (Predator=FactoryTrain,Train10
+         R0C3 alone; Hercules=StarportTrain,Train6 R1C1 alone), so their buttons never collide. -->
+    <CUnit id="Barracks">
+        <CardLayouts index="0">
+            <LayoutButtons index="15" Row="0" Column="4"/>
+        </CardLayouts>
+    </CUnit>
+    <CUnit id="Starport">
+        <CardLayouts index="0">
+            <LayoutButtons index="18" Row="1" Column="2"/>
+        </CardLayouts>
+    </CUnit>
+
     <!-- AP Medic kit: Restoration (ally debuff-cleanse) + Optical Flare (enemy blind).
          Appended (enemy-invisible cards). Medic vanilla AbilArray 4 / LayoutButtons 9 →
          appends 4,5 / 9,10; free card cells R2C3, R2C4. -->
@@ -674,6 +705,12 @@
          Ghost kit (Snipe/EMP/cloak). FLAG: Nova model token + 1.5x scaling unverified. -->
     <CUnit id="MercSeniorGhost" parent="Ghost">
         <Name value="Unit/Name/MercSeniorGhost"/>
+        <!-- Override the inherited single Ghost weapon (base Ghost WeaponArray is one entry at
+             index 0, C10CanisterRifle) with the MercSeniorGhost-only rifle clone that bakes the
+             +50% damage into its effect + DisplayEffect, so the damage panel reads the real 30
+             (+15 Light) the merc fires. The +50% Ranged fraction is removed from
+             WoLUSeniorGhostBoost so it isn't double-counted (see BehaviorData.xml). -->
+        <WeaponArray index="0" Link="C10CanisterRifleWoLU"/>
         <LifeArmor value="3"/>
         <ShieldsMax value="75"/>
         <ShieldsStart value="75"/>
