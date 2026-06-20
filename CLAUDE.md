@@ -25,8 +25,9 @@ python3 scripts/preview.py --check  # CHECK8: every per-player edit sits on a ve
 python3 scripts/check_autocast.py   # CHECK9: every autocast + reactive (DamageResponse) trigger matches its declared INTENT (edit the spec in scripts/check_autocast.py when intent changes)
 python3 scripts/check_merc_parity.py  # CHECK10: every base-unit per-player buff (genlib field + galaxy loop) reaches its merc/hero counterpart — guards the recurring "merc silently misses an upgrade" class (allowlist genuine N/A in the script's EXCEPTIONS). Run AFTER genlib.py (it parses the generated lib).
 python3 scripts/check_panel_damage.py # CHECK11: every rerouted weapon's unit-info damage panel (its DisplayEffect) shows the number the player actually fires — guards the "card lies after an Effect/ImpactEffect reroute" class; fix by repointing DisplayEffect to the player's fired *WoLU clone.
+python3 scripts/check_no_vanilla_rename.py # CHECK12: never RE-IDENTIFY a vanilla unit (rename via GameStrings Unit/Name or a <Name> field) — guards the "touched a core unit" class; rename ONLY our own clones.
 python3 scripts/build.py build   # patch maps + assemble campaign into build/
-python3 scripts/build.py install # copy into /Applications/StarCraft II
+python3 scripts/build.py install # copy into the SC2 USER folder (Documents\StarCraft II) — NOT the game install dir
 ```
 
 - **You cannot run the game.** The user verifies in game. Always tell them exactly what to check and in which mission. `galaxy_lint.py` + `audit.py` are the only *automatic* debugging we have (no SC2 MCP); runtime debugging is the in-game diag line + the owner — see [docs/debug-toolkit.md](docs/debug-toolkit.md).
@@ -55,8 +56,10 @@ All changes affect **only the player** (rule 9) — enemies stay vanilla. (1) No
 
 - Galaxy is **single-pass**: forward-declare or define before use. A compile error = black map, **no error message**. `galaxy_lint.py` before every build, no exceptions.
 - `CatalogFieldValueModify` can **edit** existing fields per player but never **create** array entries; behavior-class abilities **cannot autocast**. Structural changes go through the **clone architecture**: `*WoLU` clones in static XML, gated by the `WoLUnbalancedFlag` upgrade, wired by per-player swaps of existing links. **Never clone unit types** (mission scripts check them).
+- **Never RE-IDENTIFY a vanilla unit** — do not rename it (`Unit/Name/<vanilla-id>` in GameStrings, or a `<Name>` field on a vanilla `<CUnit>`) and never change its TYPE id. Mission/campaign triggers + objective/dialog text key off unit identity; touching a core unit is gratuitous risk for zero benefit. Name ONLY our own player-exclusive clones (the elite mercs etc.). **`scripts/check_no_vanilla_rename.py` (CHECK12) FAILS the gate on any vanilla rename.** Corollary: **diagnostics must never touch a core/vanilla entity** — use a subtitle (`UIDisplayMessage`) or a NEW key, not a rename of a real unit/ability.
 - Cloned/added area-damage effects **friendly-fire by default** — always set explicit `SearchFilters` (Crucio pattern).
 - Static XML is global: direct stat edits there leak to enemies. XML is for definitions and player-exclusive units (heroes, mercs) only.
+- **Verify the mod is actually LOADED before debugging the code.** "Nothing changed" almost always means the build isn't being loaded, not that the code is wrong: `build.py install` targets the SC2 **USER** folder (`Documents\StarCraft II`), never the game install dir, and the in-mission **canary subtitle** (or a static load-proof) confirms the library ran. Check WHERE the files land + whether the canary shows FIRST — a byte-correct mod installed to the wrong place looks identical to a broken mod (this cost the v0.3.14–v0.3.17 spiral; see [docs/learnings.md](docs/learnings.md) §Verification tooling).
 
 ## Don't-guess discipline (how we stop repeating the same mistakes)
 

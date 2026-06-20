@@ -15,6 +15,7 @@ python3 scripts/preview.py --check >/dev/null 2>&1 || { echo "pre-commit: previe
 python3 scripts/check_autocast.py >/dev/null 2>&1 || { echo "pre-commit: CHECK9 FAILED (an autocast/reactive trigger doesn't match its declared intent, or a new autocast/DamageResponse has no declared intent — see scripts/check_autocast.py):"; python3 scripts/check_autocast.py; fail=1; }
 python3 scripts/check_merc_parity.py >/dev/null 2>&1 || { echo "pre-commit: CHECK10 FAILED (a base-unit per-player buff doesn't reach a merc/hero counterpart, or an exception is stale — see scripts/check_merc_parity.py):"; python3 scripts/check_merc_parity.py; fail=1; }
 python3 scripts/check_panel_damage.py >/dev/null 2>&1 || { echo "pre-commit: CHECK11 FAILED (a rerouted weapon's unit-info damage panel shows a different number than the player actually fires — repoint the weapon's DisplayEffect to the player's fired clone; see scripts/check_panel_damage.py):"; python3 scripts/check_panel_damage.py; fail=1; }
+python3 scripts/check_no_vanilla_rename.py >/dev/null 2>&1 || { echo "pre-commit: CHECK12 FAILED (a VANILLA unit is being renamed/re-identified — vanilla unit identity is off-limits; rename only our own clones; see scripts/check_no_vanilla_rename.py):"; python3 scripts/check_no_vanilla_rename.py; fail=1; }
 python3 scripts/check_dispatch_doctrine.py --quiet || { echo "pre-commit: dispatch-doctrine check FAILED (run: python3 scripts/check_dispatch_doctrine.py)"; fail=1; }
 
 untracked="$(git ls-files --others --exclude-standard 2>/dev/null || true)"
