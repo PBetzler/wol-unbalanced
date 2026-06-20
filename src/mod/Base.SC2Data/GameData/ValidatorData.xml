@@ -96,4 +96,52 @@
         <CombineArray value="WoLUTargetIsMedic"/>
         <CombineArray value="WoLUTargetIsMedivac"/>
     </CValidatorCombine>
+
+    <!-- ============================================================================
+         Science Vessel Magellan FREE double-beam heal: periodic-sustain validators.
+         The Medivac heal mechanism drains energy in TWO places: (a) the periodic
+         MedivacHealModifySet's MedivacHealModifyCasterEnergy (-0.33/tick), gated alive
+         by PeriodicValidator=HealPeriodicCombine which itself contains a CasterHasEnergy
+         AND-member; (b) the ability-level healCasterMinEnergy (>=5 energy to auto-start),
+         also carried by MedivacHealSearch's ValidatorArray. To make the SV heal FREE
+         (like the old Nano-Repair beams + the mod's free-ability ethos) we drop BOTH on
+         OUR clones only — the Medivac + enemy SVs keep the vanilla drain (rule 9).
+         These validators are CREATABLE in static XML (validators have no per-player
+         runtime catalog — learnings §"A VALIDATOR's threshold is NOT per-player-editable").
+         ids verified against mods/_reference/campaigns/liberty.sc2campaign/ValidatorData.xml
+         (HealPeriodicCombine :262, MedivacIsHealing :174) + liberty.sc2mod (CasterHasEnergy).
+         ============================================================================ -->
+
+    <!-- "This SV is running OUR heal ability." Vanilla MedivacIsHealing keys on
+         AbilLink=MedivacDoubleBeamHeal, but the SV re-issues SVDoubleBeamHealWoLU, so the
+         vanilla check would FAIL the periodic heal on the SV. Re-key it to our ability so
+         the periodic life-restore actually ticks. (Same CValidatorUnitOrderQueue shape.) -->
+    <CValidatorUnitOrderQueue id="SVIsHealingWoLU">
+        <AbilLink value="SVDoubleBeamHealWoLU"/>
+    </CValidatorUnitOrderQueue>
+
+    <!-- The free-sustain periodic validator: clone of HealPeriodicCombine (an And) with the
+         CasterHasEnergy member DROPPED (so the heal keeps ticking at 0 energy) and
+         MedivacIsHealing swapped for SVIsHealingWoLU. Every other gate is kept verbatim
+         (LifeGTZero, NotMaxHP, HealTargetInRange, NotHidden) so the beam still tears down
+         when the target is full/dead/out-of-range/hidden — none of those is energy-related. -->
+    <CValidatorCombine id="SVHealPeriodicCombineWoLU">
+        <Type value="And"/>
+        <CombineArray value="SVIsHealingWoLU"/>
+        <CombineArray value="LifeGTZero"/>
+        <CombineArray value="NotMaxHP"/>
+        <CombineArray value="HealTargetInRange"/>
+        <CombineArray value="NotHidden"/>
+    </CValidatorCombine>
+
+    <!-- The auto-acquire SCAN's keep-alive validator: clone of HealScanPeriodicCombine
+         (an And of CasterHasEnergy + AtLeastOneHealBeamBusy) with the CasterHasEnergy member
+         DROPPED so the channeled scan that grabs the 2nd target keeps running at 0 energy.
+         AtLeastOneHealBeamBusy (>=1 beam currently busy) is KEPT — the scan should only run
+         while at least one beam is active, exactly as vanilla. (HealScanPeriodicCombine :164;
+         AtLeastOneHealBeamBusy :118.) -->
+    <CValidatorCombine id="SVHealScanPeriodicCombineWoLU">
+        <Type value="And"/>
+        <CombineArray value="AtLeastOneHealBeamBusy"/>
+    </CValidatorCombine>
 </Catalog>

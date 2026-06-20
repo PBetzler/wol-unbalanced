@@ -279,7 +279,6 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogUnit, "SiegeTankSieged", "LifeArmor", p, "3", c_upgradeOperationAdd);  // Tank Advanced Siege Tech: +3 armor sieged
     CatalogFieldValueModify(c_gameCatalogWeapon, "BacklashRockets", "Range", p, "8", c_upgradeOperationSet);  // Banshee Advanced Targeting Optics: +2 range (folded flat — player banshees are perma-cloaked)
     CatalogFieldValueModify(c_gameCatalogEffect, "BacklashRocketsU", "Amount", p, "1.25", c_upgradeOperationMultiply);  // Banshee Distortion Blasters: +25% dmg (folded flat)
-    CatalogFieldValueModify(c_gameCatalogAbil, "NanoRepair", "Cost[0].Vital[Energy]", p, "0", c_upgradeOperationSet);  // Science Vessel Improved Nano-Repair: free heal
     CatalogFieldValueModify(c_gameCatalogEffect, "OdinAADamage", "Amount", p, "35", c_upgradeOperationSet);  // Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)
     CatalogFieldValueModify(c_gameCatalogAbil, "heal", "Range", p, "4", c_upgradeOperationSet);  // Medic Nano Projector: +2 heal range (2->4)
     CatalogFieldValueModify(c_gameCatalogWeapon, "Diamondback", "Period", p, "0.75", c_upgradeOperationMultiply);  // Diamondback Hyperfluxor: faster attack (-25%, assumption)

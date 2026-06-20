@@ -317,4 +317,119 @@
         <EffectArray value="WraithGLaunchMissile"/>
         <EffectArray value="WoLUWraithTriggerOverrideApply"/>
     </CEffectSet>
+
+    <!-- ============================================================================
+         Science Vessel Magellan: DOUBLE-BEAM Nano-Repair (heal up to TWO targets at once,
+         biological + mechanical + air). This TRANSPLANTS the Medivac's double-beam mechanism
+         (CAbilEffectTarget MedivacDoubleBeamHeal) onto the Science Vessel by cloning the
+         player-issued chain and dropping the Biological restriction. The "2 beams" comes from
+         the per-CASTER behavior-count gate HealBeamAvailable (caster has LT 2 stacks of
+         MedivacHealBeamBusy) — that is per-caster, so it transplants cleanly to the SV.
+         Rule 9: the Medivac + enemy Science Vessels are untouched. We CLONE every node that
+         differs (the switch, the bio-restricting scan, the search filter, the re-order chain)
+         and REUSE the vanilla heal-beam persistent + stop-order + busy-behavior verbatim. Only
+         the human player can ENTER this chain (the SV ability button is WoLUHaveFlag-gated and
+         the re-order effect re-issues OUR ability), so no per-node flag gate is needed.
+         (See engram #145 + the brief; ids verified against
+         mods/_reference/campaigns/liberty.sc2campaign/{Effect,Abil,Validator,Behavior}Data.xml.)
+         ============================================================================ -->
+
+    <!-- Initial switch: gate on HealBeamAvailable. Cannot use parent= on a CEffectSwitch
+         (a partial CaseArray/CaseDefault override does not reliably merge), so restate the
+         body verbatim, repointing both cases at our clones. -->
+    <CEffectSwitch id="SVHealInitialSwitchWoLU">
+        <ValidatorArray value="NotMaxHP"/>
+        <ValidatorArray value="NotWarpingIn"/>
+        <ValidatorArray value="TargetNotBeingHealed"/>
+        <EditorCategories value="Race:Terran"/>
+        <CaseArray Validator="HealBeamAvailable" Effect="SVHealInitialSetWoLU"/>
+        <CaseDefault value="SVHealIssueOrderSetWoLU"/>
+    </CEffectSwitch>
+
+    <!-- A beam is free: fire OUR FREE heal-beam persistent on the clicked target + start OUR
+         scan to auto-acquire the 2nd target. SVHealTargetPersistentWoLU is the energy-free
+         clone (below) — it has NO biological filter (the bio-restriction lives only in the
+         scan + the ability's TargetFilters). -->
+    <CEffectSet id="SVHealInitialSetWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="SVHealTargetPersistentWoLU"/>
+        <EffectArray value="SVHealScanPersistentWoLU"/>
+    </CEffectSet>
+
+    <!-- ENERGY-FREE heal-beam persistent (rule 9: the Medivac + enemy SVs keep the vanilla
+         draining MedivacHealTargetPersistent). Clone the vanilla persistent and override only
+         the two energy-bearing children: the periodic effect set (drop the caster-energy
+         drain) and the periodic validator (drop the CasterHasEnergy gate + re-key the
+         "is-healing" check to our ability). All other validators/effects (TargetNotBeingHealed,
+         NotWarpingIn, NotMaxHP, HealBeamAvailable [the LT-2 beam-count gate that makes it heal
+         exactly TWO — KEPT], noMarkers, the Apply/Remove behavior chain, the 0.111 s period,
+         WhichLocation=TargetUnit, the Abil/MedivacHeal marker) inherit verbatim via parent=.
+         PeriodicEffectArray + PeriodicValidator on the parent are single index-less entries =
+         slot 0 → override with index="0" (bare value= on a parent= clone would APPEND, not
+         replace — the HealWoLU TargetFilters trap). -->
+    <CEffectCreatePersistent id="SVHealTargetPersistentWoLU" parent="MedivacHealTargetPersistent">
+        <PeriodicEffectArray index="0" value="SVHealModifySetWoLU"/>
+        <PeriodicValidator value="SVHealPeriodicCombineWoLU"/>
+    </CEffectCreatePersistent>
+
+    <!-- The energy-free periodic heal: the vanilla MedivacHealModifySet =
+         [MedivacHealModifyCasterEnergy(-0.33 Energy/tick), MedivacHealModifyTargetLife].
+         Drop the caster-energy drain → keep ONLY the life restore (reused verbatim; the
+         vanilla life-restore effect is untouched so the Medivac is unaffected). -->
+    <CEffectSet id="SVHealModifySetWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="MedivacHealModifyTargetLife"/>
+    </CEffectSet>
+
+    <!-- The channeled scan that periodically auto-acquires a SECOND heal target. Clone the
+         vanilla scan-persistent and repoint its periodic effect (slot 0) to our search;
+         HealScanPersistent's PeriodicEffectArray is a single index-less entry = slot 0, so
+         override it with index="0". Also override PeriodicValidator: the vanilla
+         HealScanPeriodicCombine gates the scan on CasterHasEnergy, which would stop the 2nd-beam
+         auto-acquire at 0 energy → repoint to SVHealScanPeriodicCombineWoLU (energy gate dropped,
+         AtLeastOneHealBeamBusy kept). PeriodicValidator is a scalar value= child → bare value=.
+         WhichLocation/Channeled/PeriodicPeriod/FinalEffect inherit via parent=. -->
+    <CEffectCreatePersistent id="SVHealScanPersistentWoLU" parent="HealScanPersistent">
+        <PeriodicEffectArray index="0" value="SVHealSearchWoLU"/>
+        <PeriodicValidator value="SVHealScanPeriodicCombineWoLU"/>
+    </CEffectCreatePersistent>
+
+    <!-- The auto-acquire search, with Biological DROPPED from SearchFilters so the 2nd beam
+         can grab a mechanical/air ally too. SearchFilters is an INDEXED array → override slot 0
+         explicitly (bare value= on a parent= clone APPENDS+ANDs — the HealWoLU trap). This is an
+         AUTO-acquire search of OWN+ALLY damaged units, so the filter must exclude enemy/neutral/
+         structure/self/missile/etc (Crucio-style explicit SearchFilters satisfies the
+         friendly-fire rule). AreaArray is also a single index-less entry = slot 0 → restate with
+         index="0" so the 2nd beam uses OUR ENERGY-FREE heal-beam persistent.
+         ENERGY: the parent MedivacHealSearch's ValidatorArray is [0]=HealBeamAvailable (the
+         LT-2 beam-count gate — KEEP) + [1]=healCasterMinEnergy (>=5 energy floor). Tombstone
+         slot 1 (index="1" removed="1") so the auto-acquire scan runs with NO energy gate (free
+         heal). HealBeamAvailable + TargetSorts inherit via parent=. -->
+    <CEffectEnumArea id="SVHealSearchWoLU" parent="MedivacHealSearch">
+        <SearchFilters index="0" value="Visible;Self,Neutral,Enemy,Structure,Stasis,Dead,Hidden,Missile,Invulnerable"/>
+        <ValidatorArray index="1" removed="1"/>
+        <AreaArray index="0" MaxCount="1" Radius="4.5" Effect="SVHealTargetPersistentWoLU"/>
+    </CEffectEnumArea>
+
+    <!-- No beam free: stop, then re-issue OUR ability after a short delay (the vanilla
+         no-beam-free re-order path). Reuse the stop verbatim. -->
+    <CEffectSet id="SVHealIssueOrderSetWoLU">
+        <EditorCategories value="Race:Terran"/>
+        <EffectArray value="MedivacHealIssueStopOrder"/>
+        <EffectArray value="SVHealIssueHealOrderDelayWoLU"/>
+    </CEffectSet>
+
+    <!-- Re-order delay: repoint InitialEffect to our re-issue order. InitialEffect on the parent
+         is a scalar value= child (not an indexed array), so match the parent's shape with a bare
+         value=. InitialDelay/WhichLocation inherit via parent=. -->
+    <CEffectCreatePersistent id="SVHealIssueHealOrderDelayWoLU" parent="MedivacHealIssueHealOrderDelay">
+        <InitialEffect value="SVHealIssueHealOrderWoLU"/>
+    </CEffectCreatePersistent>
+
+    <!-- The re-issue order: the vanilla MedivacHealIssueHealOrder HARDCODES
+         Abil value="MedivacDoubleBeamHeal" — repoint it to re-issue OUR ability so the chain
+         loops on the SV's clone, never the Medivac's. WhichUnit/Player/Target inherit via parent=. -->
+    <CEffectIssueOrder id="SVHealIssueHealOrderWoLU" parent="MedivacHealIssueHealOrder">
+        <Abil value="SVDoubleBeamHealWoLU"/>
+    </CEffectIssueOrder>
 </Catalog>
