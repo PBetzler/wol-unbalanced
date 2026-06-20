@@ -1,3 +1,5 @@
+Unit/Name/Marine=Marine [WoLU LOADED]
+Unit/Name/SCV=SCV [WoLU LOADED]
 Button/Name/Stim=Super Stimpack
 Button/Tooltip/Stim=Increases movement and attack speed and <c val="00FF40">heals life</c> (30 for the Marine line, 60 for Firebats and Marauders).<n/>WoL Unbalanced: stims heal instead of hurting. Autocasts while fighting (18 s cooldown).
 Button/Name/MagrailWoLU=Magrail Shot
