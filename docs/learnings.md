@@ -864,6 +864,21 @@ gotcha; authoritative details live in the code/plan, not here.
 
 ## Verification tooling
 
+- **`build.py install` MUST target the SC2 USER folder (`Documents\StarCraft II` on Windows),
+  NOT the game install dir (`Program Files (x86)\StarCraft II`).** The game, Editor, and CCM all
+  load CUSTOM campaign maps + mods from the user folder (`Documents\StarCraft II\Maps\Campaign` +
+  `…\Mods`). Installing into the Program Files dir drops the files where the game never looks for
+  custom content → `Documents\…\Maps\Campaign` stays empty → you play the **vanilla** WoL campaign
+  with NO mod (no canary, no buffs, no mercs) and reinstalling "changes nothing". This cost a
+  multi-session debugging spiral (v0.3.14–v0.3.17): the released zips + the mod galaxy were all
+  byte-correct, but `_default_sc2_dir()` had been wrongly pointed at Program Files (regression in
+  commit a4ab52b, "direct launch reads it" — but the OWNER plays via CCM/the campaign list, which
+  reads Documents). **The mod being 100% correct does not mean it is being loaded — verify WHERE the
+  files land before suspecting the code.** A fast static load-proof: a `Unit/Name/Marine=…` override
+  in the mod's GameStrings shows in mission 1 the instant the mod's DATA loads, with zero dependence
+  on the trigger lib — distinguishes "mod not loaded at all" (install/path) from "lib not running"
+  (galaxy/trigger). Override the path with `$WOLU_SC2_DIR` if SC2's user folder is relocated.
+
 - **SC2 client API live reads are a HARD BLOCK on retail 5.x** (this Mac). `scripts/verify_api.py`
   can `RequestPing` + `RequestCreateGame` (campaign map loads, mod deps resolve — a "mod loads via
   the engine" sanity check), but `RequestJoinGame` ALWAYS fails `"Unable to validate game license"`.
