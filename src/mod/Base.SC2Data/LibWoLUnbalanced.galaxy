@@ -35,6 +35,8 @@ void libWoLU_EnableCurrentMissionUnits (int p);
 bool libWoLU_ShouldOfferSkipProphecy (int p);
 void libWoLU_CreateSkipProphecyButton ();
 void libWoLU_SkipProphecyMissions (int p);
+string libWoLU_b2s (bool v);            // bool -> "1"/"0" for diag subtitles
+void libWoLU_PurchaseAllMercs (int p);  // re-assert every merc Purchased (hub re-grant)
 
 void libWoLU_ApplyPlayer (int p) {
     libWoLUGen_Apply(p);
@@ -478,11 +480,16 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
 // Gate: should the Skip-Prophecy button be offered right now? True only when ALL hold:
 //   - we are on the tstory01 Hyperion hub, AND
 //   - the human player is Terran (the campaign hero faction; Protoss interludes are skipped), AND
-//   - the Prophecy arc is REACHABLE (TZeratul01 is Available) but NOT yet finished (TZeratul04
-//     not Completed). So the button is hidden before Tychus 02 unlocks the arc, and after all
-//     four are done.
+//   - the Prophecy arc is REACHABLE (TZeratul01 is UNLOCKED, i.e. NOT Locked) but NOT yet finished
+//     (TZeratul04 not Completed). So the button is hidden before Tychus 02 unlocks the arc, and
+//     after all four are done.
+// NOTE (v0.3.15 fix): the gate now tests TZeratul01 != Locked, NOT == Available. libCamp_gf_MissionStatus
+// (CampaignLib.galaxy:2767-2779) returns Available ONLY while a mission is unlocked-AND-not-completed —
+// so the moment the player CLEARS TZeratul01 its status becomes Completed and an `== Available` gate
+// would wrongly hide the button while TZeratul02-04 still remain. `!= Locked` (Available OR Completed)
+// keeps the button up across the whole arc until TZeratul04 is done.
 // libCamp_gf_MissionStatusCheck(mapID, status) (CampaignLib.galaxy:2781) and the
-// MissionStatus_* enums (Available=1, Completed=2) are in scope via the co-injected CampaignLib.
+// MissionStatus_* enums (Locked, Available, Completed) are in scope via the co-injected CampaignLib.
 bool libWoLU_ShouldOfferSkipProphecy (int p) {
     if (libCamp_gv_tS_CurrentMap != libCamp_ge_MapID_MapTStory01) {
         return false;
@@ -490,7 +497,7 @@ bool libWoLU_ShouldOfferSkipProphecy (int p) {
     if (PlayerRace(p) != "Terr") {
         return false;
     }
-    if (libCamp_gf_MissionStatusCheck(libCamp_ge_MapID_MapTZeratul01, libCamp_ge_MissionStatus_Available) == false) {
+    if (libCamp_gf_MissionStatusCheck(libCamp_ge_MapID_MapTZeratul01, libCamp_ge_MissionStatus_Locked) == true) {
         return false; // arc not unlocked yet → nothing to skip
     }
     if (libCamp_gf_MissionStatusCheck(libCamp_ge_MapID_MapTZeratul04, libCamp_ge_MissionStatus_Completed) == true) {
@@ -593,11 +600,51 @@ void libWoLU_SkipProphecyMissions (int p) {
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("Prophecy missions skipped - research points granted."));
 }
 
-// Deferred creator: fires on tstory01 at 2 s (and again at 11 s, after intro sequences),
-// AFTER CampaignLib has loaded its transition data — creating the button at the raw map-init
-// instant would race the campaign's own state load. The gate + the dialog-already-exists guard
-// in the creator make the double timer harmless (second pass is a no-op once created).
+// bool -> "1"/"0" for the diag subtitles below (Galaxy has no bool->string native).
+string libWoLU_b2s (bool v) {
+    if (v) {
+        return "1";
+    }
+    return "0";
+}
+
+// Re-assert EVERY campaign merc as Purchased (BUG-1 fix, v0.3.15). When a counterpart-unlock
+// mission completes (e.g. The Dig unlocks the Siege Tank), the campaign's own
+// libCamp_gf_TS_UpdateMercStatus (CampaignLib.galaxy:3653-3656) flips that merc Locked->New —
+// i.e. back to PURCHASABLE — and our main per-mission grant runs on GAME-time timers that may not
+// advance on the story-mode Hyperion hub, so the merc panel shows a buy button there. Re-purchase
+// here (called from the hub handler on a REAL-time timer). SetMercStatus(Purchased) is what hides
+// the panel's buy button; UpdateMercStatus leaves an already-Purchased merc alone once its
+// counterpart is enabled, so this is stable. Re-apply the merc tech/upgrades to keep calldowns +
+// upgrades consistent. Idempotent; player-only (rule 9).
+void libWoLU_PurchaseAllMercs (int p) {
+    int i;
+    i = libCamp_gv_TSC_MERC_FIRST;
+    while (i <= libCamp_gv_TSC_MERC_LAST) {
+        libCamp_gf_SetMercStatus(libCamp_gv_tS_MercID[i], libCamp_ge_StoryMercStatus_Purchased);
+        i = i + 1;
+    }
+    libCamp_gf_TS_ApplyMercenaryTech(p);
+    libCamp_gf_TS_ApplyMercUpgrades(p);
+}
+
+// Hub handler — runs on the tstory01 Hyperion only. Wired (libWoLU_InitLib) on BOTH game-time and
+// REAL-time timers: the story-mode hub may not advance game time the way a combat mission does, so
+// the real-time passes guarantee this fires on the Hyperion. Does three things there:
+//   (1) re-purchase all mercs (BUG-1: Siege Breakers et al. stay owned, not buyable),
+//   (2) emit a diagnostic subtitle (TEMP — removable once the owner confirms both fixes),
+//   (3) create the one-time Skip-Prophecy button if the gate allows (BUG-2).
+// Early-returns on every other map, so combat missions see nothing (no spam, no work).
 bool libWoLU_OnStoryModeInit (bool testConds, bool runActions) {
+    if (libCamp_gv_tS_CurrentMap != libCamp_ge_MapID_MapTStory01) {
+        return true; // Hyperion hub only
+    }
+    libWoLU_PurchaseAllMercs(libWoLU_Player);
+    // TEMP diag (remove once confirmed): if the owner sees this on the Hyperion, this real-time
+    // trigger fired there. z1/z4 = MissionStatus ints for TZeratul01/04 (0=Locked,1=Available,
+    // 2=Completed); offer = the button gate result; dlg = the button's dialog id (0/invalid = not
+    // yet created). race should read "Terr".
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU hub: race=" + PlayerRace(libWoLU_Player) + " z1=" + IntToString(libCamp_gf_MissionStatus(libCamp_ge_MapID_MapTZeratul01)) + " z4=" + IntToString(libCamp_gf_MissionStatus(libCamp_ge_MapID_MapTZeratul04)) + " offer=" + libWoLU_b2s(libWoLU_ShouldOfferSkipProphecy(libWoLU_Player)) + " dlg=" + IntToString(libWoLU_gv_skipProphecyDialog)));
     if (libWoLU_ShouldOfferSkipProphecy(libWoLU_Player) == true) {
         libWoLU_CreateSkipProphecyButton();
     }
@@ -632,12 +679,16 @@ void libWoLU_InitLib () {
     // behavior-maintenance pass above.
     TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnGraduateRange"), 3.0, c_timeGame);
 
-    // Skip-Prophecy button (tstory01 hub only). The creator runs on a short deferred timer
-    // (2 s + an 11 s safety pass, so CampaignLib's transition data has finished loading and
-    // any intro sequence has cleared); the gate inside scopes it to the hub. The click handler
-    // listens for ANY dialog-control click and matches our stored button id internally.
+    // Hyperion-hub handler (merc re-purchase + Skip-Prophecy button + diag; scoped to tstory01
+    // inside the handler). Fires on BOTH game-time AND real-time passes: the story-mode hub may
+    // not advance game time like a combat mission, so the real-time events guarantee it runs there
+    // (this is the v0.3.15 fix for "button never appeared" + "Siege Breakers stayed buyable" — both
+    // symptoms of the game-time grant not reaching the hub). The handler is idempotent and the
+    // button creator is guarded, so multiple passes are harmless.
     t = TriggerCreate("libWoLU_OnStoryModeInit");
     TriggerAddEventTimeElapsed(t, 2.0, c_timeGame);
     TriggerAddEventTimeElapsed(t, 11.0, c_timeGame);
+    TriggerAddEventTimeElapsed(t, 2.0, c_timeReal);
+    TriggerAddEventTimeElapsed(t, 6.0, c_timeReal);
     TriggerAddEventDialogControl(TriggerCreate("libWoLU_OnSkipProphecyClicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
 }

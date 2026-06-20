@@ -673,6 +673,32 @@ gotcha; authoritative details live in the code/plan, not here.
   `TechTreeAbilityAllow` / `libNtve_gf_SetUpgradeLevelForPlayer`).
 - Mercs: `libCamp_gf_SetMercStatus(id, Purchased)`; Locked derives from the
   counterpart's tech group — skip Locked mercs and rule 3 gating is preserved.
+- **`libCamp_gf_TS_UpdateMercStatus` (CampaignLib.galaxy:3641-3663) re-derives merc status from
+  the counterpart tech group on EVERY post-victory `ApplyCampaignTech` pass and will UNDO a manual
+  `Purchased` if you're not careful.** Per merc: if all counterpart subgroups are Enabled and the
+  merc is currently `Locked` → it flips to **`New`** (= a fresh, PURCHASABLE contract); if any
+  subgroup is NOT enabled → it is **reset to `Locked`** unconditionally. It does NOT touch an
+  already-`Purchased` merc once the counterpart is enabled. Consequence (the "Siege Breakers buyable
+  after The Dig" bug, v0.3.15): the mission that unlocks a merc's counterpart (The Dig → Siege Tank)
+  enables the subgroup, so the very next `UpdateMercStatus` flips that merc `Locked→New` — buyable
+  again — and our auto-purchase only sticks if we re-assert `SetMercStatus(Purchased)` AFTER the
+  counterpart unlocks. To force "all mercs always owned" you must re-purchase on a trigger that
+  reliably runs wherever the merc panel is read (the **Hyperion hub `tstory01`**), not only in
+  combat missions.
+- **Mission status is three-valued and ORDER-derived: `libCamp_gf_MissionStatus(map)`
+  (CampaignLib.galaxy:2767-2779) returns `Completed` if its completed-age≠0, ELSE `Available` if its
+  available-age≠0, ELSE `Locked`.** So a mission is `Available` ONLY while unlocked-AND-not-completed
+  — the instant you clear it, it reports `Completed`, never `Available`. To mean "this mission is
+  reachable (unlocked), completed or not", test `MissionStatusCheck(map, Locked) == false`, NOT
+  `== Available` (the v0.3.15 Skip-Prophecy gate bug: an `== Available` gate hid the button the
+  moment TZeratul01 was cleared, even with 02-04 still to skip).
+- **Story-mode hub (`tstory01`) timer caveat [UNCONFIRMED — pending owner diag]:** symptoms in
+  v0.3.14/15 (merc re-purchase + a custom button both failing to appear on the Hyperion, while the
+  same code works in combat missions) are consistent with `c_timeGame` `TriggerAddEventTimeElapsed`
+  NOT advancing on the story-mode hub. CampaignLib itself schedules all its story-mode waits on
+  `c_timeReal` (CampaignLib.galaxy:673-770). Mitigation shipped: register hub-affecting triggers on
+  BOTH `c_timeGame` AND `c_timeReal`. Promote this to a confirmed rule only after the owner's diag
+  subtitle proves the game-time pass didn't fire on `tstory01`.
 - Lab research lives in `libCamp_gv_tSX_ResearchState[1..20]` as adjacent pairs
   (Raven/SV = 7/8, Predator/Hercules = 15/16); Ghost/Spectre are tech groups 20/21.
 - **In WoL the player-facing weapon/armor RESEARCHES are NOT the base `Terran*Weapons/ArmorsLevelN`
