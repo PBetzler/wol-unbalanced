@@ -515,15 +515,22 @@ bool libWoLU_ShouldOfferSkipProphecy (int p) {
 // libNtve_gf_SetDialogItemText wrapper (the NativeLib idiom both CampaignLib and the rogue
 // kit use for button captions) — our lib includes TriggerLibs/NativeLib, so it resolves.
 //
-// Position: anchored top-center, pushed DOWN ~120 px so it sits below the star-map header and
-// doesn't cover the mission nodes. [GAME]-PENDING: exact placement is a guess; the owner may
-// relocate the offset / anchor after seeing it in the hub.
+// Position (v0.3.19): anchored BOTTOM-center, ~90 px up from the bottom edge. The original
+// top-center +120 placement sat UNDER the crystal's native star-map / mission-launch panel (which
+// renders on top and captures clicks → the button was visible but un-clickable AT the crystal,
+// while clickable in the other rooms where no native panel overlaps). The native star-map UI fills
+// the upper/center of the screen, so a bottom-anchored button is clear of it — likely clickable at
+// the crystal too, and less intrusive in the other rooms. NOTE: this is a single persistent screen
+// overlay (created once, shown until clicked), so it floats over EVERY Hyperion room by design —
+// that's why it "stays" on armory/cantina/lab; it vanishes for good on the one click. [GAME]-PENDING:
+// confirm it's now clickable at the crystal; if the native panel still overlaps, the bottom corner
+// is the next move.
 void libWoLU_CreateSkipProphecyButton () {
     if (libWoLU_gv_skipProphecyDialog != c_invalidDialogId) {
         return; // already created this visit — never make a second one
     }
-    // Small dialog: 420x44, anchored top-center, +120 px down from the top edge.
-    DialogCreate(420, 44, c_anchorTop, 0, 120, false);
+    // Small dialog: 420x44, anchored bottom-center, +90 px up from the bottom edge.
+    DialogCreate(420, 44, c_anchorBottom, 0, 90, false);
     libWoLU_gv_skipProphecyDialog = DialogLastCreated();
     DialogSetVisible(libWoLU_gv_skipProphecyDialog, PlayerGroupAll(), true);
     // The clickable button child, filling the dialog.
@@ -531,7 +538,7 @@ void libWoLU_CreateSkipProphecyButton () {
     libWoLU_gv_skipProphecyButton = DialogControlLastCreated();
     libNtve_gf_SetDialogItemText(libWoLU_gv_skipProphecyButton, StringToText("Skip Prophecy Missions (grant research)"), PlayerGroupAll());
     DialogControlSetSize(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), 420, 44);
-    DialogControlSetPosition(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), c_anchorTop, 0, 0);
+    DialogControlSetPosition(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), c_anchorBottom, 0, 0);
 }
 
 // The action: mark all 4 Prophecy missions complete and grant their full research yield,
@@ -557,6 +564,15 @@ void libWoLU_SkipProphecyMissions (int p) {
     int m;
     int prot;
     int zerg;
+    int protBefore;
+    int zergBefore;
+
+    // Capture the Lab research TOTALS before granting, so the confirmation below can report the
+    // exact amount this skip added (lets the owner verify "all points given").
+    // libCamp_gf_StoryResearchPoints (CampaignLib.galaxy:4828) sums, over every Completed mission,
+    // the per-mission opportunity array + that mission's completion reward.
+    protBefore = libCamp_gf_StoryResearchPoints(libCamp_ge_StoryResearchCategory_ResearchCategoryProtoss);
+    zergBefore = libCamp_gf_StoryResearchPoints(libCamp_ge_StoryResearchCategory_ResearchCategoryZerg);
 
     // Iterate the four Prophecy mission ids (22..25 inclusive are exactly TZeratul01..04).
     m = libCamp_ge_MapID_MapTZeratul01;
@@ -598,7 +614,13 @@ void libWoLU_SkipProphecyMissions (int p) {
     }
     libWoLU_gv_skipProphecyDialog = c_invalidDialogId;
     libWoLU_gv_skipProphecyButton = c_invalidDialogControlId;
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("Prophecy missions skipped - research points granted."));
+    // Report the EXACT research this skip added (after - before) + the new Lab totals, so the
+    // grant is verifiable in-game rather than just "some points".
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("Prophecy missions skipped. Research granted: +"
+        + IntToString(libCamp_gf_StoryResearchPoints(libCamp_ge_StoryResearchCategory_ResearchCategoryProtoss) - protBefore) + " Protoss / +"
+        + IntToString(libCamp_gf_StoryResearchPoints(libCamp_ge_StoryResearchCategory_ResearchCategoryZerg) - zergBefore) + " Zerg (Lab totals now "
+        + IntToString(libCamp_gf_StoryResearchPoints(libCamp_ge_StoryResearchCategory_ResearchCategoryProtoss)) + " / "
+        + IntToString(libCamp_gf_StoryResearchPoints(libCamp_ge_StoryResearchCategory_ResearchCategoryZerg)) + ")."));
 }
 
 // bool -> "1"/"0" for the diag subtitles below (Galaxy has no bool->string native).

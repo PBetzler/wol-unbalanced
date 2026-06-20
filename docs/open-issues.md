@@ -6,6 +6,13 @@ Format: `- [ ]` open, `- [x]` resolved. Newest at the top of each section. When 
 
 Running gate: `python3 scripts/audit.py` catches the structural classes statically (missing/malformed actors, dead calldowns) before a build ships; the rest below need in-game observation.
 
+## v0.3.19 — Skip-Prophecy button WORKS in-game; research-grant verified + button UX polish (2026-06-20)
+
+First successful loading playtest: canary shows, the Skip-Prophecy button appears, grants research, is one-time. Owner reported 3 things; findings:
+- [x] **Research grant is COMPLETE (verified).** `libCamp_gf_TS_StoryResearchMissionOpportunities` (CampaignLib.galaxy:5000-5018) returns secondary-objective research (`ObjectReward × count`, idx 1-2) PLUS the main-objective reward; the Lab total (`libCamp_gf_StoryResearchPoints`, :4828 / :4853-4855) adds the mission-COMPLETION reward on top for each Completed mission. We store the opportunities + mark all 4 Zeratul missions Completed → each contributes its exact 100% yield (= opportunities + completion reward) for BOTH Protoss and Zerg, no double-count, no omission. The "some points" the owner saw is the Prophecy arc's real (modest) total. Made it VERIFIABLE: the confirmation subtitle now prints `Research granted: +P Protoss / +Z Zerg (Lab totals now …)` (delta captured before vs after via `StoryResearchPoints`).
+- [ ] **[GAME] Button not clickable AT the crystal, clickable elsewhere — diagnosed + mitigated.** At the crystal/star-map console the game renders its native mission-launch panel ON TOP, capturing clicks; our trigger-created `Dialog` sits beneath it (un-clickable there). Off the crystal (armory/cantina/lab) no native panel overlaps → clickable. Moved the button top-center→**bottom-center** (`c_anchorBottom`, +90px) to clear the upper/center star-map UI — likely clickable at the crystal now; ⚠ owner to confirm (if still blocked, the native SceneUI fully covers it and the off-crystal click is the supported path).
+- [x] **Button "stays on every room" — by design.** It's a single persistent screen-anchored `Dialog` (created once, shown until clicked, not tied to a room), so it floats over all Hyperion rooms and vanishes for good on the one click. Repositioned lower so it's less intrusive.
+
 ## v0.3.18 — ROOT CAUSE found (install path = the GAME INSTALL dir) + correcting the spiral record (2026-06-20)
 
 **The real bug behind the whole "nothing works" spiral was NOT in the mod — it was the install
