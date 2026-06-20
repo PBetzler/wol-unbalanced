@@ -34,6 +34,7 @@ void libWoLU_EnableCurrentMissionUnits (int p);
 // compiler because libWoLU_InitLib and the deferred handler reference them earlier).
 bool libWoLU_ShouldOfferSkipProphecy (int p);
 void libWoLU_CreateSkipProphecyButton ();
+bool libWoLU_OnCrystalZeratulScreen (int p);   // true iff on the star-map crystal with a Zeratul report selected
 void libWoLU_SkipProphecyMissions (int p);
 string libWoLU_b2s (bool v);            // bool -> "1"/"0" for diag subtitles
 void libWoLU_PurchaseAllMercs (int p);  // re-assert every merc Purchased (hub re-grant)
@@ -511,20 +512,23 @@ bool libWoLU_ShouldOfferSkipProphecy (int p) {
 // Standard Galaxy dialog GUI idiom, copied from CampaignLib's own button blocks
 // (e.g. CampaignLib.galaxy:13476-13505) and the Perpetual Randomizer's dialog triggers:
 // DialogCreate → store DialogLastCreated; DialogControlCreate(button) → store
-// DialogControlLastCreated; set text/size/position; DialogSetVisible. The text uses the
+// DialogControlLastCreated; set text/size/position. The text uses the
 // libNtve_gf_SetDialogItemText wrapper (the NativeLib idiom both CampaignLib and the rogue
 // kit use for button captions) — our lib includes TriggerLibs/NativeLib, so it resolves.
 //
-// Position (v0.3.19): anchored BOTTOM-center, ~90 px up from the bottom edge. The original
-// top-center +120 placement sat UNDER the crystal's native star-map / mission-launch panel (which
-// renders on top and captures clicks → the button was visible but un-clickable AT the crystal,
-// while clickable in the other rooms where no native panel overlaps). The native star-map UI fills
-// the upper/center of the screen, so a bottom-anchored button is clear of it — likely clickable at
-// the crystal too, and less intrusive in the other rooms. NOTE: this is a single persistent screen
-// overlay (created once, shown until clicked), so it floats over EVERY Hyperion room by design —
-// that's why it "stays" on armory/cantina/lab; it vanishes for good on the one click. [GAME]-PENDING:
-// confirm it's now clickable at the crystal; if the native panel still overlaps, the bottom corner
-// is the next move.
+// Position: anchored BOTTOM-center, ~90 px up from the bottom edge — clear of the native
+// star-map / mission-launch panel that fills the upper/center of the screen.
+//
+// Visibility model (v0.3.20): the button is created ONCE, HIDDEN, and a periodic poll
+// (libWoLU_OnStoryModeInit) flips its visibility so it shows ONLY on the star-map crystal
+// with a Zeratul mission selected — NOT as a persistent overlay over every Hyperion room.
+// So this creator NO LONGER shows the button; it starts hidden and the poll owns visibility.
+//
+// DialogSetRenderPriority raises the dialog's render/input layer ABOVE the native battle-report
+// panel, so the button can render AND be clicked at the crystal (the native panel renders on top
+// otherwise). 4096 is well above the engine's default dialog priority; the rogue kit uses 550 for
+// an achievement popup over the same UI (mods/rogue/.../LibWoLC.galaxy:111). [GAME]-PENDING: the
+// exact render-priority value and confirmed clickability at the crystal need an in-game check.
 void libWoLU_CreateSkipProphecyButton () {
     if (libWoLU_gv_skipProphecyDialog != c_invalidDialogId) {
         return; // already created this visit — never make a second one
@@ -532,13 +536,57 @@ void libWoLU_CreateSkipProphecyButton () {
     // Small dialog: 420x44, anchored bottom-center, +90 px up from the bottom edge.
     DialogCreate(420, 44, c_anchorBottom, 0, 90, false);
     libWoLU_gv_skipProphecyDialog = DialogLastCreated();
-    DialogSetVisible(libWoLU_gv_skipProphecyDialog, PlayerGroupAll(), true);
+    // Start HIDDEN — the poll (libWoLU_OnStoryModeInit) decides when to show it.
+    DialogSetVisible(libWoLU_gv_skipProphecyDialog, PlayerGroupAll(), false);
+    // Render/input ABOVE the native battle-report panel so it's clickable at the crystal.
+    DialogSetRenderPriority(libWoLU_gv_skipProphecyDialog, 4096);
     // The clickable button child, filling the dialog.
     DialogControlCreate(libWoLU_gv_skipProphecyDialog, c_triggerControlTypeButton);
     libWoLU_gv_skipProphecyButton = DialogControlLastCreated();
     libNtve_gf_SetDialogItemText(libWoLU_gv_skipProphecyButton, StringToText("Skip Prophecy Missions (grant research)"), PlayerGroupAll());
     DialogControlSetSize(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), 420, 44);
     DialogControlSetPosition(libWoLU_gv_skipProphecyButton, PlayerGroupAll(), c_anchorBottom, 0, 0);
+}
+
+// Are we right now on the star-map "crystal" with a Zeratul mission selected?
+// True iff ALL hold:
+//   - on the tstory01 Hyperion hub (libCamp_gv_tS_CurrentMap == ...MapTStory01),
+//   - the native battle-report panel (the star map) is open (UIFrameVisible(1, ...BattleReportPanel)),
+//   - the currently-selected report (BattleReportPanelGetSelectedBattleReport(1)) is one of the four
+//     Zeratul missions' battle-report ids (libCamp_gv_tS_BattleReportMissions[TZeratul01..04]), AND
+//   - the Prophecy arc is still offerable (libWoLU_ShouldOfferSkipProphecy: arc unlocked, not finished).
+// Signatures verified against the co-injected CampaignLib: UIFrameVisible(1, c_syncFrameTypeBattleReportPanel)
+// (CampaignLib.galaxy:12319), BattleReportPanelGetSelectedBattleReport(1) (:12330), and the
+// libCamp_gv_tS_BattleReportMissions[<mapID>] == selectedReport comparison (:12334). The four Zeratul
+// map ids are contiguous (TZeratul01..04), so we index the array directly with each.
+bool libWoLU_OnCrystalZeratulScreen (int p) {
+    int selectedReport;
+    if (libCamp_gv_tS_CurrentMap != libCamp_ge_MapID_MapTStory01) {
+        return false; // Hyperion hub only
+    }
+    if (UIFrameVisible(1, c_syncFrameTypeBattleReportPanel) != true) {
+        return false; // star map not open
+    }
+    if (libWoLU_ShouldOfferSkipProphecy(p) != true) {
+        return false; // arc not unlocked yet, or already fully completed
+    }
+    selectedReport = BattleReportPanelGetSelectedBattleReport(1);
+    if (selectedReport == c_invalidBattleReportId) {
+        return false; // nothing selected
+    }
+    if (libCamp_gv_tS_BattleReportMissions[libCamp_ge_MapID_MapTZeratul01] == selectedReport) {
+        return true;
+    }
+    if (libCamp_gv_tS_BattleReportMissions[libCamp_ge_MapID_MapTZeratul02] == selectedReport) {
+        return true;
+    }
+    if (libCamp_gv_tS_BattleReportMissions[libCamp_ge_MapID_MapTZeratul03] == selectedReport) {
+        return true;
+    }
+    if (libCamp_gv_tS_BattleReportMissions[libCamp_ge_MapID_MapTZeratul04] == selectedReport) {
+        return true;
+    }
+    return false; // a non-Zeratul report is selected
 }
 
 // The action: mark all 4 Prophecy missions complete and grant their full research yield,
@@ -651,25 +699,36 @@ void libWoLU_PurchaseAllMercs (int p) {
     libCamp_gf_TS_ApplyMercUpgrades(p);
 }
 
-// Hub handler — runs on the tstory01 Hyperion only. Wired (libWoLU_InitLib) on BOTH game-time and
-// REAL-time timers: the story-mode hub may not advance game time the way a combat mission does, so
-// the real-time passes guarantee this fires on the Hyperion. Does three things there:
+// Hub handler / Skip-Prophecy visibility poll — runs on the tstory01 Hyperion only. Wired
+// (libWoLU_InitLib) on both game-time passes AND a ~0.5 s REAL-time periodic: the story-mode hub
+// may not advance game time the way a combat mission does, so the real-time poll guarantees this
+// fires (and keeps firing) on the Hyperion. Does three things there:
 //   (1) re-purchase all mercs (BUG-1: Siege Breakers et al. stay owned, not buyable),
-//   (2) emit a diagnostic subtitle (TEMP — removable once the owner confirms both fixes),
-//   (3) create the one-time Skip-Prophecy button if the gate allows (BUG-2).
-// Early-returns on every other map, so combat missions see nothing (no spam, no work).
+//   (2) ensure the Skip-Prophecy button is CREATED ONCE (hidden) while the arc is offerable,
+//   (3) drive the button's VISIBILITY from libWoLU_OnCrystalZeratulScreen — visible exactly when
+//       the player is on the star-map crystal with a Zeratul mission selected, hidden otherwise.
+// This replaces the old "create-and-show, persistent overlay over every room" behavior: the button
+// now appears ONLY on the Zeratul crystal screen and nowhere else (armory/cantina/lab and the star
+// map for non-Zeratul missions all hide it). The poll is the reliable baseline; it covers panel
+// open, selection change, and panel exit uniformly without flicker.
+// Early-returns on every other map, so combat missions see nothing (no work).
 bool libWoLU_OnStoryModeInit (bool testConds, bool runActions) {
     if (libCamp_gv_tS_CurrentMap != libCamp_ge_MapID_MapTStory01) {
         return true; // Hyperion hub only
     }
     libWoLU_PurchaseAllMercs(libWoLU_Player);
-    // TEMP diag (remove once confirmed): if the owner sees this on the Hyperion, this real-time
-    // trigger fired there. z1/z4 = MissionStatus ints for TZeratul01/04 (0=Locked,1=Available,
-    // 2=Completed); offer = the button gate result; dlg = the button's dialog id (0/invalid = not
-    // yet created). race should read "Terr".
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU hub: race=" + PlayerRace(libWoLU_Player) + " z1=" + IntToString(libCamp_gf_MissionStatus(libCamp_ge_MapID_MapTZeratul01)) + " z4=" + IntToString(libCamp_gf_MissionStatus(libCamp_ge_MapID_MapTZeratul04)) + " offer=" + libWoLU_b2s(libWoLU_ShouldOfferSkipProphecy(libWoLU_Player)) + " dlg=" + IntToString(libWoLU_gv_skipProphecyDialog)));
+    // Ensure the button exists (hidden) while the arc is still offerable. The creator is guarded
+    // (idempotent) and starts the button hidden, so this is safe to call every poll tick. Once the
+    // skip is used, libWoLU_SkipProphecyMissions destroys the dialog AND the gate (ShouldOffer)
+    // fails → it's never re-created, satisfying the one-time semantics.
     if (libWoLU_ShouldOfferSkipProphecy(libWoLU_Player) == true) {
         libWoLU_CreateSkipProphecyButton();
+    }
+    // Set visibility from the crystal-screen test. If the dialog hasn't been created yet (gate not
+    // met), skip — there's nothing to show. DialogSetVisible takes the live boolean so the button
+    // shows exactly on the Zeratul crystal screen and hides everywhere else, without flicker.
+    if (libWoLU_gv_skipProphecyDialog != c_invalidDialogId) {
+        DialogSetVisible(libWoLU_gv_skipProphecyDialog, PlayerGroupAll(), libWoLU_OnCrystalZeratulScreen(libWoLU_Player));
     }
     return true;
 }
@@ -713,5 +772,9 @@ void libWoLU_InitLib () {
     TriggerAddEventTimeElapsed(t, 11.0, c_timeGame);
     TriggerAddEventTimeElapsed(t, 2.0, c_timeReal);
     TriggerAddEventTimeElapsed(t, 6.0, c_timeReal);
+    // ~0.5 s REAL-time poll drives the Skip-Prophecy button's visibility (show only on the Zeratul
+    // crystal screen) + keeps mercs re-purchased on the hub. Real-time because the story-mode hub
+    // may not advance game time. The handler early-returns off tstory01, so this is free elsewhere.
+    TriggerAddEventTimePeriodic(t, 0.5, c_timeReal);
     TriggerAddEventDialogControl(TriggerCreate("libWoLU_OnSkipProphecyClicked"), c_playerAny, c_invalidDialogControlId, c_triggerControlEventTypeClick);
 }

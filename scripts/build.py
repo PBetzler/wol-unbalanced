@@ -74,7 +74,7 @@ SC2 = _default_sc2_dir()
 MOD_NAME = "WoLUnbalanced.SC2Mod"
 DEP_LINE = r"file:Mods\WoLUnbalanced.SC2Mod"
 TITLE = "WoL Unbalanced"
-VERSION = "0.3.19"
+VERSION = "0.3.20"
 
 # --- Optional Nightmare-difficulty base (LOCAL-ONLY) -------------------------------
 # `python3 scripts/build.py build nightmare` (or `package nightmare`) layers our mod on
@@ -393,6 +393,27 @@ def install() -> None:
     mods_dst = os.path.join(SC2, "Mods")
     os.makedirs(maps_dst, exist_ok=True)
     os.makedirs(mods_dst, exist_ok=True)
+    # PREFLIGHT (abort BEFORE touching anything): if StarCraft II is running it holds the campaign
+    # maps open (Windows denies write/delete via its read-share lock). install CLEARS the slot before
+    # re-copying, so a mid-run lock failure leaves the campaign HALF-WIPED (missing maps → broken).
+    # Detect a lock up front and abort cleanly — a running game must never break the install. (Maps
+    # unlocked ⇒ SC2 is closed ⇒ the mod folder is free too, so checking the maps suffices.)
+    locked = []
+    for name in os.listdir(maps_dst):
+        p = os.path.join(maps_dst, name)
+        if os.path.isfile(p):
+            try:
+                with open(p, "r+b"):  # request WRITE access without modifying; fails if SC2 holds it
+                    pass
+            except OSError:
+                locked.append(name)
+    if locked:
+        shown = ", ".join(sorted(locked)[:4]) + (" …" if len(locked) > 4 else "")
+        raise SystemExit(
+            "\ninstall: ABORTED — nothing changed. StarCraft II is RUNNING (it has campaign files "
+            f"locked: {shown}).\n"
+            "  Fully QUIT StarCraft II, then re-run:  python scripts/build.py install\n"
+            "  (Installing while SC2 is open can half-wipe the campaign slot.)\n")
     # Clear the WoL slot: loose FILES only — never the other-campaign subfolders.
     for name in os.listdir(maps_dst):
         p = os.path.join(maps_dst, name)
