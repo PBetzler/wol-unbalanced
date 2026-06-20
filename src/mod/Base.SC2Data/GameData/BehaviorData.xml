@@ -158,6 +158,27 @@
         </DamageResponse>
     </CBehaviorBuff>
 
+    <!-- Science Vessel passive AUTO-HEAL AURA (v0.3.24 — REPLACES the abandoned Medivac-beam
+         heal transplant, which didn't heal in game on a non-Medivac caster). A permanent hidden
+         buff that, every 1 s, fires WoLUSVHealAuraSearch (EffectData.xml) to heal ALL nearby
+         friendlies (bio + mech + air) +15 Life → ~15 HP/s, FREE. Built on the basic life-add
+         primitive (robust), not the fragile heal-beam system. Pattern = our own
+         WoLUDefMatrixOnDamage above (permanent hidden runtime-added buff, proven to persist) +
+         the CBehaviorBuff periodic SCALARS <Period>/<PeriodicEffect> (NOT the *Array forms —
+         those exist only on CEffectCreatePersistent; CBehaviorBuff periodics are scalars, verified
+         vs liberty.sc2mod BehaviorData.xml CloakField/ChangelingDisguise). A permanent buff needs
+         NO <Duration>. Period 1.0 s × Change 15 = ~15 HP/s (the brief's rate). Applied player-only
+         to ScienceVessel via libWoLU_AddBehaviorToType (LibWoLUnbalanced.galaxy) — enemy SVs never
+         get it (rule 9). -->
+    <CBehaviorBuff id="WoLUSVHealAura">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Period value="1.0"/>
+        <PeriodicEffect value="WoLUSVHealAuraSearch"/>
+    </CBehaviorBuff>
+
     <!-- Predator Charge (AP): a permanent +120% move-speed buff (the Zealot-charge feel
          without the engine-coupled CAbilAugment, which doesn't link to its buff in data and
          is untested on Terran units). Adapted from Protoss Charging (MoveSpeedMultiplier 2.2);

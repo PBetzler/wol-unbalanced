@@ -50,7 +50,8 @@ AUTOCAST_INTENT = {
     "YamatoWoLU":                 {"validators": {"WoLUYamatoBigTarget"},      "air": False, "targetsorts": False},  # big targets only
     "MissilePodsWoLU":            {"validators": set(),                        "air": True,  "targetsorts": False},  # anti-air
     "MagrailWoLU":                {"validators": set(),                        "air": False, "targetsorts": False},  # bonus shot, enemy in range
-    "SVDoubleBeamHealWoLU":       {"validators": set(),                        "air": False, "targetsorts": False},  # SV double-beam heal (2 targets, bio+mech+air); autocast block + validators + TargetSorts INHERITED via parent=MedivacDoubleBeamHeal (checker reads only our XML, doesn't resolve parents → none visible here)
+    # (SVDoubleBeamHealWoLU removed in v0.3.24 — the SV heal is now a passive aura behavior
+    #  WoLUSVHealAura, not an autocast ability, so CHECK9 no longer tracks it.)
     "EMPShockwaveWoLU":           {"validators": {"WoLUTargetEnergyOrShields"},"air": False, "targetsorts": False},  # only vs energy/shields (SV BW EMP)
     "IrradiateWoLU":              {"validators": set(),                        "air": False, "targetsorts": False},  # enemy biological in range (AutoCastFilters = bio enemy)
     "DukesRevengeYamatoWoLU":     {"validators": {"WoLUYamatoBigTarget"},      "air": False, "targetsorts": False},

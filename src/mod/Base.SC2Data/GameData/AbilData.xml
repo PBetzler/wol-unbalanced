@@ -395,45 +395,13 @@
         <CmdButtonArray index="Execute" DefaultButtonFace="OpticalFlareWoLU" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
 
-    <!-- Science Vessel Magellan: ONE double-beam Nano-Repair that heals up to TWO targets at
-         once (biological + mechanical + air). Owner-confirmed consolidation of the former two
-         single-beam clones (NanoRepairWoLU / NanoRepairWoLU2). TRANSPLANTS the Medivac's
-         double-beam mechanism: parent="MedivacDoubleBeamHeal" inherits the autocast block,
-         range, arc, smart/autocast validator arrays, TargetSorts, energy gating, etc. We
-         override only what must change for the SV + rule 9:
-           - Effect -> SVHealInitialSwitchWoLU (our cloned chain: the "2 beams" come from the
-             per-caster HealBeamAvailable behavior-count gate, transplanted unchanged; the
-             bio-restriction is dropped in our cloned scan SVHealSearchWoLU).
-           - TargetFilters index="0" -> drop Biological (heal bio + mech + air). MUST be
-             index="0": TargetFilters is an INDEXED array, and a bare value= on a parent= clone
-             APPENDS+ANDs the inherited "Biological,..." slot back in (the HealWoLU trap,
-             learnings §TargetFilters is an INDEXED array).
-           - AutoCastFilters index="0" -> own+ally damaged units ("-" source include; exclude
-             enemy/neutral). Air is healed by NOT excluding it (no explicit "Air" require). Same
-             intent as the old NanoRepairWoLU AutoCastFilters ("-;Neutral,Enemy").
-           - CmdButtonArray Execute -> NanoRepair face (keep the SV's Nano-Repair icon, NOT the
-             Medivac Heal face) + Requirements="WoLUHaveFlag" (player-only gate; this REPLACES
-             the inherited AdvancedHealingAIPurchased requirement).
-           - AutoCastValidatorArray index="0" removed="1" -> drop the inherited healCasterMinEnergy
-             (>=5 energy to auto-start) so the heal auto-casts regardless of the SV's energy. The
-             parent's slot 1 (NotStopping) survives (don't autocast while stopping). The remaining
-             energy drain/floor is removed in the cloned effect chain (SVHealModifySetWoLU drops the
-             caster-energy drain; SVHealPeriodicCombineWoLU + SVHealSearchWoLU drop the energy gates)
-             so the heal is FREE — like the old Nano-Repair beams + the mod's free-ability ethos.
-         Rule 9: the Medivac keeps MedivacDoubleBeamHeal -> MedivacHealInitialSwitch (with the
-         bio MedivacHealSearch + the draining MedivacHealTargetPersistent) untouched; enemy SVs
-         keep vanilla NanoRepair. ENERGY: FREE — MedivacDoubleBeamHeal has NO <Cost>; the drain
-         was entirely periodic (MedivacHealModifyCasterEnergy) + the healCasterMinEnergy floors,
-         all dropped on our clones only. BEAM/visual binds to the Medivac heal-beam actors
-         (heal-beam look may differ from the Nano-Repair beam — [GAME]-pending). ids verified
-         against mods/_reference/campaigns/liberty.sc2campaign/AbilData.xml. -->
-    <CAbilEffectTarget id="SVDoubleBeamHealWoLU" parent="MedivacDoubleBeamHeal">
-        <Effect index="0" value="SVHealInitialSwitchWoLU"/>
-        <TargetFilters index="0" value="Visible;Self,Enemy,Structure,Missile,Uncommandable,Dead,Hidden,Invulnerable"/>
-        <AutoCastFilters index="0" value="-;Neutral,Enemy,Missile,Stasis,Dead,Invulnerable"/>
-        <AutoCastValidatorArray index="0" removed="1"/>
-        <CmdButtonArray index="Execute" DefaultButtonFace="NanoRepair" Requirements="WoLUHaveFlag"/>
-    </CAbilEffectTarget>
+    <!-- (Science Vessel Magellan heal: the former SVDoubleBeamHealWoLU ability — a transplant of
+         the Medivac double-beam heal — was REMOVED in v0.3.24. It did not heal in game (the Medivac
+         heal-BEAM behavior system is fragile on a non-Medivac caster). Replaced by a passive
+         auto-heal AURA built on the basic life-add primitive: behavior WoLUSVHealAura
+         (BehaviorData.xml) + effects WoLUSVHealAuraSearch / WoLUSVHealAuraHeal (EffectData.xml),
+         attached player-only to the Science Vessel via libWoLU_AddBehaviorToType. The aura is
+         passive → no ability + no card button.) -->
 
     <!-- Siege Tank Spider Mines (AP): lay a cloaked Vulture spider mine. Modeled on the
          vanilla VultureSpiderMines ability. IgnoreFacing is REQUIRED: a SIEGED tank cannot

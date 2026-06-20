@@ -440,9 +440,10 @@ def emit():
         ("Weapon", "BacklashRockets", "Range", "8", "Set", "Banshee Advanced Targeting Optics: +2 range (folded flat — player banshees are perma-cloaked)"),
         ("Effect", "BacklashRocketsU", "Amount", "1.25", "Multiply", "Banshee Distortion Blasters: +25% dmg (folded flat)"),
         # (Removed v0.3.x: the "Abil NanoRepair Cost[0].Vital[Energy]=0" edit. The player's SV
-        #  heal is now SVDoubleBeamHealWoLU (a STATIC clone made free in EffectData/ValidatorData,
-        #  not via a per-player cost edit); the vanilla NanoRepair button is no longer card-exposed
-        #  to the player, so the old edit was an orphaned no-op — dropped to avoid a misleading line.)
+        #  heal is now the passive WoLUSVHealAura behavior (a permanent hidden CBehaviorBuff that
+        #  periodically heals all nearby friendlies, applied player-only via libWoLU_AddBehaviorToType,
+        #  not a per-player cost edit); the vanilla NanoRepair button is no longer card-exposed to
+        #  the player, so the old edit was an orphaned no-op — dropped to avoid a misleading line.)
         ("Effect", "OdinAADamage", "Amount", "35", "Set", "Odin AA mirrors Thor: HIP floor 35/rocket (was 15, no light bonus)"),
         ("Abil", "heal", "Range", "4", "Set", "Medic Nano Projector: +2 heal range (2->4)"),
         # (Removed: heal TargetFilters — a string field, no-op per-player [preview CHECK8]. The

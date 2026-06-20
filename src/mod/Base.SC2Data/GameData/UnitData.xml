@@ -320,25 +320,28 @@
     <!-- Science Vessel: AP list includes Defensive Matrix — reuse the BC clone
          (same append + WoLUHaveFlag gate). Free card cell 2,2 (vanilla SV uses
          2,0 NanoRepair / 2,1 Irradiate / 2,3 Detector).
-         HEAL: consolidated to ONE double-beam Nano-Repair (SVDoubleBeamHealWoLU) that heals
-         up to TWO targets at once — replaces the former two single-beam clones
-         (NanoRepairWoLU / NanoRepairWoLU2). AbilArray idx6 holds the one heal ability; idx8
-         (the old 2nd beam) is removed. -->
+         HEAL (v0.3.24): now a PASSIVE auto-heal AURA (behavior WoLUSVHealAura, attached
+         player-only via libWoLU_AddBehaviorToType) — heals all nearby friendlies (bio+mech+air)
+         ~15 HP/s, free. This REPLACES the abandoned active double-beam Nano-Repair ability
+         (SVDoubleBeamHealWoLU), which did not heal in game. The aura is passive → no ability +
+         no card button: the old heal AbilArray slot (idx6) is dropped and the old heal button
+         (merged idx 8 = R2C0) is tombstoned (a dangling AbilCmd to a deleted ability is a card
+         defect). The SV's other WoLU abilities (EMPShockwaveWoLU / IrradiateWoLU /
+         DefensiveMatrixWoLU / TacticalJumpWoLU + free cloak via the galaxy behavior) stay. -->
     <CUnit id="ScienceVessel">
         <AbilArray index="4" Link="DefensiveMatrixWoLU"/>
         <AbilArray index="5" Link="TacticalJumpWoLU"/>
-        <AbilArray index="6" Link="SVDoubleBeamHealWoLU"/>
         <AbilArray index="7" Link="EMPShockwaveWoLU"/>
         <AbilArray index="8" removed="1"/>
         <AbilArray index="9" Link="IrradiateWoLU"/>
         <CardLayouts index="0">
-            <!-- ONE heal button on the SV's native Nano-Repair cell (merged idx 8 = R2C0):
-                 re-pointed to the double-beam heal, NanoRepair face kept, WoLUHaveFlag-gated.
-                 The old SECOND heal button (merged idx 11 = R1C1) is tombstoned — one heal
-                 button only. Irradiate autocast stays at merged idx 7 (R2C1). Merged indices
-                 confirmed via audit.py's merge oracle (do NOT eyeball). Rule 9: cards are
-                 player-UI-only; enemy SVs render no card and keep vanilla NanoRepair/Irradiate. -->
-            <LayoutButtons index="8" Face="NanoRepair" Type="AbilCmd" AbilCmd="SVDoubleBeamHealWoLU,Execute" Requirements="WoLUHaveFlag"/>
+            <!-- Heal button tombstoned (merged idx 8 = R2C0): the active heal ability is gone,
+                 the heal is now a passive aura (no button needed). Irradiate autocast stays at
+                 merged idx 7 (R2C1). The old SECOND heal button (merged idx 11 = R1C1) was
+                 already tombstoned below. Merged indices confirmed via audit.py's merge oracle
+                 (do NOT eyeball). Rule 9: cards are player-UI-only; enemy SVs render no card and
+                 keep vanilla NanoRepair/Irradiate. -->
+            <LayoutButtons index="8" removed="1"/>
             <LayoutButtons index="7" AbilCmd="IrradiateWoLU,Execute"/>
             <LayoutButtons index="9" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="10" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="0"/>
@@ -353,13 +356,19 @@
          learnings §"Per-player runtime LINK edits are no-ops"). This is a FIELD edit on the existing
          Raven unit, NOT a unit-type clone, so it's rule-safe. It intentionally adds the weapon to
          enemy Ravens too, but the firing effect set is WoLUHasFlag-gated (EffectData.xml) so only the
-         human player's Raven actually intercepts. No Turret: PointDefenseLaser is a hidden
-         continuous-scan omnidirectional intercept (no aiming needed); binding the drone's turret to a
-         Raven actor that lacks it could break firing, so we leave it turretless (360° default). The
-         laser is a hidden weapon (Options Hidden=1 inherited via parent), so it adds no command-card
-         button — nothing to gate on the card. -->
+         human player's Raven actually intercepts.
+         TURRET (v0.3.24 — explicit owner-accepted TEST): the laser wouldn't auto-fire unturreted.
+         Mount it on the vanilla PointDefenseDrone turret — exactly how the native carrier binds it:
+         the Turret= attribute goes on the UNIT's WeaponArray entry (NOT on the weapon), matching
+         CUnit id="PointDefenseDrone" <WeaponArray Link="PointDefenseLaser" Turret="PointDefenseDrone"/>
+         (mods/_reference/mods/liberty.sc2mod/UnitData.xml:1890). PointDefenseDrone is a vanilla
+         CTurret (parent="FreeRotate", 360° yaw — TurretData.xml:54), resolvable in mods/_reference/,
+         so no clone is needed. [GAME]-PENDING owner playtest: may not fire, may look odd, or the
+         turret bone may be absent on the Raven model (the Raven has no native turret) — this is the
+         owner's accepted experiment. The laser is a hidden weapon (Options Hidden=1 inherited via
+         parent), so it adds no command-card button — nothing to gate on the card. -->
     <CUnit id="Raven">
-        <WeaponArray index="0" Link="PointDefenseLaserWoLU"/>
+        <WeaponArray index="0" Link="PointDefenseLaserWoLU" Turret="PointDefenseDrone"/>
     </CUnit>
 
     <!-- Tactical Jump (AP) appended to Hercules + Predator. Vanilla counts: Hercules

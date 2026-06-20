@@ -46,8 +46,6 @@ Button/Tooltip/RestorationWoLU=Removes <c val="FFFF00">all harmful effects</c> f
 Abil/Name/OpticalFlareWoLU=Optical Flare
 Button/Name/OpticalFlareWoLU=Optical Flare
 Button/Tooltip/OpticalFlareWoLU=<c val="FFFF00">Blinds</c> an enemy unit for 15 s: sight reduced to ~1 and detection disabled.<n/>WoL Unbalanced: Brood War Medic ability.
-Abil/Name/SVDoubleBeamHealWoLU=Nano-Repair (Magellan)
-Button/Tooltip/SVDoubleBeamHealWoLU=A <c val="FFFF00">free double-beam</c> Nano-Repair — heals <c val="FFFF00">two targets at once</c> (<c val="FFFF00">biological, mechanical, and air</c>) at <c val="FFFF00">no energy cost</c>. Auto-casts on damaged allies.<n/>WoL Unbalanced: Magellan Computation Systems.
 Abil/Name/IrradiateWoLU=Irradiate
 Button/Name/IrradiateWoLU=Irradiate
 Button/Tooltip/IrradiateWoLU=Irradiates an enemy <c val="FFFF00">biological</c> unit, dealing heavy damage over time. <c val="FFFF00">Auto-casts</c> on nearby biological enemies.<n/>WoL Unbalanced: autocast Irradiate.

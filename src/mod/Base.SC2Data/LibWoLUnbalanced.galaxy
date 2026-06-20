@@ -230,9 +230,12 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // OPEN-POINTS diagnostic — keep ONLY the issues under active debug; REMOVE each marker
     // once the owner confirms it in game (the "clean the markers up afterwards" rule). Reads
     // our clones straight from the LIVE catalog, so empties = the loaded build lacks them.
-    // Healthy on v0.3.23: raven=PointDefenseLaserWoLU  svheal=SVHealInitialSwitchWoLU  hp=15.
+    // raven      = Raven WeaponArray[0].Link    (expect PointDefenseLaserWoLU)
+    // ravturret  = Raven WeaponArray[0].Turret  (expect PointDefenseDrone — the turret mount, v0.3.24)
+    // aura       = WoLUSVHealAuraHeal life Change (expect 15 — the SV passive heal-aura per-tick HP)
+    // Healthy on v0.3.24: raven=PointDefenseLaserWoLU  ravturret=PointDefenseDrone  aura=15.
     // Any empty/old value (with the version line above) tells us the live build is stale.
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: raven=" + CatalogFieldValueGet(c_gameCatalogUnit, "Raven", "WeaponArray[0].Link", libWoLU_Player) + " svheal=" + CatalogFieldValueGet(c_gameCatalogAbil, "SVDoubleBeamHealWoLU", "Effect[0]", libWoLU_Player) + " hp=" + CatalogFieldValueGet(c_gameCatalogEffect, "SVHealModifyTargetLifeWoLU", "VitalArray[Life].Change", libWoLU_Player)));
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: raven=" + CatalogFieldValueGet(c_gameCatalogUnit, "Raven", "WeaponArray[0].Link", libWoLU_Player) + " ravturret=" + CatalogFieldValueGet(c_gameCatalogUnit, "Raven", "WeaponArray[0].Turret", libWoLU_Player) + " aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player)));
     return true;
 }
 
@@ -439,6 +442,9 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         libWoLU_AddBehaviorToType(libWoLU_Player, "Battlecruiser", "WoLUDefMatrixOnDamage");
         libWoLU_AddBehaviorToType(libWoLU_Player, "ScienceVessel", "WoLUDefMatrixOnDamage");
         libWoLU_AddBehaviorToType(libWoLU_Player, "DukesRevenge", "WoLUDefMatrixOnDamage");
+        // SV passive auto-heal aura — heals all nearby friendlies (bio+mech+air), free,
+        // player-only rule-9-safe; replaces the abandoned Medivac-beam heal transplant.
+        libWoLU_AddBehaviorToType(libWoLU_Player, "ScienceVessel", "WoLUSVHealAura");
     }
     return true;
 }
