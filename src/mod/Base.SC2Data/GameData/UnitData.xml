@@ -325,12 +325,39 @@
         <AbilArray index="5" Link="TacticalJumpWoLU"/>
         <AbilArray index="6" Link="NanoRepairWoLU"/>
         <AbilArray index="7" Link="EMPShockwaveWoLU"/>
+        <AbilArray index="8" Link="NanoRepairWoLU2"/>
+        <AbilArray index="9" Link="IrradiateWoLU"/>
         <CardLayouts index="0">
+            <!-- Re-point the player's two vanilla heal/debuff buttons to the WoLU clones so the
+                 player's SV gets a SECOND biological heal beam (cell 2,0) + autocast Irradiate
+                 (cell 2,1). These are AbilCmd→AbilCmd one-field re-points (Medic heal-button
+                 pattern): the inherited Face/Type/Row/Column survive by field-merge. Merged
+                 indices confirmed via audit.py's merge oracle: 7=Irradiate (R2C1), 8=NanoRepair
+                 (R2C0). Rule 9: cards are player-UI-only; enemy SVs render no card and keep the
+                 vanilla NanoRepair/Irradiate abilities. WoLUHaveFlag gates the player's two new
+                 appended beams (cells 1,1 / 1,2). -->
+            <LayoutButtons index="8" AbilCmd="NanoRepairWoLU2,Execute"/>
+            <LayoutButtons index="7" AbilCmd="IrradiateWoLU,Execute"/>
             <LayoutButtons index="9" Face="DefensiveMatrix" Type="AbilCmd" AbilCmd="DefensiveMatrixWoLU,Execute" Row="2" Column="2"/>
             <LayoutButtons index="10" Face="TacticalJumpWoLU" Type="AbilCmd" AbilCmd="TacticalJumpWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="0"/>
             <LayoutButtons index="11" Face="NanoRepair" Type="AbilCmd" AbilCmd="NanoRepairWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="1"/>
             <LayoutButtons index="12" Face="EMP" Type="AbilCmd" AbilCmd="EMPShockwaveWoLU,Execute" Requirements="WoLUHaveFlag" Row="1" Column="2"/>
         </CardLayouts>
+    </CUnit>
+
+    <!-- Raven SELF Point-Defense Laser (owner request): mount the Point Defense Drone's
+         missile-intercept weapon ON the Raven. The vanilla Raven has NO WeaponArray (0 weapons);
+         adding a WeaponArray entry in STATIC XML is allowed (the no-append limit is RUNTIME-only —
+         learnings §"Per-player runtime LINK edits are no-ops"). This is a FIELD edit on the existing
+         Raven unit, NOT a unit-type clone, so it's rule-safe. It intentionally adds the weapon to
+         enemy Ravens too, but the firing effect set is WoLUHasFlag-gated (EffectData.xml) so only the
+         human player's Raven actually intercepts. No Turret: PointDefenseLaser is a hidden
+         continuous-scan omnidirectional intercept (no aiming needed); binding the drone's turret to a
+         Raven actor that lacks it could break firing, so we leave it turretless (360° default). The
+         laser is a hidden weapon (Options Hidden=1 inherited via parent), so it adds no command-card
+         button — nothing to gate on the card. -->
+    <CUnit id="Raven">
+        <WeaponArray index="0" Link="PointDefenseLaserWoLU"/>
     </CUnit>
 
     <!-- Tactical Jump (AP) appended to Hercules + Predator. Vanilla counts: Hercules

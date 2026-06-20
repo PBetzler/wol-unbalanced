@@ -50,7 +50,10 @@ AUTOCAST_INTENT = {
     "YamatoWoLU":                 {"validators": {"WoLUYamatoBigTarget"},      "air": False, "targetsorts": False},  # big targets only
     "MissilePodsWoLU":            {"validators": set(),                        "air": True,  "targetsorts": False},  # anti-air
     "MagrailWoLU":                {"validators": set(),                        "air": False, "targetsorts": False},  # bonus shot, enemy in range
-    "NanoRepairWoLU":             {"validators": set(),                        "air": False, "targetsorts": False},  # repair (ally target)
+    "NanoRepairWoLU":             {"validators": set(),                        "air": False, "targetsorts": False},  # repair beam 1 (ally target, bio+mech)
+    "NanoRepairWoLU2":            {"validators": set(),                        "air": False, "targetsorts": False},  # repair beam 2 (ally target, bio+mech)
+    "EMPShockwaveWoLU":           {"validators": {"WoLUTargetEnergyOrShields"},"air": False, "targetsorts": False},  # only vs energy/shields (SV BW EMP)
+    "IrradiateWoLU":              {"validators": set(),                        "air": False, "targetsorts": False},  # enemy biological in range (AutoCastFilters = bio enemy)
     "DukesRevengeYamatoWoLU":     {"validators": {"WoLUYamatoBigTarget"},      "air": False, "targetsorts": False},
     "DukesRevengeMissilePodsWoLU":{"validators": set(),                        "air": True,  "targetsorts": False},
 }

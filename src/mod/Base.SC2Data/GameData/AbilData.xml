@@ -395,13 +395,46 @@
         <CmdButtonArray index="Execute" DefaultButtonFace="OpticalFlareWoLU" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
 
-    <!-- Science Vessel Magellan: a SECOND free Nano-Repair beam (heal 2 targets at once).
-         Reuses the vanilla NanoRepair healer effect so the heal-beam visual binds. Manual
-         cast on a 2nd target always works; autocast-both is the in-game uncertainty. -->
+    <!-- Science Vessel Magellan: TWO free Nano-Repair beams (heal 2 targets at once). The SV
+         keeps two distinct heal-beam abilities — single-beam healers heal one target each, so
+         two beams heal two units at once (owner confirmed).
+         BIOLOGICAL HEAL: the vanilla NanoRepair healer effect (CEffectCreateHealer) has NO
+         mechanical filter — the mechanical-only restriction is entirely in the casting ABILITY's
+         TargetFilters (learnings §CEffectCreateHealer is NOT biological-only). NanoRepairWoLU has
+         NO parent=, so its <TargetFilters> is its own slot 0 → a bare value= REPLACES it (not the
+         append/AND trap, which only bites a parent= clone). Drop the `Mechanical` require so it
+         heals biological + mechanical + air. Reuses the vanilla NanoRepair healer effect so the
+         heal-beam visual binds.
+         BEAM 1 of 2: appended ability (card cell 1,1), WoLUHaveFlag-gated, autocast ON. -->
     <CAbilEffectTarget id="NanoRepairWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <Effect index="0" value="NanoRepair"/>
-        <TargetFilters value="Mechanical,Visible;Self,Enemy,Structure,Missile,Uncommandable,Dead,Hidden,Invulnerable"/>
+        <TargetFilters value="Visible;Self,Enemy,Structure,Missile,Uncommandable,Dead,Hidden,Invulnerable"/>
+        <Range value="4"/>
+        <Arc value="360"/>
+        <AutoCastRange value="6"/>
+        <AcquireAttackers value="1"/>
+        <Flags index="AllowMovement" value="1"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <Flags index="NoDeceleration" value="1"/>
+        <Flags index="ReExecutable" value="1"/>
+        <Flags index="Smart" value="1"/>
+        <Cost><Vital index="Energy" value="0"/></Cost>
+        <CmdButtonArray index="Execute" DefaultButtonFace="NanoRepair" Requirements="WoLUHaveFlag"/>
+        <AutoCastFilters value="-;Neutral,Enemy"/>
+    </CAbilEffectTarget>
+
+    <!-- BEAM 2 of 2: the player's OTHER heal beam. The SV's vanilla NanoRepair button (merged card
+         cell 2,0) is re-pointed (UnitData.xml) to THIS clone so the player's second beam ALSO heals
+         biological — WITHOUT touching the vanilla NanoRepair ability (rule 9: enemy SVs keep their
+         vanilla mechanical-only NanoRepair). Same biological-healing config as NanoRepairWoLU,
+         WoLUHaveFlag-gated, autocast ON. NO parent= → its TargetFilters is its own slot 0 (bare
+         value= replaces). Reuses the vanilla NanoRepair healer effect for the beam visual. -->
+    <CAbilEffectTarget id="NanoRepairWoLU2">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="NanoRepair"/>
+        <TargetFilters value="Visible;Self,Enemy,Structure,Missile,Uncommandable,Dead,Hidden,Invulnerable"/>
         <Range value="4"/>
         <Arc value="360"/>
         <AutoCastRange value="6"/>
@@ -442,8 +475,13 @@
         <CmdButtonArray index="Execute" DefaultButtonFace="SpiderMineWoLU" Requirements="WoLUHaveFlag"/>
     </CAbilEffectTarget>
 
-    <!-- Science Vessel EMP Shockwave (BW SV): manual targeted AoE energy/shield drain. Effect
-         points at the friendly-fire-safe cloned launch+area; reuses the vanilla EMP drain. -->
+    <!-- Science Vessel EMP Shockwave (BW SV): targeted AoE energy/shield drain. Effect points at
+         the friendly-fire-safe cloned launch+area; reuses the vanilla EMP drain.
+         AUTOCAST: auto-fires at enemy units in range that actually have energy or shields to drain
+         (WoLUTargetEnergyOrShields — don't waste 75 energy on a target with neither). Modeled on
+         EMPWoLU above (same AutoCast/AutoCastOn flags, AutoCastRange = Range 10, enemy-only filter,
+         WoLUTargetEnergyOrShields validator). AINotifyEffect kept. The AoE EnumArea (EMPShockwave-
+         SearchWoLU) already excludes own/allied units (Crucio filter), so autocast never drains us. -->
     <CAbilEffectTarget id="EMPShockwaveWoLU">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <Effect index="0" value="EMPShockwaveLaunchWoLU"/>
@@ -453,10 +491,36 @@
         <CursorEffect value="EMPSearch"/>
         <Cost><Vital index="Energy" value="75"/></Cost>
         <TargetFilters value="Visible;Self,Player,Ally,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="10"/>
+        <AutoCastFilters value="Visible;Self,Player,Ally,Neutral,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <AutoCastValidatorArray value="WoLUTargetEnergyOrShields"/>
         <CmdButtonArray index="Execute" DefaultButtonFace="EMP" Requirements="WoLUHaveFlag">
             <Flags index="ToSelection" value="1"/>
         </CmdButtonArray>
         <AINotifyEffect value="EMPShockwaveLaunchWoLU"/>
+    </CAbilEffectTarget>
+
+    <!-- Science Vessel Irradiate (vanilla SV ability): clone with autocast so the player's SV
+         auto-irradiates enemy BIOLOGICAL units (Irradiate damages biological over time). The SV's
+         vanilla Irradiate card button (merged card cell 2,1) is re-pointed (UnitData.xml) to this
+         clone; the vanilla Irradiate ability is kept on the unit + enemy cards (rule 9 — enemy SVs
+         use vanilla, no autocast). parent="Irradiate" inherits Effect=IrradiateSet, Range 9, Arc
+         360, 25 energy cost. The vanilla TargetFilters already excludes structures/resources; we
+         override slot 0 EXPLICITLY (index="0") to require Biological for autocast accuracy (the
+         parent= append/AND trap — learnings §TargetFilters is an INDEXED array). AutoCastFilters
+         = enemy biological only. AINotifyEffect = the vanilla Irradiate effect IrradiateSet
+         (vanilla cleared it; we set it so the AI/notify path is wired for the autocast). Gated
+         WoLUHaveFlag so only the player's SV gets the autocast button. -->
+    <CAbilEffectTarget id="IrradiateWoLU" parent="Irradiate">
+        <TargetFilters index="0" value="Biological,Visible;Structure,RawResource,HarvestableResource,Item,Dead,Hidden,Invulnerable"/>
+        <Flags index="AutoCast" value="1"/>
+        <Flags index="AutoCastOn" value="1"/>
+        <AutoCastRange value="9"/>
+        <AutoCastFilters value="Biological,Visible;Self,Player,Ally,Neutral,Structure,RawResource,HarvestableResource,Item,Missile,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="Irradiate" Requirements="WoLUHaveFlag"/>
+        <AINotifyEffect value="IrradiateSet"/>
     </CAbilEffectTarget>
 
     <!-- ============================================================================

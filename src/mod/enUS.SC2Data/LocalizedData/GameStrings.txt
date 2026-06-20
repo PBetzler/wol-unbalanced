@@ -47,10 +47,15 @@ Abil/Name/OpticalFlareWoLU=Optical Flare
 Button/Name/OpticalFlareWoLU=Optical Flare
 Button/Tooltip/OpticalFlareWoLU=<c val="FFFF00">Blinds</c> an enemy unit for 15 s: sight reduced to ~1 and detection disabled.<n/>WoL Unbalanced: Brood War Medic ability.
 Abil/Name/NanoRepairWoLU=Nano-Repair (Magellan)
-Button/Tooltip/NanoRepairWoLU=A second <c val="FFFF00">free</c> Nano-Repair beam — repair <c val="FFFF00">two targets at once</c>.<n/>WoL Unbalanced: Magellan Computation Systems.
+Button/Tooltip/NanoRepairWoLU=A second <c val="FFFF00">free</c> Nano-Repair beam — repair <c val="FFFF00">two targets at once</c>, now healing <c val="FFFF00">biological and mechanical</c> units alike.<n/>WoL Unbalanced: Magellan Computation Systems.
+Abil/Name/NanoRepairWoLU2=Nano-Repair
+Button/Tooltip/NanoRepairWoLU2=A <c val="FFFF00">free</c> Nano-Repair beam — heals <c val="FFFF00">biological and mechanical</c> units. Auto-casts on damaged allies.<n/>WoL Unbalanced: Magellan Computation Systems.
+Abil/Name/IrradiateWoLU=Irradiate
+Button/Name/IrradiateWoLU=Irradiate
+Button/Tooltip/IrradiateWoLU=Irradiates an enemy <c val="FFFF00">biological</c> unit, dealing heavy damage over time. <c val="FFFF00">Auto-casts</c> on nearby biological enemies.<n/>WoL Unbalanced: autocast Irradiate.
 Abil/Name/EMPShockwaveWoLU=EMP Shockwave
 Button/Name/EMPShockwaveWoLU=EMP Shockwave
-Button/Tooltip/EMPShockwaveWoLU=Launches an <c val="FFFF00">EMP Shockwave</c>: drains <c val="FFFF00">all energy and 100 shields</c> from enemy units in a radius and reveals cloaked units. Does not affect your own units.<n/>WoL Unbalanced: Brood War Science Vessel ability.
+Button/Tooltip/EMPShockwaveWoLU=Launches an <c val="FFFF00">EMP Shockwave</c>: drains <c val="FFFF00">all energy and 100 shields</c> from enemy units in a radius and reveals cloaked units. Does not affect your own units. <c val="FFFF00">Auto-casts</c> at enemies with energy or shields.<n/>WoL Unbalanced: Brood War Science Vessel ability.
 Unit/ShieldArmorName/WoLUDefensiveMatrix=Defensive Matrix
 Abil/Name/HealWoLU=Adaptive Medpacks
 Abil/Name/CalldownMULEWoLU=Calldown: MULE

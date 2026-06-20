@@ -111,6 +111,32 @@ gotcha; authoritative details live in the code/plan, not here.
   `SpectreCloakingFree`; any cloak toggle ⇒ `cloak-toggle`), and does NOT police cosmetic passive-
   display card faces (display-only; audit.py's #3-class check already guards face↔capability). Genuine
   N/A cases go in the script's `EXCEPTIONS` allowlist with a reason; a STALE exception also FAILs.
+- **A VALIDATOR's threshold is NOT per-player-editable — there is no validator catalog.** The
+  `CatalogFieldValueModify` `c_gameCatalog*` kinds (and genlib's `CATALOGS`) are ONLY
+  Unit/Abil/Weapon/Effect/Behavior; there is no `c_gameCatalogValidator`. So a
+  `CValidatorUnitCompareVital.Value` (e.g. `CasterHas10Energy`'s `10`) cannot be raised/lowered per
+  player at runtime. Any rule-9 design phrased as "set a firing-validator threshold globally, then
+  lower it per-player for the human" is therefore **unachievable** — use the
+  `CValidatorPlayerRequirement WoLUHasFlag/WoLUNoFlag` (Shaped-Blast) pattern instead: gate the
+  player branch on `WoLUHasFlag` and the enemy branch on `WoLUNoFlag` via a `ValidatorArray` on the
+  effect set. Validators themselves are freely CREATABLE in static `ValidatorData.xml` (e.g.
+  `WoLUCasterHas1Energy` for the Raven PD-laser) — they just can't be per-player runtime-EDITED.
+  Corollary: a `CEffectModifyUnit`'s `VitalArray[<Vital>].Change` (an energy/HP drain) is the
+  **CHECK8-UNCERTAIN** field class (preview.py's GOOD Effect fields are only
+  `Amount`/`ArmorReduction`/`PeriodCount`) — a per-player edit on it WARNs and is not
+  verified-applying. To change a drain rule-9-safely, **bake it into a `WoLUHasFlag`-gated
+  player-branch effect clone (static)** — don't genlib-edit the shared vanilla drain. (This is why
+  the Raven self-PDD laser uses a flag-gated effect set + a baked `-1` drain clone, and why making
+  the DEPLOYED Point-Defense-Drone cost 1 energy is blocked: its drain is the shared vanilla
+  `PointDefenseLaserEnergy` and its floor is the un-editable `CasterHas10Energy`.)
+- **A weapon mounted on a different caster can't reuse the original's caster-bound effect-set
+  validators.** The vanilla Point-Defense sets (`PointDefenseLaserInitialSet`/`PointDefenseLaserSet`)
+  carry a core validator `PointDefenseDroneUnitFilter` ("caster IS a Point Defense Drone"); mounting
+  `PointDefenseLaser` on the RAVEN means that validator never passes → the laser never fires. When
+  re-homing a weapon onto a new unit, expand its effect-set `ValidatorArray` and DROP any
+  caster-identity validator (clone the set without it), keeping only the friendly-fire `SearchFilters`
+  (Missile-only here = the Crucio-safe explicit filter) and your own gate. Same class as the
+  `SpawnSpiderMineSet`→`ReplenishNanoConstructor` caster-bound-cost trap above.
 - **Never clone unit types** — mission scripts check unit types ("all your Marines
   are dead", drop pods spawning `Marine`, …).
 - Static XML is global. Safe there: pure definitions, and additions to
