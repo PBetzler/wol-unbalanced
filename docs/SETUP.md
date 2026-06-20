@@ -279,6 +279,16 @@ the `command` uses `bash`, which must be on PATH (it is, if Git for Windows is i
 ```json
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/session-start-engram-context.sh\""
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Task",
@@ -304,6 +314,10 @@ the `command` uses `bash`, which must be on PATH (it is, if Git for Windows is i
   }
 }
 ```
+- **SessionStart** → `session-start-engram-context.sh`: injects a MANDATORY directive at the top of
+  every session to load engram memory (`mem_context` + `mem_search`) BEFORE working — enforces
+  Session-Start Protocol step 3 so cross-session lessons aren't skipped (this was the root of the
+  v0.3.14–v0.3.17 spiral). Exits silently if engram isn't installed.
 - **PreToolUse(Task)** → `agent-pretool-brief-check.sh`: the dispatch-brief gate (blocks a Task
   whose brief lacks `FIRST ACTION` / `CLAUDE.md` / `ROLE` / `## Result`, or an implement/validate
   dispatch that isn't Opus — see CLAUDE.md §"Agent Dispatch Brief Template").

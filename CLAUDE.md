@@ -11,7 +11,7 @@ What lives where: [docs/HANDOFF.md](docs/HANDOFF.md) (**START HERE on a new/fres
 0. **New machine / fresh instance?** Read [docs/HANDOFF.md](docs/HANDOFF.md) (current state + next steps) and [docs/SETUP.md](docs/SETUP.md) (environment setup) — the committed repo is the source of truth; engram/Mac-local memory may be absent on Windows.
 1. Read this file end to end.
 2. Read [plan.md](plan.md) — at minimum the Status section and "Open next".
-3. Load session memory: engram `mem_context` / `mem_search` for the area you'll touch (project `wol-unbalanced`; skip gracefully if the engram MCP server is unavailable — e.g. on Windows it may not be running).
+3. **Load session memory FIRST — non-negotiable:** engram `mem_context(project="wol-unbalanced")` + `mem_search` for the area you'll touch, BEFORE reading code or making changes. Engram IS running here (verified: 130+ observations across sessions). A **SessionStart hook** ([scripts/hooks/session-start-engram-context.sh](scripts/hooks/session-start-engram-context.sh)) injects this directive at the top of every session so it can't be skimmed past — skipping the load is how known mistakes get repeated (it caused the v0.3.14–v0.3.17 spiral). Skip gracefully only if engram is genuinely unavailable on a given machine.
 4. Skim [docs/learnings.md](docs/learnings.md) — these gotchas cost real debugging sessions; don't re-derive them.
 5. `git status` — this repo works directly on `main`.
 
@@ -83,6 +83,7 @@ Most recurring bugs were one of two things: **referencing an id/path that doesn'
 
 Engram (MCP server `engram`, project `wol-unbalanced`) is the cross-session memory and the **primary** store. Non-negotiables:
 
+- **LOAD it at session start** (`mem_context` + `mem_search`) — the [SessionStart hook](scripts/hooks/session-start-engram-context.sh) injects this directive every session; do it before working. See [§Session-Start Protocol](#session-start-protocol) step 3.
 - When you re-derive or discover a non-obvious fact (engine limitation, id mapping, ordering constraint, "do not do X"), save a typed `mem_save` entry — **What / Why / Where / Learned**.
 - Before the session ends, save a `mem_session_summary` (goal, done, verified vs pending, open items). A Stop hook ([scripts/hooks/stop-engram-summary-check.sh](scripts/hooks/stop-engram-summary-check.sh)) fires a reminder if no engram write happened recently — tripwire, not a gate.
 - [docs/learnings.md](docs/learnings.md) is **curated public documentation**, not a memory mirror: promote a fact there only when it's stable, repo-relevant, and useful to anyone modding WoL — no per-session bookkeeping duty.
