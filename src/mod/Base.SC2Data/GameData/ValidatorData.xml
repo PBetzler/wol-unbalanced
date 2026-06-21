@@ -14,8 +14,9 @@
     </CValidatorPlayerRequirement>
 
     <!-- (Removed v0.3.25: WoLUCasterHas1Energy — the Raven Point-Defense Laser firing floor.
-         The whole Raven self-PD-laser cluster was deleted; the galaxy missile interceptor
-         libWoLU_OnInterceptMissiles replaces it. No other referrer.) -->
+         The whole Raven self-PD-laser cluster was deleted; replaced (v0.3.x) by the PASSIVE periodic
+         behavior WoLURavenPointDefense (BehaviorData → WoLURavenPDSearch → vanilla PointDefenseLaserDamage).
+         No other referrer.) -->
 
     <!-- EMP autocast gate: only fire at targets that actually have energy or shields
          (schema verbatim from liberty's healCasterMinEnergy, WhichUnit=Target). -->

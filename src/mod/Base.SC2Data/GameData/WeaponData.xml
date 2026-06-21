@@ -110,9 +110,11 @@
     </CWeaponLegacy>
 
     <!-- (Removed v0.3.25: the Raven SELF Point-Defense Laser weapon PointDefenseLaserWoLU. The
-         static-weapon approach never auto-fired in game; replaced by the galaxy missile interceptor
-         libWoLU_OnInterceptMissiles. Its whole effect/validator cluster was deleted too — see
-         EffectData.xml / ValidatorData.xml / UnitData.xml.) -->
+         static-weapon approach never auto-fired in game. Now replaced (v0.3.x) by the PASSIVE periodic
+         behavior WoLURavenPointDefense (BehaviorData → WoLURavenPDSearch → vanilla PointDefenseLaserDamage),
+         attached player-only in LibWoLUnbalanced.galaxy — it fires regardless of the Raven's order queue so
+         point-defense works while the Raven moves. Its whole old effect/validator cluster was deleted too —
+         see EffectData.xml / ValidatorData.xml / UnitData.xml.) -->
 
     <!-- DukesRevenge (Jackson's Revenge) long-range cannons: bump Range 6→8 to match the Loki's
          ArmageddonCannons (Range 8). DRCannonsG/DRCannonsA are DukesRevenge-EXCLUSIVE weapon ids

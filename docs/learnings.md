@@ -220,6 +220,55 @@ gotcha; authoritative details live in the code/plan, not here.
   drain. `UnitBehaviorAdd`-ing one makes the unit cloaked from that instant and stay cloaked
   for free — the way to make any cloak-capable unit "spawn cloaked." (It's generic; works on
   Ghost/Banshee/Wraith/Reaper/etc., not just the spectre/personal originals.)
+- **A SCRIPT-ORDERED ability never fires while the unit is MOVE-COMMANDED — `UnitIssueOrder(...,
+  AddToEnd)` queues BEHIND the move order. Re-home a "do X periodically regardless of what the unit
+  is doing" effect onto a PASSIVE PERIODIC `CBehaviorBuff` instead.** The Raven point-defense bug:
+  `libWoLU_OnInterceptMissiles` ordered the Raven to cast a hidden nullify ability at nearby enemy
+  missiles; the order sat behind the player's move order, so point-defense was dead whenever the Raven
+  was moving (`AddToFront` doesn't fix it either — it clobbers/freezes the move queue). **Fix = a
+  permanent hidden `CBehaviorBuff` (Period 0.0625, `PeriodicEffect=<CEffectEnumArea>`) attached
+  player-only via `libWoLU_AddBehaviorToType`** — a behavior periodic fires on the engine's own clock,
+  independent of the order queue, so it works while the unit moves/attacks. Mirror the SV heal-aura
+  pattern (`WoLUSVHealAura`) and the Point-Defense-Drone's own search→nullify. **The effect-bound
+  VISUAL still draws because the actor binds to the EFFECT id + the caster, not to an ability:** the
+  vanilla beam `CActorBeamSimple PointDefenseDroneAttackBeam` fires `On Effect.PointDefenseLaserDamage
+  .Start; At Caster` with `HostLaunch=_Selectable`(caster)→`HostImpact=_Missile`(target). For a
+  `CEffectEnumArea` fired by a behavior, the caster of each area-applied child effect is the
+  BEHAVIOR'S unit (the Raven) → the beam draws Raven→missile for free, no new actor. **Reuse the
+  VANILLA impact effect (`PointDefenseLaserDamage`: `Hide`+`NullifyMissile`, NO caster-identity
+  validator on the effect itself), NOT a clone** — any caster fires it, and a clone with a new id
+  would detach the beam. **Crucio rule for the search**: copy the vanilla `PointDefenseSearch`
+  `SearchFilters` VERBATIM = `Missile,Visible;Self,Player,Ally,Neutral,Stasis,Dead,Hidden,Invulnerable`
+  — keep `Missile` on the REQUIRE side (it is exactly what you want to hit) and EXCLUDE
+  `Self/Player/Ally` so you never nullify your own/ally missiles. (Done v0.3.x:
+  `WoLURavenPointDefense`→`WoLURavenPDSearch`→`PointDefenseLaserDamage`, replacing the script
+  interceptor. [STATIC mechanism; beam render + move-firing GAME-pending owner confirm.])
+- **A radius-ring indicator for ANY behavior is a `CActorRange` keyed to `Behavior.<id>.On/Off` — no
+  `.m3`/`.dds` needed (engine-primitive ring).** To show a unit's aura reach, clone the verified vanilla
+  `NexusShieldOverchargeRange` / `SensorTowerRadar` pattern: `<On Terms="Behavior.<id>.On" Send=
+  "Create"/>` + `<On Terms="Behavior.<id>.Off" Send="Destroy"/>` + `<Range value="N"/>`. It auto-hosts
+  to the unit carrying the behavior, so if the behavior is attached PLAYER-ONLY (via
+  `libWoLU_AddBehaviorToType`) the ring is player-only by construction (rule 9) with NO Galaxy change.
+  For owner-facing visibility through fog, copy the visibility lines VERBATIM from the precedent (BOTH
+  named examples use them): `<Inherits index="Visibility" value="0"/>` + `<FogVisibility value=
+  "Visible"/>`. Match `NexusShieldOverchargeRange` (behavior-keyed only) over `SensorTowerRadar` (also
+  carries a `UnitBirth.<id>.EditorPlaced` term specific to map-placed units). (Done v0.3.x:
+  `WoLUSVHealAuraRange`, Range 7 keyed to `Behavior.WoLUSVHealAura.On/Off` on the player's SV. **All
+  verified `CActorRange` examples attach to GROUND units/buildings — a ring on a FLYER (the SV) is
+  GAME-pending owner confirmation.**)
+- **Throttle a per-tick area effect's VISUAL without slowing the effect: drive the actor off a SEPARATE
+  slower-cadence marker, not the granular effect.** The SV heal runs at ~16 ticks/s (Period 0.0625 ×
+  Change 1) so units never die between chunks, but binding the glow pulse to `Effect.<heal>.Start` made
+  it fire 16×/s = far too busy. Fix = a second permanent behavior at the desired cadence
+  (`WoLUSVHealAuraGlow`, Period 1.0) whose `PeriodicEffect` is a `CEffectEnumArea` (IDENTICAL
+  `SearchFilters` to the heal's, so it finds the same friendlies and never an enemy) applying a
+  zero-change `CEffectModifyUnit` MARKER (`<VitalArray index="Life" Change="0"/>` — harmless no-op that
+  still raises `Effect.<marker>.Start`); REBIND the pulse actor's `On Terms` to the marker. **Host scope
+  for an area-enum-applied effect's pulse:** an area-search-applied `CEffectModifyUnit` targets the
+  SEARCHED unit by default, so the actor's `Host Subject="_Unit"` resolves to each searched friendly (the
+  HEALED unit), NOT the caster/SV — the glow appears over the healed units. (Adding `<ImpactUnit Value=
+  "Caster"/>` would redirect onto the SV — that was the old "shows above the SV" symptom; OMIT it.)
+  Precedent for `_Unit`+`SOpAttachOverhead` on an area-applied heal pulse = vanilla `RaynorHealPackModel`.
 - **Cloaking via the buff leaves the TOGGLE ability OFF → the card shows "Cloak On" not
   "Cloak Off".** The unit IS cloaked (by the buff) but its `CAbilBehavior` cloak toggle
   (`GhostCloak`/`BansheeCloak`/`WraithCloak`/`RogueGhostCloak`/

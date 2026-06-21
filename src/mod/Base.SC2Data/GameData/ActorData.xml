@@ -39,11 +39,39 @@
          Science Vessels via libWoLU_AddBehaviorToType, so this effect (and its visual) never fires
          on an enemy → the pulse never appears on enemy units. -->
     <CActorModel id="WoLUSVHealAuraPulse" parent="ModelAnimationStyleOneShot">
-        <On Terms="Effect.WoLUSVHealAuraHeal.Start" Send="Create"/>
+        <!-- REBOUND (v0.3.x) from Effect.WoLUSVHealAuraHeal.Start (~16x/s, far too busy) to
+             Effect.WoLUSVHealAuraGlowMark.Start, which fires ONCE PER SECOND PER HEALED UNIT (driven by
+             the separate 1.0 s WoLUSVHealAuraGlow behavior → WoLUSVHealAuraGlowPing search →
+             WoLUSVHealAuraGlowMark marker). The HEAL stays granular (WoLUSVHealAuraHeal, 16x/s) — only the
+             GLOW slowed to 1/s. Host _Unit = the searched friendly = the marker effect's TARGET (the HEALED
+             unit), NOT the SV: an area-enum-applied CEffectModifyUnit (WoLUSVHealAuraGlowMark, applied by
+             WoLUSVHealAuraGlowPing exactly as the heal is applied by WoLUSVHealAuraSearch) targets the
+             searched unit, so Effect.<id>.Start's _Unit resolves to each healed target. SOpAttachOverhead
+             puts the pulse over each healed unit's head. Precedent = vanilla RaynorHealPackModel (same
+             Model + Effect.<id>.Start + Host _Unit + SOpAttachOverhead for an area-applied heal). -->
+        <On Terms="Effect.WoLUSVHealAuraGlowMark.Start" Send="Create"/>
         <Model value="MedicHealModel"/>
         <Host Subject="_Unit"/>
         <HostSiteOps Ops="SOpAttachOverhead"/>
     </CActorModel>
+
+    <!-- SV heal-RANGE ring (v0.3.x — owner request): a radius-7 circle on the player's Science Vessel
+         showing its heal-aura reach. CActorRange needs NO .m3/.dds (engine-primitive ring). Keyed to
+         Behavior.WoLUSVHealAura.On/Off → auto-hosts to the unit carrying the behavior (the SV) and is
+         player-only BY CONSTRUCTION: WoLUSVHealAura is attached ONLY to the human player's SVs via
+         libWoLU_AddBehaviorToType, so the ring never appears on an enemy SV (rule 9). No Galaxy change.
+         Visibility lines copied VERBATIM from the verified vanilla NexusShieldOverchargeRange (and matching
+         SensorTowerRadar): <Inherits index="Visibility" value="0"/> + <FogVisibility value="Visible"/> so
+         the owner sees their own ring through fog. Range 7.0 == WoLUSVHealAuraSearch's AreaArray Radius.
+         [GAME]-pending: all verified CActorRange examples attach to ground units/buildings; the SV is a
+         FLYER, so the ring-on-a-flyer render needs owner confirmation. -->
+    <CActorRange id="WoLUSVHealAuraRange">
+        <Inherits index="Visibility" value="0"/>
+        <FogVisibility value="Visible"/>
+        <On Terms="Behavior.WoLUSVHealAura.On" Send="Create"/>
+        <On Terms="Behavior.WoLUSVHealAura.Off" Send="Destroy"/>
+        <Range value="7.000000"/>
+    </CActorRange>
 
     <!-- Actors for the extra elite mercs. A unit actor MUST inherit GenericUnitBase and
          declare unitName= (that's what creates the model on birth + drives weapon/attack

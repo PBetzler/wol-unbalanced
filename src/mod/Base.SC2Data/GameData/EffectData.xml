@@ -233,11 +233,13 @@
 
     <!-- (Removed v0.3.25: the Raven SELF Point-Defense Laser effect cluster —
          PointDefenseLaserInitialSetWoLU / PointDefenseSearchWoLU / PointDefenseLaserSetWoLU /
-         PointDefenseLaserEnergyWoLU. The static-weapon intercept never auto-fired in game; replaced
-         by the galaxy missile interceptor libWoLU_OnInterceptMissiles, which removes enemy missiles
-         near the player's Ravens with no weapon/effect on the unit. The weapon (WeaponData.xml),
-         the WeaponArray mount (UnitData.xml), and the firing-floor validator WoLUCasterHas1Energy
-         (ValidatorData.xml) were deleted with it.) -->
+         PointDefenseLaserEnergyWoLU. The static-weapon intercept never auto-fired in game. Raven
+         point-defense is now the PASSIVE periodic behavior WoLURavenPointDefense (BehaviorData) →
+         WoLURavenPDSearch (this file, below WoLUSVHealAuraHeal) → the vanilla PointDefenseLaserDamage,
+         attached player-only in LibWoLUnbalanced.galaxy — it fires regardless of the Raven's order queue
+         so point-defense works while the Raven moves. The old weapon (WeaponData.xml), the WeaponArray
+         mount (UnitData.xml), and the firing-floor validator WoLUCasterHas1Energy (ValidatorData.xml)
+         were deleted with the old cluster.) -->
 
     <!-- Wraith Trigger Override on-attack stack. Applies WoLUWraithTriggerOverride to the
          FIRING Wraith (WhichUnit=Source, the project convention for self-apply). Player-gated:
@@ -300,4 +302,46 @@
         <EditorCategories value="Race:Terran"/>
         <VitalArray index="Life" Change="1"/>
     </CEffectModifyUnit>
+
+    <!-- SV heal-GLOW search (v0.3.x). Fired once/sec by WoLUSVHealAuraGlow (BehaviorData) to drive the
+         visual pulse at a calm cadence (the HEAL stays granular at 16x/s via WoLUSVHealAuraSearch). Same
+         Radius/MaxCount and IDENTICAL SearchFilters as WoLUSVHealAuraSearch so it finds the SAME friendlies
+         (bio + mech + air + friendly structures) and NEVER an enemy/neutral (Enemy + Neutral stay excluded
+         → rule 9 + the Crucio rule). Applies the no-op marker WoLUSVHealAuraGlowMark to each → the pulse
+         actor binds to that marker's .Start. -->
+    <CEffectEnumArea id="WoLUSVHealAuraGlowPing">
+        <EditorCategories value="Race:Terran"/>
+        <AreaArray Radius="7" MaxCount="12" Effect="WoLUSVHealAuraGlowMark"/>
+        <SearchFilters value="Visible;Neutral,Enemy,Stasis,Dead,Hidden,Missile,Invulnerable"/>
+    </CEffectEnumArea>
+
+    <!-- SV heal-GLOW marker (v0.3.x). A zero-change CEffectModifyUnit = a harmless no-op that still raises
+         Effect.WoLUSVHealAuraGlowMark.Start on each searched target. The pulse actor (WoLUSVHealAuraPulse,
+         ActorData) binds to THIS effect's .Start so the glow fires ONCE PER SECOND PER HEALED UNIT, not on
+         every 16x/s heal tick. NO <ImpactUnit> — an area-search-applied effect targets the SEARCHED unit by
+         default (the healed friendly), so the pulse hosts on each healed unit, NOT the SV (adding
+         Value="Caster" would redirect every glow onto the SV itself — the old "shows above the SV" symptom).
+         NO cost, NO SearchFilters (this is a modify, not a search). -->
+    <CEffectModifyUnit id="WoLUSVHealAuraGlowMark">
+        <EditorCategories value="Race:Terran"/>
+        <VitalArray index="Life" Change="0"/>
+    </CEffectModifyUnit>
+
+    <!-- Raven point-defense SEARCH (v0.3.x — replaces the script interceptor). Fired every 0.0625 s by
+         WoLURavenPointDefense (BehaviorData) to find nearby enemy MISSILES and apply the VANILLA
+         PointDefenseLaserDamage (REUSED, NOT cloned — it has Hide + NullifyMissile and NO caster-identity
+         validator, so any caster fires it → engine nullify + the vanilla blue beam from the Raven). The
+         behavior's caster is the Raven, so PointDefenseLaserDamage's caster = the Raven and the beam draws
+         Raven→missile. Radius 16 (matches the old script's detection radius). SearchFilters copied
+         VERBATIM from the vanilla PointDefenseSearch (mods/_reference/.../liberty.sc2mod/EffectData.xml:519
+         `Missile,Visible;Self,Player,Ally,Neutral,Stasis,Dead,Hidden,Invulnerable`): REQUIRE Missile +
+         Visible (keep Missile on the require side — it is exactly what we want to hit), EXCLUDE
+         Self/Player/Ally/Neutral/Stasis/Dead/Hidden/Invulnerable (the Crucio rule — never nullify our own
+         or an ally's missiles, never touch enemy/neutral non-missiles). MaxCount 12 = up to 12 missiles per
+         tick (a salvo). Player-only by construction: the behavior is attached only to the player's Ravens. -->
+    <CEffectEnumArea id="WoLURavenPDSearch">
+        <EditorCategories value="Race:Terran"/>
+        <AreaArray Radius="16" MaxCount="12" Effect="PointDefenseLaserDamage"/>
+        <SearchFilters value="Missile,Visible;Self,Player,Ally,Neutral,Stasis,Dead,Hidden,Invulnerable"/>
+    </CEffectEnumArea>
 </Catalog>

@@ -180,6 +180,45 @@
         <PeriodicEffect value="WoLUSVHealAuraSearch"/>
     </CBehaviorBuff>
 
+    <!-- SV heal-GLOW cadence (v0.3.x). The heal itself stays granular (WoLUSVHealAura above:
+         Period 0.0625 × Change 1 = ~16 HP/s) so units never die between chunks. The VISUAL pulse
+         used to fire on EVERY heal tick (~16/s) = far too busy. This SEPARATE 1.0 s behavior drives
+         the glow at a calm once-per-second cadence: every 1.0 s it fires WoLUSVHealAuraGlowPing
+         (EffectData) — a search over the SAME friendlies — whose per-target WoLUSVHealAuraGlowMark
+         (a zero-change NO-OP marker) raises Effect.WoLUSVHealAuraGlowMark.Start on each healed unit,
+         which the pulse actor now binds to. Same structure as WoLUSVHealAura but Period 1.0. Permanent
+         + hidden, NO <Duration>. Applied player-only to ScienceVessel via libWoLU_AddBehaviorToType
+         (LibWoLUnbalanced.galaxy) — enemy SVs never get it (rule 9). -->
+    <CBehaviorBuff id="WoLUSVHealAuraGlow">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Period value="1.0"/>
+        <PeriodicEffect value="WoLUSVHealAuraGlowPing"/>
+    </CBehaviorBuff>
+
+    <!-- Raven SELF point-defense as a PASSIVE PERIODIC BEHAVIOR (v0.3.x — REPLACES the script-order
+         interceptor libWoLU_OnInterceptMissiles, whose UnitIssueOrder queued BEHIND the Raven's move
+         order so the nullify never fired WHILE the Raven was move-commanded). A behavior periodic fires
+         regardless of the unit's order queue → point-defense works while the Raven moves/attacks. Mirrors
+         the Point Defense Drone's own search→nullify and our WoLUSVHealAura pattern. Every 0.0625 s
+         (~16x/s — missiles are fast) it fires WoLURavenPDSearch (EffectData), an area enum that applies
+         the VANILLA PointDefenseLaserDamage (Hide + NullifyMissile, NO caster-identity validator) to each
+         nearby enemy missile → the engine nullifies the missile AND the vanilla blue laser beam
+         (CActorBeamSimple PointDefenseDroneAttackBeam, On Effect.PointDefenseLaserDamage.Start; At Caster,
+         HostLaunch=_Selectable→HostImpact=_Missile) draws Raven→missile. The behavior's caster is the
+         Raven, so the beam binds from the Raven automatically. Permanent + hidden, NO <Duration>. Applied
+         player-only to Raven via libWoLU_AddBehaviorToType — enemy Ravens never get it (rule 9). -->
+    <CBehaviorBuff id="WoLURavenPointDefense">
+        <Alignment value="Positive"/>
+        <BehaviorFlags index="Permanent" value="1"/>
+        <InfoFlags index="Hidden" value="1"/>
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Period value="0.0625"/>
+        <PeriodicEffect value="WoLURavenPDSearch"/>
+    </CBehaviorBuff>
+
     <!-- Predator Charge (AP): a permanent +120% move-speed buff (the Zealot-charge feel
          without the engine-coupled CAbilAugment, which doesn't link to its buff in data and
          is untested on Terran units). Adapted from Protoss Charging (MoveSpeedMultiplier 2.2);

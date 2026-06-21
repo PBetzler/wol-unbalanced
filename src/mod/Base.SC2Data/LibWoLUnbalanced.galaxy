@@ -26,7 +26,6 @@ int libWoLU_gv_skipProphecyButton = c_invalidDialogControlId;
 void libWoLU_SyncWeaponArmorLevels (int p);
 void libWoLU_DisableArmoryResearch (int p);
 void libWoLU_AddBehaviorToType (int p, string unitType, string behavior);
-bool libWoLU_OnInterceptMissiles (bool testConds, bool runActions);  // Raven script point-defense
 void libWoLU_GraduateSiegeRange (int p, string unitType);
 void libWoLU_SynthesizeVespene (int p);
 void libWoLU_ForceGrantAllTechRewards (int p);
@@ -230,15 +229,26 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced v__WOLU_VERSION__ (build __WOLU_BUILD__): data applied, upgrades & mercs granted."));
     // OPEN-POINTS diagnostic — keep ONLY the issues under active debug; REMOVE each marker
     // once the owner confirms it in game (the "clean the markers up afterwards" rule).
-    // aura     = WoLUSVHealAuraHeal life Change (expect 15 — the SV passive heal-aura per-tick HP;
+    // aura     = WoLUSVHealAuraHeal life Change (expect 1 — the granular SV heal-aura per-tick HP, ~16x/s;
     //            reads our clone straight from the LIVE catalog, so empty = the loaded build lacks it)
-    // ravmode  = literal "ability" — the Raven point-defense now ORDERS the Raven to cast the
-    //            WoLURavenPDNullify ABILITY (= vanilla PointDefenseLaserDamage → engine nullify +
-    //            vanilla blue laser beam) via libWoLU_OnInterceptMissiles, NOT a raw UnitRemove and
-    //            NOT a static weapon. (Previous values: "script" = the old silent UnitRemove
-    //            interceptor; the older raven=/ravturret= catalog reads are gone.)
-    // Healthy: aura=15  ravmode=ability.
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player) + " ravmode=ability"));
+    // ravmode  = literal "behavior" — the Raven point-defense is now the PASSIVE periodic behavior
+    //            WoLURavenPointDefense (→ WoLURavenPDSearch → vanilla PointDefenseLaserDamage → engine
+    //            nullify + vanilla blue laser beam), which fires regardless of the Raven's order queue so
+    //            it works WHILE THE RAVEN MOVES. (Previous values: "ability" = the script-order interceptor
+    //            that queued behind the move order; "script" = the older silent UnitRemove.)
+    // Healthy: aura=1  ravmode=behavior.
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player) + " ravmode=behavior"));
+    // ITEM-3 upgrade-level diagnostic (SECOND subtitle line — keeps the first line short). The owner
+    // reports air units (Raven/Viking) appearing +3 over other air units, but no static catalog
+    // asymmetry was found (they sit in the same Ship/Vehicle real families). These runtime level counts
+    // let the owner read back whether any one level id is granted at count>1 (a double-grant) at 3/3:
+    //   shipArm   = TerranShipArmorsLevel3 (the BASE armor id our sync grants — carries the real effect)
+    //   shipArmVP = TerranShipArmorsVanadiumPlatingLevel3 (the icon-only WRAPPER variant — should be 0
+    //               from our sync, which grants only the base ids)
+    //   shipWpn   = TerranShipWeaponsLevel3 (the BASE weapon id)
+    // A nonzero shipArmVP alongside shipArm=1 would mean both families granted = double-apply. (Diagnostic
+    // only — do NOT change any upgrade grant on the strength of this; report the readback.)
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU levels: shipArm=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipArmorsLevel3", c_techCountCompleteOnly)) + " shipArmVP=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipArmorsVanadiumPlatingLevel3", c_techCountCompleteOnly)) + " shipWpn=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipWeaponsLevel3", c_techCountCompleteOnly))));
     return true;
 }
 
@@ -516,6 +526,17 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
         // SV passive auto-heal aura — heals all nearby friendlies (bio+mech+air), free,
         // player-only rule-9-safe; replaces the abandoned Medivac-beam heal transplant.
         libWoLU_AddBehaviorToType(libWoLU_Player, "ScienceVessel", "WoLUSVHealAura");
+        // SV heal-GLOW cadence (v0.3.x): a separate 1.0 s behavior drives the visual pulse at a calm
+        // once-per-second-per-healed-unit rate (the heal above stays granular at ~16x/s). Without this
+        // the pulse fired on every heal tick (~16/s) = far too busy. Player-only (rule 9).
+        libWoLU_AddBehaviorToType(libWoLU_Player, "ScienceVessel", "WoLUSVHealAuraGlow");
+        // Raven SELF point-defense (v0.3.x): a PASSIVE periodic behavior that finds nearby enemy missiles
+        // and applies the vanilla PointDefenseLaserDamage (nullify + blue beam from the Raven). Replaces
+        // the old script-order interceptor, whose cast queued behind the move order and never fired while
+        // the Raven was move-commanded — the behavior fires regardless of orders, so it now works WHILE
+        // THE RAVEN MOVES/ATTACKS. Player-only (rule 9; enemy Ravens never get it). The Raven has no
+        // merc/hero counterpart, so no family fan-out.
+        libWoLU_AddBehaviorToType(libWoLU_Player, "Raven", "WoLURavenPointDefense");
         // Kill the leftover vanilla NanoRepair autocast on the player's SV (v0.3.25). The
         // NanoRepair card BUTTON was tombstoned (UnitData.xml LayoutButtons idx8), but the
         // NanoRepair ABILITY is still on the SV's AbilArray with ability-level AutoCast flags
@@ -530,63 +551,14 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
     return true;
 }
 
-// Raven SCRIPT point-defense (replaces the static PointDefenseLaserWoLU weapon, which never
-// auto-fired). For each of the player's living Ravens, find enemy missiles within radius 16 and ORDER
-// the Raven to cast WoLURavenPDNullify (AbilData) at each one. That ability's <Effect> is the VANILLA
-// PointDefenseLaserDamage (CEffectModifyUnit, Hide + NullifyMissile, NO caster-identity validator), so
-// the engine nullifies the missile AND the vanilla blue laser beam (CActorBeamSimple
-// PointDefenseDroneAttackBeam, On Effect.PointDefenseLaserDamage.Start; At Caster, HostLaunch=
-// _Selectable→HostImpact=_Missile) draws from the Raven to the missile — matching the Point Defense
-// Drone exactly (the old UnitRemove was a SILENT nullify with no visual). Player-only (rule 9): only
-// the human player's Ravens are enumerated/ordered; enemy missiles aimed at OTHER targets that merely
-// pass within 16 of a player Raven are also intercepted, which is the intended point-defense behavior
-// (it protects the Raven's vicinity). Runs on a tight 0.0625 s tick (~16x/s — missiles are fast).
-// Multi-missile per tick: each found missile gets its OWN queued cast via c_orderQueueAddToEnd (NOT
-// Replace, which would overwrite the previous order) so a salvo is intercepted one-per-queued-cast
-// (the ability is instant / 0-cost / 0-cooldown, so the queue drains immediately).
-// Filter semantics: UnitFilter(require-low, require-high, exclude-low, exclude-high). param 1 REQUIREs
-// Missile + Visible (so ONLY visible missiles match — don't order casts at un-targetable missiles);
-// param 4 EXCLUDEs Dead + Hidden (already-spent / unrevealed). Word confirmed against the moebius
-// reference (Lib2ECD74F3.galaxy): c_targetFilterMissile + c_targetFilterVisible are LOW-word (no -32);
-// c_targetFilterDead + c_targetFilterHidden are HIGH-word (use -32). Stasis/Invulnerable are OMITTED
-// here: their c_targetFilter* WORD (low vs high) is not present anywhere in the reference dump to
-// verify, and a wrong word would silently filter the wrong bit — Dead/Hidden cover the real cases
-// (a stasised/invulnerable missile is not a normal scenario for enemy missiles). Do NOT put Missile in
-// an exclude param or it would drop exactly what we want.
-bool libWoLU_OnInterceptMissiles (bool testConds, bool runActions) {
-    unitgroup ravens;
-    unit r;
-    unitgroup missiles;
-    unit m;
-    int i;
-    int j;
-    if (PlayerRace(libWoLU_Player) != "Terr") {
-        return true; // Protoss interludes have no Ravens; nothing to do (mirrors the other periodics).
-    }
-    // The player's living Ravens (exclude dead — same UnitFilter high-word form as the other loops).
-    ravens = UnitGroup("Raven", libWoLU_Player, RegionEntireMap(), UnitFilter(0, 0, 0, (1 << (c_targetFilterDead - 32))), 0);
-    i = UnitGroupCount(ravens, c_unitCountAll);
-    for ( ; i >= 1; i -= 1 ) {
-        r = UnitGroupUnitFromEnd(ravens, i);
-        if (r != null) {
-            // Enemy VISIBLE missiles within radius 16 of this Raven. REQUIRE Missile + Visible (param 1),
-            // EXCLUDE Dead + Hidden (param 4). UnitGroupAlliance(player, c_unitAllianceEnemy, ...) returns
-            // only enemy-owned entities, so player/ally missiles are never targeted.
-            missiles = UnitGroupAlliance(libWoLU_Player, c_unitAllianceEnemy, RegionCircle(UnitGetPosition(r), 16.0), UnitFilter((1 << c_targetFilterMissile) | (1 << c_targetFilterVisible), 0, 0, (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
-            j = UnitGroupCount(missiles, c_unitCountAll);
-            for ( ; j >= 1; j -= 1 ) {
-                m = UnitGroupUnitFromEnd(missiles, j);
-                if (m != null) {
-                    // Order the Raven (caster r) to cast the vanilla PD nullify at the missile (m).
-                    // Command index 0 = Execute; the beam draws Raven->missile. AddToEnd queues each
-                    // missile's cast so multiple-per-tick don't overwrite each other.
-                    UnitIssueOrder(r, OrderTargetingUnit(AbilityCommand("WoLURavenPDNullify", 0), m), c_orderQueueAddToEnd);
-                }
-            }
-        }
-    }
-    return true;
-}
+// (Raven SCRIPT point-defense REMOVED v0.3.x — libWoLU_OnInterceptMissiles ORDERED the Raven to cast
+// WoLURavenPDNullify, and that order queued BEHIND the Raven's move order so the nullify never fired
+// while the Raven was move-commanded. Replaced by the PASSIVE periodic behavior WoLURavenPointDefense
+// (BehaviorData → WoLURavenPDSearch → the vanilla PointDefenseLaserDamage), attached player-only to the
+// Raven in libWoLU_OnPeriodic. A behavior periodic fires regardless of the order queue, so point-defense
+// now works WHILE THE RAVEN MOVES/ATTACKS — that is the fix. The beam still draws Raven→missile because
+// PointDefenseDroneAttackBeam binds to Effect.PointDefenseLaserDamage.Start; At Caster, and the behavior's
+// caster is the Raven.)
 
 //==================================================================================================
 // "Skip Prophecy (Zeratul) missions" — one-time on-screen button (tstory01 only)
@@ -884,9 +856,9 @@ void libWoLU_InitLib () {
     // Graduating Range ticks every 3 s (the spec's interval), independent of the 2 s
     // behavior-maintenance pass above.
     TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnGraduateRange"), 3.0, c_timeGame);
-    // Raven script point-defense: a tight 0.0625 s tick (~16x/s) removes enemy missiles near the
-    // player's Ravens (missiles are fast, so a short interval matters). Player-scoped inside the handler.
-    TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnInterceptMissiles"), 0.0625, c_timeGame);
+    // (Removed: the libWoLU_OnInterceptMissiles 0.0625 s tick. Raven point-defense is now the PASSIVE
+    // periodic behavior WoLURavenPointDefense — added player-only in libWoLU_OnPeriodic — which fires
+    // regardless of the Raven's order queue, so it works while the Raven moves/attacks.)
 
     // Hyperion-hub handler (merc re-purchase + Skip-Prophecy button + diag; scoped to tstory01
     // inside the handler). Fires on BOTH game-time AND real-time passes: the story-mode hub may

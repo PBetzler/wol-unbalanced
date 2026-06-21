@@ -367,19 +367,16 @@
          PointDefenseLaserWoLU on the Raven, turreted or not) did NOT auto-fire in game across
          v0.3.21-v0.3.24 (an unturreted weapon never acquired missiles; the turret mount in v0.3.24
          relied on a turret bone the Raven model lacks). REPLACED by a GALAXY missile interceptor
-         (libWoLU_OnInterceptMissiles in LibWoLUnbalanced.galaxy) that periodically finds enemy
-         missiles near the player's Ravens. Earlier it silently UnitRemove'd them; it now ORDERS the
-         Raven to cast the WoLURavenPDNullify ability (appended below at AbilArray index 5) at each
-         missile = the VANILLA PointDefenseLaserDamage effect (Hide + NullifyMissile), so the engine
-         nullify AND the vanilla blue laser beam (PointDefenseDroneAttackBeam, drawn Raven→missile)
-         fire — matching the Point Defense Drone exactly. The static AbilArray add is global so enemy
-         Ravens also carry it, but only the player's Ravens are ever ordered to cast it (rule 9 in
-         effect; the ability button is also WoLUHaveFlag-gated). The old PointDefenseLaserWoLU weapon
-         cluster (effect set / search / drain / energy validator) stays deleted — the Raven's weapon
-         slot remains vanilla (empty); the ability + script replace it. -->
-    <CUnit id="Raven">
-        <AbilArray index="5" Link="WoLURavenPDNullify"/>
-    </CUnit>
+         (now the PASSIVE periodic behavior WoLURavenPointDefense, added player-only via
+         libWoLU_AddBehaviorToType in LibWoLUnbalanced.galaxy) that finds enemy missiles near the player's
+         Ravens and applies the VANILLA PointDefenseLaserDamage effect (Hide + NullifyMissile), so the
+         engine nullify AND the vanilla blue laser beam (PointDefenseDroneAttackBeam, drawn Raven→missile)
+         fire — matching the Point Defense Drone exactly. A BEHAVIOR fires regardless of the Raven's order
+         queue, so point-defense now works WHILE THE RAVEN MOVES/ATTACKS (the old script-order interceptor
+         queued behind the move order and never fired while move-commanded). No Raven AbilArray add is
+         needed — the behavior carries the search/effect. The old PointDefenseLaserWoLU weapon cluster
+         (effect set / search / drain / energy validator) stays deleted — the Raven's weapon slot remains
+         vanilla (empty). -->
 
     <!-- Tactical Jump (AP) appended to Hercules + Predator. Vanilla counts: Hercules
          AbilArray 3 / LayoutButtons 8 (append 3 / 8, free cell R2C2); Predator AbilArray 3 /
