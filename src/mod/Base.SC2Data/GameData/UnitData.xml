@@ -350,26 +350,15 @@
         </CardLayouts>
     </CUnit>
 
-    <!-- Raven SELF Point-Defense Laser (owner request): mount the Point Defense Drone's
-         missile-intercept weapon ON the Raven. The vanilla Raven has NO WeaponArray (0 weapons);
-         adding a WeaponArray entry in STATIC XML is allowed (the no-append limit is RUNTIME-only —
-         learnings §"Per-player runtime LINK edits are no-ops"). This is a FIELD edit on the existing
-         Raven unit, NOT a unit-type clone, so it's rule-safe. It intentionally adds the weapon to
-         enemy Ravens too, but the firing effect set is WoLUHasFlag-gated (EffectData.xml) so only the
-         human player's Raven actually intercepts.
-         TURRET (v0.3.24 — explicit owner-accepted TEST): the laser wouldn't auto-fire unturreted.
-         Mount it on the vanilla PointDefenseDrone turret — exactly how the native carrier binds it:
-         the Turret= attribute goes on the UNIT's WeaponArray entry (NOT on the weapon), matching
-         CUnit id="PointDefenseDrone" <WeaponArray Link="PointDefenseLaser" Turret="PointDefenseDrone"/>
-         (mods/_reference/mods/liberty.sc2mod/UnitData.xml:1890). PointDefenseDrone is a vanilla
-         CTurret (parent="FreeRotate", 360° yaw — TurretData.xml:54), resolvable in mods/_reference/,
-         so no clone is needed. [GAME]-PENDING owner playtest: may not fire, may look odd, or the
-         turret bone may be absent on the Raven model (the Raven has no native turret) — this is the
-         owner's accepted experiment. The laser is a hidden weapon (Options Hidden=1 inherited via
-         parent), so it adds no command-card button — nothing to gate on the card. -->
-    <CUnit id="Raven">
-        <WeaponArray index="0" Link="PointDefenseLaserWoLU" Turret="PointDefenseDrone"/>
-    </CUnit>
+    <!-- Raven SELF Point-Defense Laser (owner request): the static-weapon approach (mounting
+         PointDefenseLaserWoLU on the Raven, turreted or not) did NOT auto-fire in game across
+         v0.3.21-v0.3.24 (an unturreted weapon never acquired missiles; the turret mount in v0.3.24
+         relied on a turret bone the Raven model lacks). REPLACED in v0.3.25 by a GALAXY missile
+         interceptor (libWoLU_OnInterceptMissiles in LibWoLUnbalanced.galaxy) that periodically
+         removes enemy missiles near the player's Ravens — no weapon on the unit at all. The whole
+         weapon cluster (PointDefenseLaserWoLU + its effect set / search / drain / energy validator)
+         was deleted with this CUnit override, reverting the player Raven to vanilla (no weapon),
+         which is correct — the script interceptor replaces it. -->
 
     <!-- Tactical Jump (AP) appended to Hercules + Predator. Vanilla counts: Hercules
          AbilArray 3 / LayoutButtons 8 (append 3 / 8, free cell R2C2); Predator AbilArray 3 /

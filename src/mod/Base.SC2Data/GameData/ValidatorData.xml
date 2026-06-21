@@ -13,15 +13,9 @@
         <Value value="WoLUNoFlagReq"/>
     </CValidatorPlayerRequirement>
 
-    <!-- Raven self Point-Defense Laser firing floor: the firing Raven (Caster) needs >= 1 energy
-         to intercept (it pays 1 per intercept via PointDefenseLaserEnergyWoLU). Same shape as
-         liberty's CasterHas10Energy (WhichUnit=Caster, Vital=Energy), threshold lowered to 1. -->
-    <CValidatorUnitCompareVital id="WoLUCasterHas1Energy">
-        <WhichUnit Value="Caster"/>
-        <Compare value="GE"/>
-        <Value value="1"/>
-        <Vital value="Energy"/>
-    </CValidatorUnitCompareVital>
+    <!-- (Removed v0.3.25: WoLUCasterHas1Energy — the Raven Point-Defense Laser firing floor.
+         The whole Raven self-PD-laser cluster was deleted; the galaxy missile interceptor
+         libWoLU_OnInterceptMissiles replaces it. No other referrer.) -->
 
     <!-- EMP autocast gate: only fire at targets that actually have energy or shields
          (schema verbatim from liberty's healCasterMinEnergy, WhichUnit=Target). -->

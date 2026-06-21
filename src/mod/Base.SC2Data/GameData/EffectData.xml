@@ -231,70 +231,13 @@
         <EffectArray value="DefensiveMatrixFillWoLU"/>
     </CEffectSet>
 
-    <!-- ============================================================================
-         Raven SELF Point-Defense Laser (owner request). Every Raven gets the Point Defense
-         Drone's missile-intercept weapon ON THE RAVEN ITSELF (PointDefenseLaserWoLU weapon in
-         WeaponData.xml, added to the Raven's WeaponArray in UnitData.xml). Rule-9 isolation:
-         the firing effect set is gated WoLUHasFlag (the campaign's Shaped-Blast pattern, the
-         mod's standard player-only lever) — only the human player's Raven actually intercepts;
-         enemy Ravens carry the weapon but its set no-ops for them.
-
-         DESIGN NOTE (why NOT the literal "energy validator > 200 max" gate): the per-player lever
-         the brief proposed — raise a firing VALIDATOR's threshold to 250 (above the Raven's 200
-         energy max) for everyone, then per-player lower it to 1 — is NOT achievable. There is no
-         `c_gameCatalogValidator` in this codebase (genlib CATALOGS = Unit/Abil/Weapon/Effect/
-         Behavior only), so a validator's compare Value is NOT per-player-editable; and a per-player
-         edit on the energy-DRAIN effect's VitalArray[Energy].Change is the CHECK8-UNCERTAIN class
-         (an effect VitalArray.Change is not a verified-applying per-player scalar). The WoLUHasFlag
-         effect-gate achieves the owner's GOAL (player Raven intercepts, enemy never does) more
-         reliably and is rule-9-safe by construction. The "1 energy per intercept" cost is honored
-         by the baked -1 drain (PointDefenseLaserEnergyWoLU) + the 1-energy firing floor below.
-
-         The vanilla chain (PointDefenseLaserInitialSet → PointDefenseSearch → PointDefenseLaserSet
-         → {NullifyMissile damage, dummy, ready-buff, -10 energy}) gates on a core validator
-         `PointDefenseDroneUnitFilter` ("caster is a Point Defense Drone") that a RAVEN cannot pass
-         — so we cannot reuse the vanilla sets verbatim on the Raven. We clone the sets WITHOUT that
-         drone-only validator, gate on WoLUHasFlag + a 1-energy floor instead, and REUSE the vanilla
-         leaf effects (NullifyMissile / dummy / ready-buff) so the intercept behavior + visual are
-         unchanged. SearchFilters stays Missile-only (the Crucio friendly-fire-safe explicit
-         filter), so the laser only ever targets missiles. ============================ -->
-    <CEffectSet id="PointDefenseLaserInitialSetWoLU">
-        <EditorCategories value="Race:Terran"/>
-        <ValidatorArray value="WoLUHasFlag"/>
-        <ValidatorArray value="WoLUCasterHas1Energy"/>
-        <EffectArray value="PointDefenseSearchWoLU"/>
-        <EffectArray value="PointDefenseApplyBehavior"/>
-    </CEffectSet>
-    <!-- 8-radius missile search centered on the Raven. SearchFilters Missile-only = the explicit
-         friendly-fire-safe filter (Crucio rule); we omit the unverifiable core validator
-         PointDefenseSearchTargetFilters (the SearchFilters already constrains to missiles). Each
-         missile found fires PointDefenseLaserSetWoLU. -->
-    <CEffectEnumArea id="PointDefenseSearchWoLU">
-        <EditorCategories value="Race:Terran"/>
-        <ImpactLocation Value="SourceUnit"/>
-        <SearchFilters value="Missile,Visible;Self,Player,Ally,Neutral,Stasis,Dead,Hidden,Invulnerable"/>
-        <AreaArray Radius="8" Effect="PointDefenseLaserSetWoLU"/>
-    </CEffectEnumArea>
-    <!-- Per-missile: nullify the missile (reuse vanilla PointDefenseLaserDamage = NullifyMissile),
-         the vanilla notification dummy, the vanilla ready-buff, and our -1 energy drain. Gated
-         WoLUHasFlag + the 1-energy floor (NOT the drone-only PointDefenseDroneUnitFilter the Raven
-         can't pass). -->
-    <CEffectSet id="PointDefenseLaserSetWoLU">
-        <EditorCategories value="Race:Terran"/>
-        <ValidatorArray value="WoLUHasFlag"/>
-        <ValidatorArray value="WoLUCasterHas1Energy"/>
-        <EffectArray value="PointDefenseLaserDamage"/>
-        <EffectArray value="PointDefenseLaserDummy"/>
-        <EffectArray value="PointDefenseApplyBehavior"/>
-        <EffectArray value="PointDefenseLaserEnergyWoLU"/>
-    </CEffectSet>
-    <!-- 1-energy-per-intercept drain (owner: "1 energy for both units"). parent= the vanilla
-         -10 drain; override only the Change to -1. ImpactUnit=Caster (the firing Raven) inherited. -->
-    <CEffectModifyUnit id="PointDefenseLaserEnergyWoLU" parent="PointDefenseLaserEnergy">
-        <VitalArray index="Energy">
-            <Change value="-1"/>
-        </VitalArray>
-    </CEffectModifyUnit>
+    <!-- (Removed v0.3.25: the Raven SELF Point-Defense Laser effect cluster —
+         PointDefenseLaserInitialSetWoLU / PointDefenseSearchWoLU / PointDefenseLaserSetWoLU /
+         PointDefenseLaserEnergyWoLU. The static-weapon intercept never auto-fired in game; replaced
+         by the galaxy missile interceptor libWoLU_OnInterceptMissiles, which removes enemy missiles
+         near the player's Ravens with no weapon/effect on the unit. The weapon (WeaponData.xml),
+         the WeaponArray mount (UnitData.xml), and the firing-floor validator WoLUCasterHas1Energy
+         (ValidatorData.xml) were deleted with it.) -->
 
     <!-- Wraith Trigger Override on-attack stack. Applies WoLUWraithTriggerOverride to the
          FIRING Wraith (WhichUnit=Source, the project convention for self-apply). Player-gated:

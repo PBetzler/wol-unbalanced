@@ -109,14 +109,8 @@
         <Effect value="WraithGTriggerOverrideSet"/>
     </CWeaponLegacy>
 
-    <!-- Raven SELF Point-Defense Laser (owner request): the Point Defense Drone's missile-intercept
-         weapon mounted ON the Raven. parent="PointDefenseLaser" inherits the Missile-only
-         TargetFilters/AcquireFilters, Range 8, Hidden+ContinuousScan Options, and the Marker — only
-         the Effect is re-pointed to our player-gated clone set. Added to the Raven's WeaponArray
-         (UnitData.xml). The set (PointDefenseLaserInitialSetWoLU, EffectData.xml) is WoLUHasFlag-gated
-         + 1-energy-floored, so ONLY the player's Raven intercepts (enemy Ravens carry the weapon but
-         it no-ops); 1 energy drained per intercept. See EffectData.xml for the full design rationale. -->
-    <CWeaponLegacy id="PointDefenseLaserWoLU" parent="PointDefenseLaser">
-        <Effect value="PointDefenseLaserInitialSetWoLU"/>
-    </CWeaponLegacy>
+    <!-- (Removed v0.3.25: the Raven SELF Point-Defense Laser weapon PointDefenseLaserWoLU. The
+         static-weapon approach never auto-fired in game; replaced by the galaxy missile interceptor
+         libWoLU_OnInterceptMissiles. Its whole effect/validator cluster was deleted too — see
+         EffectData.xml / ValidatorData.xml / UnitData.xml.) -->
 </Catalog>
