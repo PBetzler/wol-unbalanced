@@ -813,36 +813,53 @@ gotcha; authoritative details live in the code/plan, not here.
 - Campaign upgrades already list **merc** units in their `EffectArray`s (e.g.
   `CombatShield` covers `WarPig`) but never heroes — extend via XML `CUpgrade`
   appends (`MarauderLifeBoost` = Kinetic Foam).
-- **Extending a weapon/armor LEVEL upgrade's affected-unit list — and the two-family trap.**
-  The weapon/armor upgrade tree splits into TWO families per level: the **base**
-  `Terran{Ship,Vehicle}{Weapons,Armors}LevelN` ids (which our Eng Bay sync grants — they
-  carry the REAL `Level`/`Amount`/`LifeArmor` effects) vs. the **wrapper**
-  `…UltraCapacitorsLevelN`/`…VanadiumPlatingLevelN` ids (icon-only display variants the sync
-  does NOT grant). **Gotcha:** the base-Level `EffectArray`s do NOT cover every player combat
-  unit — several base fliers (Banshee, Battlecruiser, Viking) + base Thor/SiegeTank/Hellion
-  armor + Medivac/Raven armor have their scaling entries ONLY in the bare **wrapper**
-  `…UltraCapacitors`/`…VanadiumPlating` upgrades (the `default="1"` ids at
-  `liberty.sc2campaign/UpgradeData.xml`: `TerranShipWeaponsUltraCapacitors` :394,
-  `TerranVehicleArmorsVanadiumPlating` :318, `TerranShipArmorsVanadiumPlating` :467). In the
-  base-Level upgrades those same units appear ONLY as cosmetic `Actor,<id>,LifeArmorIcon` /
-  `Weapon,<id>,Icon` Set entries — NOT real scaling. So if you grant only the base-Level ids
-  (as our sync does), those units don't scale. **Fix = mirror the missing units into the
-  base-Level upgrades** via same-id `<CUpgrade>` overrides with **index-less new-key
-  `EffectArray` APPENDS** (the CombatShield pattern — no explicit `index=` for NEW keys; that
-  discipline is only for OVERRIDING an existing slot's Value). Resolve the mirror values
-  against the wrapper, and re-state each LevelN identically (the per-level deltas are all `1`).
+- **Extending a weapon/armor LEVEL upgrade's affected-unit list — the THREE-family trap (CORRECTED
+  v0.3.30; an earlier reading of this note caused a real over-count bug).** A `…LevelN` upgrade with
+  `parent="<ROOT>"` INHERITS and applies the ROOT's per-unit `EffectArray` (+1/level) — even though the
+  `…LevelN` id's OWN body is icon-only `Set` entries. This is the load-bearing mechanic: the base
+  `TerranVehicleArmorsLevel1` body has only `Actor,<id>,LifeArmorIcon` Sets, yet it applies +1 armor
+  because it inherits `Unit,Thor,LifeArmor +1` from `parent="TerranVehicleArmors"`. So "the LevelN body
+  is icons-only" does NOT mean "no scaling" — the scaling rides the parent ROOT. There are up to THREE
+  grantable families per unit, EACH contributing +3 at 3/3, and granting more than one OVER-COUNTS:
+    1. **base ROOT** `Terran{Ship,Vehicle}{Weapons,Armors}` (`default="1"`, liberty.sc2mod
+       `UpgradeData.xml`) — its real `LifeArmor`/`Level`/`Amount` entries are delivered by granting the
+       base `…LevelN` ids (which `parent=` it). The base ROOTs DO cover the base fliers + Thor/SiegeTank/
+       Hellion + Medivac/Raven armor + Banshee/BC/Viking weapon (verify the AffectedUnit list); the
+       libertystory base-`…LevelN` BODIES add the rest (Diamondback/Vulture/Goliath/Predator/
+       SpartanCompany/SiegeBreaker/Odin/Hercules/Wraith/SV/DukesRevenge/DuskWing/HelsAngel). Together
+       this **base family is our single canonical scaling family**, granted by the Eng-Bay sync
+       (`libWoLU_SyncWeaponArmorLevels`) for infantry-research parity. **This is the ONLY family any unit
+       should be in.**
+    2. **wrapper ROOT** `…UltraCapacitors`/`…VanadiumPlating` (`default="1"`, liberty.sc2campaign
+       `UpgradeData.xml`: `TerranShipWeaponsUltraCapacitors` :394, `TerranVehicleArmorsVanadiumPlating`
+       :318, `TerranShipArmorsVanadiumPlating` :467) — its real entries are delivered by granting the
+       wrapper `…{UltraCapacitors,VanadiumPlating}LevelN` ids, which `libWoLU_DisableArmoryResearch`
+       grants ONLY to hide the libertystory Armory buttons (Research16-27 target the wrappers; a
+       `CAbilResearch` button auto-hides when its target upgrade is QueuedOrBetter). The wrapper ROOTs
+       carry the SAME real stat as the base family for nearly every vehicle/ship unit → a universal +3
+       over-count. **v0.3.30 NEUTRALIZED this**: keep granting the wrapper LevelN (buttons stay hidden)
+       but override the 4 wrapper ROOT `<CUpgrade>`s with a FULL re-stated `EffectArray` (explicit
+       indices, RegenerativeBioSteel pattern) zeroing every `LifeArmor`/`LifeArmorLevel`/weapon `Level`/
+       `Effect,…,Amount`/`AttributeBonus`/`RateMultiplier` Value to 0 and every `Operation="Multiply"`
+       LifeMax/LifeStart to 1 (the wrapper ROOTs have NO icon entries to preserve — icons live in the
+       LevelN bodies). Rule-9-safe: WoL grants the wrappers only to the human.
+    3. **our own same-id `<CUpgrade>` appends** into the base `…LevelN` ids — historically added (on the
+       OLD, WRONG reading of this note) to "mirror the missing units" the note claimed were wrapper-only.
+       But family 1's base ROOT ALREADY covers those base units, so these appends were 100% redundant =
+       the extra +3 that made the "9-units." **v0.3.30 REMOVED all base-unit appends**, keeping ONLY the
+       MERC entries (see reach rule 1 below). **Do NOT re-add base-unit appends** — grep the base ROOT +
+       libertystory LevelN first; a base unit is almost always already covered.
   **Two reach rules:** (1) **armor is a per-unit-id `Unit` field** → it does NOT propagate to a
-  `parent=` merc, so `MercThor`/`MercHellion`/`MercWraith` need EXPLICIT armor entries; **weapons
-  reach `parent=` mercs via shared effect ids** (the merc inherits the base weapon's `Effect`),
-  so no merc-weapon entry is needed. (2) **Omit the wrapper's `LifeMax`/`LifeStart` `Operation=
-  "Multiply" Value="1.05"` entries** — that +5% HP is a separate perk; the base-Level armor
-  upgrades intentionally carry only `LifeArmor`+`LifeArmorLevel`. Before adding any unit, grep the
-  base-Level upgrade's MERGED contents (libertystory + liberty.sc2mod layers) — standalone
-  mercs/heroes (Wraith/Hercules/Odin/Predator/SpartanCompany/SiegeBreaker*/HelsAngel*/DukesRevenge/
-  DuskWing/ScienceVessel) usually ALREADY have base-Level entries; don't duplicate. (Done v0.3.x:
-  added the base fliers + Thor/SiegeTank/Hellion armor + Medivac/Raven armor + MercThor/MercHellion/
-  MercWraith to `TerranShip{Weapons,Armors}LevelN` + `TerranVehicleArmorsLevelN` —
-  `src/mod/Base.SC2Data/GameData/UpgradeData.xml`.) **One in-game caveat:** an upgrade entry
+  `parent=` merc, AND `MercThor`/`MercHellion`/`MercWraith` appear in NO vanilla weapon/armor upgrade
+  (not even the wrapper ROOT), so a same-id base-`…LevelN` append is their ONLY armor-scaling source —
+  these merc entries MUST stay (`Unit,MercThor/MercHellion,LifeArmor[Level]` in `TerranVehicleArmorsLevelN`,
+  `Unit,MercWraith,…` in `TerranShipArmorsLevelN`). **weapons reach `parent=` mercs via shared effect ids**
+  (the merc inherits the base weapon's `Effect`/`Level`), so no merc-WEAPON append is needed. (2) **The
+  wrapper's `LifeMax`/`LifeStart` `Operation="Multiply" Value="1.05"` +5% HP perk is separate** from the
+  armor-LEVEL scaling and is also neutralized (→1) in the wrapper-ROOT override, since the base family
+  carries only `LifeArmor`+`LifeArmorLevel`. (Done v0.3.30 — `src/mod/Base.SC2Data/GameData/UpgradeData.xml`:
+  removed redundant base-unit `…LevelN` appends, kept merc-only entries, zeroed the 4 wrapper ROOTs.)
+  **One in-game caveat:** an upgrade entry
   modifying a weapon `Effect`'s `Amount` (e.g. `Effect,TwinGatlingCannons,Amount`) when our mod has
   rerouted that weapon's `Effect` to a `*WoLUSet` whose children are `parent="<that effect>"` —
   whether the bump reaches the already-loaded child clones is unverified statically, but it's the

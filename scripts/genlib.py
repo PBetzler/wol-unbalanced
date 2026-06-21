@@ -110,6 +110,43 @@ def train_entries():
     return entries
 
 
+# Rule: Terran add-ons build in 10 s. Add-on build time lives on a CAbilBuild's
+# InfoArray[BuildN].Time — the SAME verified per-player nested-scalar class as
+# CAbilTrain InfoArray[TrainN].Time and EngineeringBayResearch InfoArray[ResearchN].Time
+# (an attr on the InfoArray element; CHECK8-GOOD once preview.py's classifier accepts
+# Build*). We ENUMERATE the (ability, BuildIndex, unit) set from the reference catalogs
+# rather than hardcoding, so any new add-on Build entry is covered automatically.
+ADDON_ABILS = ["BarracksAddOns", "FactoryAddOns", "StarportAddOns"]
+ADDON_BUILD_TIME = 10.0
+
+
+def addon_build_entries():
+    """(abil id, build index, unit, time) for the Terran add-on CAbilBuild abilities,
+    for every InfoArray that builds a *TechLab / *Reactor / *TechReactor. Later catalogs
+    win on Time (libertystory adds the Build3/Build4 TechReactor entries on top of the base
+    Build1 TechLab / Build2 Reactor)."""
+    entries = {}
+    for _, root in load("AbilData.xml"):
+        for abil in root.iter("CAbilBuild"):
+            aid = abil.get("id")
+            if aid not in ADDON_ABILS:
+                continue
+            for info in abil.findall("InfoArray"):
+                idx = info.get("index")
+                unit_el = info.find("Unit")
+                unit = unit_el.get("value") if unit_el is not None else info.get("Unit")
+                time = info.get("Time")
+                if time is None:
+                    t_el = info.find("Time")
+                    time = t_el.get("value") if t_el is not None else None
+                if idx and unit and (unit.endswith("TechLab") or unit.endswith("Reactor")
+                                     or unit.endswith("TechReactor")):
+                    key = (aid, idx)
+                    prev = entries.get(key)
+                    entries[key] = (unit, float(time) if time else (prev[1] if prev else None))
+    return entries
+
+
 # Vanilla->clone swaps live in static XML index-overrides (UnitData.xml): runtime
 # per-player LINK edits (AbilArray/WeaponArray/LayoutButtons) are silent no-ops —
 # only scalar stat-like fields apply per player (verified in game, see learnings).
@@ -232,6 +269,19 @@ def emit():
                 f'    CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", '
                 f'"InfoArray[{train}].Resource[{res}]", p, "{final}", c_upgradeOperationSet);  '
                 f'// {label}: {res} {cur} -> {final}')
+
+    lines.append("")
+    lines.append("    // --- Terran add-ons build in 10 s (build-time cap on add-on CAbilBuild Time) ---")
+    # InfoArray[BuildN].Time on BarracksAddOns/FactoryAddOns/StarportAddOns — the same verified
+    # per-player nested-scalar class as Train/Research Time (CHECK8-GOOD). Enumerated from the
+    # reference catalogs (Build1=TechLab 25s, Build2=Reactor 50s, Build3/Build4=TechReactor 50s on
+    # ALL THREE add-on abilities — Starport included, which the original analysis missed; the sweep
+    # caught it). 10 s is well under the rule-5 60 s cap. Buildings have no merc/hero variant, so
+    # this is rule-9-safe with no parity mirroring needed.
+    for (aid, idx), (unit, time) in sorted(addon_build_entries().items()):
+        if time == ADDON_BUILD_TIME:
+            continue
+        lines.append(f'    CatalogFieldValueModify(c_gameCatalogAbil, "{aid}", "InfoArray[{idx}].Time", p, "{ADDON_BUILD_TIME}", c_upgradeOperationSet);  // {unit}, was {time}')
 
     lines.append("")
     lines.append("    // --- Per-unit stats (unit-table comments) ---")

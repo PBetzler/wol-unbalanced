@@ -129,10 +129,35 @@ void libWoLU_GrantCampaignTech (int p) {
     libWoLU_EnableCurrentMissionUnits(p);
 
     // Branch units last — the apply pass above may have re-restricted them.
-    if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled)) {
+    // ITEM 2 (v0.3.30): fire when EITHER branch group is enabled (mirror the OR-pattern at
+    // the top of this function). The OLD gate keyed ONLY on the Ghost group == Enabled, but
+    // libCamp_gf_ApplyCampaignTech(p) above runs libCamp_gf_TS_UpdateTechGroupStates(), which
+    // RESETS every TechGroupState to Hidden then re-enables only completed-mission groups — so
+    // in the Spectre-unlocked-but-Ghost-not scenario the Ghost group was reset to Hidden, the
+    // gate was FALSE, and the Ghost was never re-allowed (owner: only Spectre buildable). The
+    // same reset also runs EnableCampaignTechUnit(false, Ghost), which DISABLES the Ghost train
+    // command — so TechTreeUnitAllow alone isn't enough; we must also re-allow the train command
+    // explicitly. Command indices verified against CampaignLib.galaxy:6918/6925 (the campaign's
+    // own EnableCampaignTechUnit map): Ghost = BarracksTrain index 2 (InfoArray Train3),
+    // Spectre = BarracksTrain index 6 (InfoArray Train7). This runs AFTER ApplyCampaignTech, so
+    // it is the last word.
+    if ((libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionGhost] == c_purchaseCategoryStateEnabled)
+        || (libCamp_gv_tS_TechGroupState[libCamp_ge_StoryTechGroup_StoryTechGroupDominionSpectre] == c_purchaseCategoryStateEnabled)) {
         TechTreeUnitAllow(p, "Ghost", true);
         TechTreeUnitAllow(p, "Spectre", true);
+        TechTreeAbilityAllow(p, AbilityCommand("BarracksTrain", 2), true);  // Ghost (Train3)
+        TechTreeAbilityAllow(p, AbilityCommand("BarracksTrain", 6), true);  // Spectre (Train7)
     }
+
+    // ITEM 3b (v0.3.30): Psi Disruptor not buildable — clear the PsiDisruptor SCV-build
+    // command's Restricted state for the human player. The card collision is fixed in
+    // UnitData.xml (3a), and the research pair is already granted by the lab-research loop,
+    // but PsiDisruptor's TerranBuild InfoArray[Build8].Button.State="Restricted" (libertystory)
+    // keeps the command unusable even after the cell is freed (HiveMind's Build22 has State=None
+    // and is unaffected). Command index 7 = Build8 (verified: TerranBuild AbilityCommand index =
+    // numeric BuildN - 1, cross-checked vs CampaignLib.galaxy:723/732 where Factory=Build11→10,
+    // Starport=Build12→11). Player-only via TechTreeAbilityAllow(p, ...) → rule-9-safe.
+    TechTreeAbilityAllow(p, AbilityCommand("TerranBuild", 7), true);  // PsiDisruptor (Build8) — clear Restricted
 
     // Rule 2, strict reading: upgrades exist already in the unit's UNLOCK mission.
     // BuyAllTech is undone by the engine for tech groups the story hasn't introduced
@@ -326,8 +351,7 @@ void libWoLU_DisableArmoryResearch (int p) {
     //                     (the real effect-carrying ids — learnings §"the two-family trap").
     //   * Research16-27 → the 12 WRAPPER Level upgrades
     //                     Terran{Vehicle,Ship}{Weapons,Armors}{UltraCapacitors,VanadiumPlating}Level{1,2,3}
-    //                     (ICON-ONLY display variants — no real +damage/+armor EffectArray; verified
-    //                     against liberty.sc2campaign/UpgradeData.xml — every entry is a Weapon/Actor Icon Set).
+    //                     (icon-only in their OWN body, BUT parent=-chained off the wrapper ROOTs).
     // BOTH families must be GRANTED for ALL 24 buttons to auto-hide. The OLD comment claimed the
     // wrappers "auto-hide once the UltraCapacitors/VanadiumPlating ROOT is complete, which BuyAllTech
     // grants" — that was FALSE: the ROOT is not force-granted and the player starts before-lab
@@ -335,8 +359,18 @@ void libWoLU_DisableArmoryResearch (int p) {
     // stayed satisfied and the last 4 buttons kept showing. The wrapper Level ids exist in
     // liberty.sc2campaign/UpgradeData.xml (parent=-chained off …UltraCapacitors/…VanadiumPlating) and
     // have NO MaxLevel field (single-level → level 1 = max, same as the base Level ids), so granting
-    // level 1 is enough. CRITICAL: because the wrappers carry NO real effect, granting them adds NO
-    // double-damage/-armor — they ONLY satisfy the button's Show requirement so it hides; the real
+    // level 1 is enough.
+    //
+    // ITEM 1b CORRECTION (v0.3.30): the OLD comment ALSO claimed the wrapper Level ids "carry NO real
+    // effect" — that too was FALSE. A wrapper LevelN's OWN body is icon-only, but it INHERITS the
+    // wrapper ROOT's REAL per-unit stat (Weapon Level / Effect Amount / LifeArmor / +5% HP) via
+    // parent= — exactly the same inheritance that makes the base TerranVehicleArmorsLevel1 (icon-only
+    // body) apply +1 armor through parent="TerranVehicleArmors". So granting the wrapper LevelN here
+    // was silently adding a SECOND +3 on top of family A (the base Level ids) — the owner's "+3
+    // over-tuned levels" bug. We KEEP the grant (it is what hides the buttons) but NEUTRALIZE the
+    // wrapper ROOTs in UpgradeData.xml (ITEM 1b: every real stat Value→0, every ×1.05 HP Multiply→1),
+    // so the still-granted wrapper LevelN now inherits a zeroed stat and contributes 0 levels — the
+    // grant's ONLY remaining effect is to satisfy the button's Show requirement so it hides. The real
     // scaling lives on the BASE Level ids (still granted above). This is UNCONDITIONAL (rule 2: armory
     // upgrades auto-unlocked), unlike libWoLU_SyncWeaponArmorLevels which only grants when the matching
     // infantry upgrade is detected. NO double-apply with that sync: all grants are guarded by the SAME
@@ -359,8 +393,11 @@ void libWoLU_DisableArmoryResearch (int p) {
         if (TechTreeUpgradeCount(p, "TerranShipArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
             TechTreeUpgradeAddLevel(p, "TerranShipArmorsLevel" + lvl, 1);
         }
-        // --- the 12 WRAPPER Level upgrades (icon-only; hide Research16-27). Granting these adds NO
-        //     damage/armor — they ONLY satisfy the wrapper buttons' Show requirement so they hide. ---
+        // --- the 12 WRAPPER Level upgrades (hide Research16-27). The wrapper LevelN INHERIT a REAL
+        //     stat from their wrapper ROOT via parent= — which is exactly why we NEUTRALIZE those
+        //     ROOTs in UpgradeData.xml (ITEM 1b: stat→0). With the ROOT zeroed, granting these adds
+        //     NO damage/armor; the grant ONLY satisfies the wrapper buttons' Show requirement so they
+        //     hide. (Do NOT remove this grant — without it the last 4 Armory buttons reappear.) ---
         if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsUltraCapacitorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
             TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsUltraCapacitorsLevel" + lvl, 1);
         }

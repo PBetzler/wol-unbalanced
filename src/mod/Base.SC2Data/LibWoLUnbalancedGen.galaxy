@@ -161,6 +161,20 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train10].Resource[Minerals]", p, "75", c_upgradeOperationSet);  // Death Heads / MercReaper (Reaper -25/-25; no vespene): Minerals 100 -> 75
     CatalogFieldValueModify(c_gameCatalogAbil, "SummonMercenaries", "InfoArray[Train15].Resource[Minerals]", p, "75", c_upgradeOperationSet);  // Senior Ghost / MercSeniorGhost (Ghost -100/-50; no vespene): Minerals 175 -> 75
 
+    // --- Terran add-ons build in 10 s (build-time cap on add-on CAbilBuild Time) ---
+    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksAddOns", "InfoArray[Build1].Time", p, "10.0", c_upgradeOperationSet);  // BarracksTechLab, was 25.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksAddOns", "InfoArray[Build2].Time", p, "10.0", c_upgradeOperationSet);  // BarracksReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksAddOns", "InfoArray[Build3].Time", p, "10.0", c_upgradeOperationSet);  // BarracksTechReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "BarracksAddOns", "InfoArray[Build4].Time", p, "10.0", c_upgradeOperationSet);  // BarracksTechReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "FactoryAddOns", "InfoArray[Build1].Time", p, "10.0", c_upgradeOperationSet);  // FactoryTechLab, was 25.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "FactoryAddOns", "InfoArray[Build2].Time", p, "10.0", c_upgradeOperationSet);  // FactoryReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "FactoryAddOns", "InfoArray[Build3].Time", p, "10.0", c_upgradeOperationSet);  // FactoryTechReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "FactoryAddOns", "InfoArray[Build4].Time", p, "10.0", c_upgradeOperationSet);  // FactoryTechReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportAddOns", "InfoArray[Build1].Time", p, "10.0", c_upgradeOperationSet);  // StarportTechLab, was 25.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportAddOns", "InfoArray[Build2].Time", p, "10.0", c_upgradeOperationSet);  // StarportReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportAddOns", "InfoArray[Build3].Time", p, "10.0", c_upgradeOperationSet);  // StarportTechReactor, was 50.0
+    CatalogFieldValueModify(c_gameCatalogAbil, "StarportAddOns", "InfoArray[Build4].Time", p, "10.0", c_upgradeOperationSet);  // StarportTechReactor, was 50.0
+
     // --- Per-unit stats (unit-table comments) ---
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeMax", p, "2", c_upgradeOperationMultiply);  // Firebat: double HP (100 -> 200)
     CatalogFieldValueModify(c_gameCatalogUnit, "Firebat", "LifeStart", p, "2", c_upgradeOperationMultiply);

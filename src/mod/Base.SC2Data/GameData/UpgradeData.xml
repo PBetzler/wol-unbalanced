@@ -162,143 +162,63 @@
          consistent with that precedent. Flag Viking-ground-damage-scaling for playtest.
          ================================================================================ -->
 
-    <!-- Ship WEAPONS — mirror TerranShipWeaponsUltraCapacitors (base fliers' weapon scaling). -->
-    <CUpgrade id="TerranShipWeaponsLevel1">
-        <EffectArray Reference="Weapon,BacklashRockets,Level" Value="1"/>          <!-- Banshee -->
-        <EffectArray Reference="Effect,BacklashRocketsU,Amount" Value="1"/>
-        <EffectArray Reference="Weapon,ATSLaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-ground -->
-        <EffectArray Reference="Effect,ATSLaserBatteryU,Amount" Value="1.000000"/>
-        <EffectArray Reference="Weapon,ATALaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-air -->
-        <EffectArray Reference="Effect,ATALaserBatteryU,Amount" Value="1.000000"/>
-        <EffectArray Reference="Weapon,LanzerTorpedoes,Level" Value="1"/>          <!-- Viking air mode -->
-        <EffectArray Reference="Effect,LanzerTorpedoesDamage,Amount" Value="1.000000"/>
-        <EffectArray Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="1.000000"/>
-        <EffectArray Reference="Weapon,TwinGatlingCannon,Level" Value="1"/>        <!-- Viking ground mode (see verify note) -->
-        <EffectArray Reference="Effect,TwinGatlingCannons,Amount" Value="1"/>
-    </CUpgrade>
-    <CUpgrade id="TerranShipWeaponsLevel2">
-        <EffectArray Reference="Weapon,BacklashRockets,Level" Value="1"/>          <!-- Banshee -->
-        <EffectArray Reference="Effect,BacklashRocketsU,Amount" Value="1"/>
-        <EffectArray Reference="Weapon,ATSLaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-ground -->
-        <EffectArray Reference="Effect,ATSLaserBatteryU,Amount" Value="1.000000"/>
-        <EffectArray Reference="Weapon,ATALaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-air -->
-        <EffectArray Reference="Effect,ATALaserBatteryU,Amount" Value="1.000000"/>
-        <EffectArray Reference="Weapon,LanzerTorpedoes,Level" Value="1"/>          <!-- Viking air mode -->
-        <EffectArray Reference="Effect,LanzerTorpedoesDamage,Amount" Value="1.000000"/>
-        <EffectArray Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="1.000000"/>
-        <EffectArray Reference="Weapon,TwinGatlingCannon,Level" Value="1"/>        <!-- Viking ground mode (see verify note) -->
-        <EffectArray Reference="Effect,TwinGatlingCannons,Amount" Value="1"/>
-    </CUpgrade>
-    <CUpgrade id="TerranShipWeaponsLevel3">
-        <EffectArray Reference="Weapon,BacklashRockets,Level" Value="1"/>          <!-- Banshee -->
-        <EffectArray Reference="Effect,BacklashRocketsU,Amount" Value="1"/>
-        <EffectArray Reference="Weapon,ATSLaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-ground -->
-        <EffectArray Reference="Effect,ATSLaserBatteryU,Amount" Value="1.000000"/>
-        <EffectArray Reference="Weapon,ATALaserBattery,Level" Value="1"/>          <!-- Battlecruiser anti-air -->
-        <EffectArray Reference="Effect,ATALaserBatteryU,Amount" Value="1.000000"/>
-        <EffectArray Reference="Weapon,LanzerTorpedoes,Level" Value="1"/>          <!-- Viking air mode -->
-        <EffectArray Reference="Effect,LanzerTorpedoesDamage,Amount" Value="1.000000"/>
-        <EffectArray Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="1.000000"/>
-        <EffectArray Reference="Weapon,TwinGatlingCannon,Level" Value="1"/>        <!-- Viking ground mode (see verify note) -->
-        <EffectArray Reference="Effect,TwinGatlingCannons,Amount" Value="1"/>
-    </CUpgrade>
+    <!-- ================================================================================
+         ITEM 1a (v0.3.30): de-duplicate the weapon/armor LEVEL families so every vehicle/
+         ship unit ends up in EXACTLY ONE granted family (= family A, the base
+         Terran{Ship,Vehicle}{Weapons,Armors}LevelN that libWoLU_SyncWeaponArmorLevels
+         grants at infantry-research parity). The owner saw +3 OVER-tuned levels because
+         each unit sat in up to THREE granted families, each +3 at 3/3:
+           A = base LevelN  (real effects via the base ROOTs in liberty.sc2mod +
+               the extra-unit entries in the libertystory LevelN override) — KEEP.
+           C = THESE same-id <CUpgrade> appends (added historically before family A's
+               coverage was understood) — REDUNDANT for base units, so REMOVED below.
+           D = the icon-only WRAPPER LevelN, whose ROOTs we NEUTRALIZE further down.
+         The base-unit ship-weapon / ship-armor / Thor+SiegeTank+Hellion vehicle-armor
+         appends were 100% redundant with family A (verified: the liberty.sc2mod base
+         ROOTs TerranShipWeapons / TerranShipArmors / TerranVehicleArmors already carry
+         every one of those units' real per-level effect — see the audit in the dispatch
+         report), so they are deleted entirely.
 
-    <!-- Ship ARMOR — mirror TerranShipArmorsVanadiumPlating LifeArmor/LifeArmorLevel (NOT the
-         LifeMax/LifeStart ×1.05 perk). Wraith/Hercules/ScienceVessel/DukesRevenge/DuskWing/
-         HelsAngel* already have base ship-armor entries — not duplicated. -->
+         ONLY the elite-merc entries survive — MercThor / MercHellion (vehicle armor) and
+         MercWraith (ship armor) are the SOLE scaling source for those mercs (mercs appear
+         in NO vanilla weapon/armor upgrade ROOT or libertystory LevelN), so removing them
+         would drop the mercs to 0 levels (rule-4 parity violation). These three blocks
+         therefore become MERC-ONLY. (genlib also adds a flat one-time +armor to some of
+         these — additive and independent of this per-level scaling; both stack, no conflict.)
+         ================================================================================ -->
+
+    <!-- Ship ARMOR — MERC-ONLY now: MercWraith (Winged Nightmares) is the sole merc whose
+         ship-armor scaling lives here; base fliers are covered by the family-A base ROOT. -->
     <CUpgrade id="TerranShipArmorsLevel1">
-        <EffectArray Reference="Unit,Banshee,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Banshee,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Battlecruiser,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Battlecruiser,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Medivac,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Medivac,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Raven,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Raven,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,VikingFighter,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,VikingFighter,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,VikingAssault,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,VikingAssault,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercWraith,LifeArmor" Value="1.000000"/>       <!-- rule-4 merc parity (Winged Nightmares) -->
         <EffectArray Reference="Unit,MercWraith,LifeArmorLevel" Value="1"/>
     </CUpgrade>
     <CUpgrade id="TerranShipArmorsLevel2">
-        <EffectArray Reference="Unit,Banshee,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Banshee,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Battlecruiser,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Battlecruiser,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Medivac,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Medivac,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Raven,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Raven,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,VikingFighter,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,VikingFighter,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,VikingAssault,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,VikingAssault,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercWraith,LifeArmor" Value="1.000000"/>       <!-- rule-4 merc parity (Winged Nightmares) -->
         <EffectArray Reference="Unit,MercWraith,LifeArmorLevel" Value="1"/>
     </CUpgrade>
     <CUpgrade id="TerranShipArmorsLevel3">
-        <EffectArray Reference="Unit,Banshee,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Banshee,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Battlecruiser,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Battlecruiser,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Medivac,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Medivac,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Raven,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Raven,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,VikingFighter,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,VikingFighter,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,VikingAssault,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,VikingAssault,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercWraith,LifeArmor" Value="1.000000"/>       <!-- rule-4 merc parity (Winged Nightmares) -->
         <EffectArray Reference="Unit,MercWraith,LifeArmorLevel" Value="1"/>
     </CUpgrade>
 
-    <!-- Vehicle ARMOR — mirror TerranVehicleArmorsVanadiumPlating LifeArmor/LifeArmorLevel (NOT
-         the LifeMax/LifeStart ×1.05 perk). Diamondback/Vulture/Goliath/SpartanCompany/
-         SiegeBreaker*/Odin/Predator already have base vehicle-armor entries — not duplicated.
-         MercThor (parent Thor) / MercHellion (parent Hellion) are SEPARATE unit ids — armor is a
-         Unit field, so it does NOT reach them via parent=; explicit entries added. MercWraith
-         handled in the Ship block above. (genlib also adds a flat one-time +armor to some of
-         these — additive and independent of this per-level scaling; both stack, no conflict.) -->
+    <!-- Vehicle ARMOR — MERC-ONLY now: MercThor (Jotun, parent Thor) + MercHellion (Condor,
+         parent Hellion) are SEPARATE unit ids — armor is a Unit field, so it does NOT reach
+         them via parent=; explicit entries are their only scaling source. Base Thor/
+         SiegeTank/Hellion are covered by the family-A base ROOT (TerranVehicleArmors). -->
     <CUpgrade id="TerranVehicleArmorsLevel1">
-        <EffectArray Reference="Unit,Thor,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Thor,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,SiegeTank,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,SiegeTank,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Hellion,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Hellion,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercThor,LifeArmor" Value="1.000000"/>        <!-- rule-4 merc parity (Jotun) -->
         <EffectArray Reference="Unit,MercThor,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
         <EffectArray Reference="Unit,MercHellion,LifeArmorLevel" Value="1"/>
     </CUpgrade>
     <CUpgrade id="TerranVehicleArmorsLevel2">
-        <EffectArray Reference="Unit,Thor,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Thor,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,SiegeTank,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,SiegeTank,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Hellion,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Hellion,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercThor,LifeArmor" Value="1.000000"/>        <!-- rule-4 merc parity (Jotun) -->
         <EffectArray Reference="Unit,MercThor,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
         <EffectArray Reference="Unit,MercHellion,LifeArmorLevel" Value="1"/>
     </CUpgrade>
     <CUpgrade id="TerranVehicleArmorsLevel3">
-        <EffectArray Reference="Unit,Thor,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Thor,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,SiegeTank,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,SiegeTank,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="1"/>
-        <EffectArray Reference="Unit,Hellion,LifeArmor" Value="1.000000"/>
-        <EffectArray Reference="Unit,Hellion,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercThor,LifeArmor" Value="1.000000"/>        <!-- rule-4 merc parity (Jotun) -->
         <EffectArray Reference="Unit,MercThor,LifeArmorLevel" Value="1"/>
         <EffectArray Reference="Unit,MercHellion,LifeArmor" Value="1.000000"/>     <!-- rule-4 merc parity (Condor) -->
@@ -357,5 +277,249 @@
         <!-- Hel's Angels (Viking merc) → Fighter mode (separate morph id) -->
         <EffectArray Operation="Subtract" Reference="Abil,WreckingCrewFighterMode,InfoArray[0].SectionArray[Actor].DurationArray[Duration]" Value="1.333000"/>  <!-- 2.333 -> 1.0 -->
         <EffectArray Operation="Subtract" Reference="Abil,WreckingCrewFighterMode,InfoArray[0].SectionArray[Stats].DurationArray[Duration]" Value="1.333000"/>  <!-- 2.333 -> 1.0 -->
+    </CUpgrade>
+
+    <!-- ================================================================================
+         ITEM 1b (v0.3.30): NEUTRALIZE the wrapper ROOT upgrades (FAMILY D).
+         libWoLU_DisableArmoryResearch still GRANTS the wrapper LevelN
+         (Terran{Vehicle,Ship}{Weapons,Armors}{UltraCapacitors,VanadiumPlating}LevelN)
+         to the human player so the libertystory Armory buttons (Research16-27)
+         auto-hide (a CAbilResearch button hides once its target upgrade is
+         QueuedOrBetter). Those wrapper LevelN are icon-only in their OWN body BUT
+         INHERIT the wrapper ROOT stat via parent= (so granting them was silently
+         adding a SECOND +3 (weapon/armor levels, +5% HP) on every listed unit on top
+         of family A). We zero the ROOT stat here so the still-granted wrapper LevelN
+         contributes 0 levels: buttons stay hidden, no double-apply. Full-restate-with-
+         explicit-indices (the RegenerativeBioSteel pattern) so no duplicate/fighting
+         entries exist; every real stat (Weapon Level / Effect Amount / AttributeBonus /
+         LifeArmor / LifeArmorLevel / RateMultiplier) -> 0, every Operation="Multiply"
+         LifeMax/LifeStart (x1.05 HP) -> 1 (no-op multiply). These ROOTs have NO icon Set
+         entries (icons live in the LevelN bodies, not the ROOT), so nothing display-only
+         is touched. RULE 9: WoL never grants these wrapper ROOTs (or the wrapper LevelN)
+         to enemies (only our per-player libWoLU_DisableArmoryResearch grants the LevelN
+         to the human), so this global static edit is effectively player-only; enemy
+         vehicles/ships are untouched. -->
+
+    <CUpgrade id="TerranVehicleWeaponsUltraCapacitors">  <!-- 68 entries restated, stat zeroed -->
+        <EffectArray index="0" Reference="Weapon,ThorsHammer,Level" Value="0"/>
+        <EffectArray index="1" Reference="Weapon,JavelinMissileLaunchers,Level" Value="0"/>
+        <EffectArray index="2" Reference="Effect,ThorsHammerDamage,Amount" Value="0"/>
+        <EffectArray index="3" Reference="Effect,JavelinMissileLaunchersDamage,Amount" Value="0"/>
+        <EffectArray index="4" Reference="Weapon,90mmCannons,Level" Value="0"/>
+        <EffectArray index="5" Reference="Effect,90mmCannons,Amount" Value="0"/>
+        <EffectArray index="6" Reference="Effect,90mmCannons,AttributeBonus[Armored]" Value="0"/>
+        <EffectArray index="7" Reference="Weapon,CrucioShockCannon,Level" Value="0"/>
+        <EffectArray index="8" Reference="Effect,CrucioShockCannonBlast,Amount" Value="0"/>
+        <EffectArray index="9" Reference="Effect,CrucioShockCannonDirected,Amount" Value="0"/>
+        <EffectArray index="10" Reference="Effect,CrucioShockCannonDummy,Amount" Value="0"/>
+        <EffectArray index="11" Reference="Effect,CrucioShockCannonFriendlyDamage,Amount" Value="0"/>
+        <EffectArray index="12" Reference="Effect,CrucioShockCannonEnemyDamage,Amount" Value="0"/>
+        <EffectArray index="13" Reference="Effect,InfernalFlameThrower,Amount" Value="0"/>
+        <EffectArray index="14" Reference="Weapon,InfernalFlameThrower,Level" Value="0"/>
+        <EffectArray index="15" Reference="Effect,InfernalFlameThrower,AttributeBonus[Light]" Value="0"/>
+        <EffectArray index="16" Reference="Weapon,Diamondback,Level" Value="0"/>
+        <EffectArray index="17" Reference="Effect,DiamondbackBeam,Amount" Value="0"/>
+        <EffectArray index="18" Reference="Effect,DiamondbackBeam,AttributeBonus[Armored]" Value="0"/>
+        <EffectArray index="19" Reference="Weapon,Vulture,Level" Value="0"/>
+        <EffectArray index="20" Reference="Effect,VultureU,Amount" Value="0"/>
+        <EffectArray index="21" Reference="Weapon,GoliathG,Level" Value="0"/>
+        <EffectArray index="22" Reference="Weapon,GoliathGUpgraded,Level" Value="0"/>
+        <EffectArray index="23" Reference="Effect,GoliathG,Amount" Value="0"/>
+        <EffectArray index="24" Reference="Weapon,GoliathA,Level" Value="0"/>
+        <EffectArray index="25" Reference="Weapon,GoliathAUpgraded,Level" Value="0"/>
+        <EffectArray index="26" Reference="Effect,GoliathAU,Amount" Value="0"/>
+        <EffectArray index="27" Reference="Weapon,SpartanCompanyG,Level" Value="0"/>
+        <EffectArray index="28" Reference="Weapon,SpartanCompanyGUpgraded,Level" Value="0"/>
+        <EffectArray index="29" Reference="Effect,SpartanCompanyG,Amount" Value="0"/>
+        <EffectArray index="30" Reference="Weapon,SpartanCompanyA,Level" Value="0"/>
+        <EffectArray index="31" Reference="Weapon,SpartanCompanyAUpgraded,Level" Value="0"/>
+        <EffectArray index="32" Reference="Effect,SpartanCompanyAU,Amount" Value="0"/>
+        <EffectArray index="33" Reference="Weapon,SiegeBreaker,Level" Value="0"/>
+        <EffectArray index="34" Reference="Effect,SiegeBreakerDamage,Amount" Value="0"/>
+        <EffectArray index="35" Reference="Effect,SiegeBreakerDamage,AttributeBonus[Armored]" Value="0"/>
+        <EffectArray index="36" Reference="Weapon,ArcliteShockCannon,Level" Value="0"/>
+        <EffectArray index="37" Reference="Effect,ArcliteShockCannonBlast,Amount" Value="0"/>
+        <EffectArray index="38" Reference="Effect,ArcliteShockCannonDirected,Amount" Value="0"/>
+        <EffectArray index="39" Reference="Effect,ArcliteShockCannonDummy,Amount" Value="0"/>
+        <EffectArray index="40" Reference="Effect,ArcliteShockCannonFriendlyDamage,Amount" Value="0"/>
+        <EffectArray index="41" Reference="Effect,ArcliteShockCannonEnemyDamage,Amount" Value="0"/>
+        <EffectArray index="42" Reference="Weapon,Odin,Level" Value="0"/>
+        <EffectArray index="43" Reference="Effect,OdinDamage,Amount" Value="0"/>
+        <EffectArray index="44" Reference="Effect,OdinDamage,AttributeBonus[Structure]" Value="0"/>
+        <EffectArray index="45" Reference="Weapon,OdinAntiAir,Level" Value="0"/>
+        <EffectArray index="46" Reference="Effect,OdinAADamage,Amount" Value="0"/>
+        <EffectArray index="47" Reference="Effect,OdinAADamage,AttributeBonus[Armored]" Value="0"/>
+        <EffectArray index="48" Reference="Effect,Predator,Amount" Value="0"/>
+        <EffectArray index="49" Reference="Weapon,Predator,Level" Value="0"/>
+        <EffectArray index="50" Reference="Weapon,ThorsHammer,RateMultiplier" Value="0"/>
+        <EffectArray index="51" Reference="Weapon,JavelinMissileLaunchers,RateMultiplier" Value="0"/>
+        <EffectArray index="52" Reference="Weapon,90mmCannons,RateMultiplier" Value="0"/>
+        <EffectArray index="53" Reference="Weapon,CrucioShockCannon,RateMultiplier" Value="0"/>
+        <EffectArray index="54" Reference="Weapon,InfernalFlameThrower,RateMultiplier" Value="0"/>
+        <EffectArray index="55" Reference="Weapon,Diamondback,RateMultiplier" Value="0"/>
+        <EffectArray index="56" Reference="Weapon,Vulture,RateMultiplier" Value="0"/>
+        <EffectArray index="57" Reference="Weapon,GoliathG,RateMultiplier" Value="0"/>
+        <EffectArray index="58" Reference="Weapon,GoliathA,RateMultiplier" Value="0"/>
+        <EffectArray index="59" Reference="Weapon,GoliathGUpgraded,RateMultiplier" Value="0"/>
+        <EffectArray index="60" Reference="Weapon,GoliathAUpgraded,RateMultiplier" Value="0"/>
+        <EffectArray index="61" Reference="Weapon,SpartanCompanyG,RateMultiplier" Value="0"/>
+        <EffectArray index="62" Reference="Weapon,SpartanCompanyA,RateMultiplier" Value="0"/>
+        <EffectArray index="63" Reference="Weapon,SpartanCompanyGUpgraded,RateMultiplier" Value="0"/>
+        <EffectArray index="64" Reference="Weapon,SpartanCompanyAUpgraded,RateMultiplier" Value="0"/>
+        <EffectArray index="65" Reference="Weapon,SiegeBreaker,RateMultiplier" Value="0"/>
+        <EffectArray index="66" Reference="Weapon,ArcliteShockCannon,RateMultiplier" Value="0"/>
+        <EffectArray index="67" Reference="Weapon,Predator,RateMultiplier" Value="0"/>
+    </CUpgrade>
+    <CUpgrade id="TerranShipWeaponsUltraCapacitors">  <!-- 48 entries restated, stat zeroed -->
+        <EffectArray index="0" Reference="Weapon,BacklashRockets,Level" Value="0"/>
+        <EffectArray index="1" Reference="Effect,BacklashRocketsU,Amount" Value="0"/>
+        <EffectArray index="2" Reference="Weapon,ATSLaserBattery,Level" Value="0"/>
+        <EffectArray index="3" Reference="Effect,ATSLaserBatteryU,Amount" Value="0"/>
+        <EffectArray index="4" Reference="Weapon,ATALaserBattery,Level" Value="0"/>
+        <EffectArray index="5" Reference="Effect,ATALaserBatteryU,Amount" Value="0"/>
+        <EffectArray index="6" Reference="Weapon,LanzerTorpedoes,Level" Value="0"/>
+        <EffectArray index="7" Reference="Weapon,TwinGatlingCannon,Level" Value="0"/>
+        <EffectArray index="8" Reference="Effect,LanzerTorpedoesDamage,Amount" Value="0"/>
+        <EffectArray index="9" Reference="Effect,TwinGatlingCannons,Amount" Value="0"/>
+        <EffectArray index="10" Reference="Effect,LanzerTorpedoesDamage,AttributeBonus[Armored]" Value="0"/>
+        <EffectArray index="11" Reference="Weapon,WraithG,Level" Value="0"/>
+        <EffectArray index="12" Reference="Effect,WraithGU,Amount" Value="0"/>
+        <EffectArray index="13" Reference="Weapon,WraithA,Level" Value="0"/>
+        <EffectArray index="14" Reference="Effect,WraithAU,Amount" Value="0"/>
+        <EffectArray index="15" Reference="Weapon,DuskWingBanshee,Level" Value="0"/>
+        <EffectArray index="16" Reference="Effect,DuskWingBansheeDamage,Amount" Value="0"/>
+        <EffectArray index="17" Reference="Weapon,WreckingCrewAssault,Level" Value="0"/>
+        <EffectArray index="18" Reference="Weapon,WreckingCrewFighter,Level" Value="0"/>
+        <EffectArray index="19" Reference="Effect,WreckingCrewFighterU,Amount" Value="0"/>
+        <EffectArray index="20" Reference="Effect,WreckingCrewAssault,Amount" Value="0"/>
+        <EffectArray index="21" Reference="Effect,WreckingCrewFighterU,AttributeBonus[Armored]" Value="0"/>
+        <EffectArray index="22" Reference="Weapon,DRBattlecruiserA,Level" Value="0"/>
+        <EffectArray index="23" Reference="Weapon,DRCannonsA,Level" Value="0"/>
+        <EffectArray index="24" Reference="Weapon,DRBattlecruiserFakeA,Level" Value="0"/>
+        <EffectArray index="25" Reference="Weapon,DRBattlecruiserG,Level" Value="0"/>
+        <EffectArray index="26" Reference="Weapon,DRCannonsG,Level" Value="0"/>
+        <EffectArray index="27" Reference="Weapon,DRBattlecruiserFakeG,Level" Value="0"/>
+        <EffectArray index="28" Reference="Effect,DRBattlecruiserGU,Amount" Value="0"/>
+        <EffectArray index="29" Reference="Effect,DRCannonsG,Amount" Value="0"/>
+        <EffectArray index="30" Reference="Effect,DRBattlecruiserAU,Amount" Value="0"/>
+        <EffectArray index="31" Reference="Effect,DRCannonsA,Amount" Value="0"/>
+        <EffectArray index="32" Reference="Weapon,BacklashRockets,RateMultiplier" Value="0"/>
+        <EffectArray index="33" Reference="Weapon,ATSLaserBattery,RateMultiplier" Value="0"/>
+        <EffectArray index="34" Reference="Weapon,ATALaserBattery,RateMultiplier" Value="0"/>
+        <EffectArray index="35" Reference="Weapon,LanzerTorpedoes,RateMultiplier" Value="0"/>
+        <EffectArray index="36" Reference="Weapon,TwinGatlingCannon,RateMultiplier" Value="0"/>
+        <EffectArray index="37" Reference="Weapon,WraithG,RateMultiplier" Value="0"/>
+        <EffectArray index="38" Reference="Weapon,WraithA,RateMultiplier" Value="0"/>
+        <EffectArray index="39" Reference="Weapon,DuskWingBanshee,RateMultiplier" Value="0"/>
+        <EffectArray index="40" Reference="Weapon,WreckingCrewAssault,RateMultiplier" Value="0"/>
+        <EffectArray index="41" Reference="Weapon,WreckingCrewFighter,RateMultiplier" Value="0"/>
+        <EffectArray index="42" Reference="Weapon,DRBattlecruiserA,RateMultiplier" Value="0"/>
+        <EffectArray index="43" Reference="Weapon,DRCannonsA,RateMultiplier" Value="0"/>
+        <EffectArray index="44" Reference="Weapon,DRBattlecruiserFakeA,RateMultiplier" Value="0"/>
+        <EffectArray index="45" Reference="Weapon,DRBattlecruiserG,RateMultiplier" Value="0"/>
+        <EffectArray index="46" Reference="Weapon,DRCannonsG,RateMultiplier" Value="0"/>
+        <EffectArray index="47" Reference="Weapon,DRBattlecruiserFakeG,RateMultiplier" Value="0"/>
+    </CUpgrade>
+    <CUpgrade id="TerranVehicleArmorsVanadiumPlating">  <!-- 46 entries restated, stat zeroed -->
+        <EffectArray index="0" Reference="Unit,Thor,LifeArmorLevel" Value="0"/>
+        <EffectArray index="1" Reference="Unit,Thor,LifeArmor" Value="0"/>
+        <EffectArray index="2" Operation="Multiply" Reference="Unit,Thor,LifeMax" Value="1"/>
+        <EffectArray index="3" Operation="Multiply" Reference="Unit,Thor,LifeStart" Value="1"/>
+        <EffectArray index="4" Reference="Unit,SiegeTank,LifeArmorLevel" Value="0"/>
+        <EffectArray index="5" Reference="Unit,SiegeTank,LifeArmor" Value="0"/>
+        <EffectArray index="6" Operation="Multiply" Reference="Unit,SiegeTank,LifeMax" Value="1"/>
+        <EffectArray index="7" Operation="Multiply" Reference="Unit,SiegeTank,LifeStart" Value="1"/>
+        <EffectArray index="8" Reference="Unit,SiegeTankSieged,LifeArmorLevel" Value="0"/>
+        <EffectArray index="9" Reference="Unit,SiegeTankSieged,LifeArmor" Value="0"/>
+        <EffectArray index="10" Operation="Multiply" Reference="Unit,SiegeTankSieged,LifeMax" Value="1"/>
+        <EffectArray index="11" Operation="Multiply" Reference="Unit,SiegeTankSieged,LifeStart" Value="1"/>
+        <EffectArray index="12" Reference="Unit,Diamondback,LifeArmor" Value="0"/>
+        <EffectArray index="13" Reference="Unit,Diamondback,LifeArmorLevel" Value="0"/>
+        <EffectArray index="14" Operation="Multiply" Reference="Unit,Diamondback,LifeMax" Value="1"/>
+        <EffectArray index="15" Operation="Multiply" Reference="Unit,Diamondback,LifeStart" Value="1"/>
+        <EffectArray index="16" Reference="Unit,Hellion,LifeArmor" Value="0"/>
+        <EffectArray index="17" Reference="Unit,Hellion,LifeArmorLevel" Value="0"/>
+        <EffectArray index="18" Operation="Multiply" Reference="Unit,Hellion,LifeMax" Value="1"/>
+        <EffectArray index="19" Operation="Multiply" Reference="Unit,Hellion,LifeStart" Value="1"/>
+        <EffectArray index="20" Reference="Unit,Vulture,LifeArmor" Value="0"/>
+        <EffectArray index="21" Reference="Unit,Vulture,LifeArmorLevel" Value="0"/>
+        <EffectArray index="22" Operation="Multiply" Reference="Unit,Vulture,LifeMax" Value="1"/>
+        <EffectArray index="23" Operation="Multiply" Reference="Unit,Vulture,LifeStart" Value="1"/>
+        <EffectArray index="24" Reference="Unit,Goliath,LifeArmor" Value="0"/>
+        <EffectArray index="25" Reference="Unit,Goliath,LifeArmorLevel" Value="0"/>
+        <EffectArray index="26" Operation="Multiply" Reference="Unit,Goliath,LifeMax" Value="1"/>
+        <EffectArray index="27" Operation="Multiply" Reference="Unit,Goliath,LifeStart" Value="1"/>
+        <EffectArray index="28" Reference="Unit,SpartanCompany,LifeArmor" Value="0"/>
+        <EffectArray index="29" Reference="Unit,SpartanCompany,LifeArmorLevel" Value="0"/>
+        <EffectArray index="30" Operation="Multiply" Reference="Unit,SpartanCompany,LifeMax" Value="1"/>
+        <EffectArray index="31" Operation="Multiply" Reference="Unit,SpartanCompany,LifeStart" Value="1"/>
+        <EffectArray index="32" Reference="Unit,SiegeBreakerSieged,LifeArmor" Value="0"/>
+        <EffectArray index="33" Reference="Unit,SiegeBreakerSieged,LifeArmorLevel" Value="0"/>
+        <EffectArray index="34" Operation="Multiply" Reference="Unit,SiegeBreakerSieged,LifeMax" Value="1"/>
+        <EffectArray index="35" Operation="Multiply" Reference="Unit,SiegeBreakerSieged,LifeStart" Value="1"/>
+        <EffectArray index="36" Reference="Unit,SiegeBreaker,LifeArmor" Value="0"/>
+        <EffectArray index="37" Reference="Unit,SiegeBreaker,LifeArmorLevel" Value="0"/>
+        <EffectArray index="38" Operation="Multiply" Reference="Unit,SiegeBreaker,LifeMax" Value="1"/>
+        <EffectArray index="39" Operation="Multiply" Reference="Unit,SiegeBreaker,LifeStart" Value="1"/>
+        <EffectArray index="40" Reference="Unit,Odin,LifeArmor" Value="0"/>
+        <EffectArray index="41" Reference="Unit,Odin,LifeArmorLevel" Value="0"/>
+        <EffectArray index="42" Reference="Unit,Predator,LifeArmor" Value="0"/>
+        <EffectArray index="43" Reference="Unit,Predator,LifeArmorLevel" Value="0"/>
+        <EffectArray index="44" Operation="Multiply" Reference="Unit,Predator,LifeMax" Value="1"/>
+        <EffectArray index="45" Operation="Multiply" Reference="Unit,Predator,LifeStart" Value="1"/>
+    </CUpgrade>
+    <CUpgrade id="TerranShipArmorsVanadiumPlating">  <!-- 52 entries restated, stat zeroed -->
+        <EffectArray index="0" Reference="Unit,Banshee,LifeArmorLevel" Value="0"/>
+        <EffectArray index="1" Reference="Unit,Banshee,LifeArmor" Value="0"/>
+        <EffectArray index="2" Operation="Multiply" Reference="Unit,Banshee,LifeMax" Value="1"/>
+        <EffectArray index="3" Operation="Multiply" Reference="Unit,Banshee,LifeStart" Value="1"/>
+        <EffectArray index="4" Reference="Unit,Battlecruiser,LifeArmorLevel" Value="0"/>
+        <EffectArray index="5" Reference="Unit,Battlecruiser,LifeArmor" Value="0"/>
+        <EffectArray index="6" Operation="Multiply" Reference="Unit,Battlecruiser,LifeMax" Value="1"/>
+        <EffectArray index="7" Operation="Multiply" Reference="Unit,Battlecruiser,LifeStart" Value="1"/>
+        <EffectArray index="8" Reference="Unit,Medivac,LifeArmorLevel" Value="0"/>
+        <EffectArray index="9" Reference="Unit,Medivac,LifeArmor" Value="0"/>
+        <EffectArray index="10" Operation="Multiply" Reference="Unit,Medivac,LifeMax" Value="1"/>
+        <EffectArray index="11" Operation="Multiply" Reference="Unit,Medivac,LifeStart" Value="1"/>
+        <EffectArray index="12" Reference="Unit,Raven,LifeArmorLevel" Value="0"/>
+        <EffectArray index="13" Reference="Unit,Raven,LifeArmor" Value="0"/>
+        <EffectArray index="14" Operation="Multiply" Reference="Unit,Raven,LifeMax" Value="1"/>
+        <EffectArray index="15" Operation="Multiply" Reference="Unit,Raven,LifeStart" Value="1"/>
+        <EffectArray index="16" Reference="Unit,VikingAssault,LifeArmor" Value="0"/>
+        <EffectArray index="17" Reference="Unit,VikingAssault,LifeArmorLevel" Value="0"/>
+        <EffectArray index="18" Operation="Multiply" Reference="Unit,VikingAssault,LifeMax" Value="1"/>
+        <EffectArray index="19" Operation="Multiply" Reference="Unit,VikingAssault,LifeStart" Value="1"/>
+        <EffectArray index="20" Reference="Unit,VikingFighter,LifeArmor" Value="0"/>
+        <EffectArray index="21" Reference="Unit,VikingFighter,LifeArmorLevel" Value="0"/>
+        <EffectArray index="22" Operation="Multiply" Reference="Unit,VikingFighter,LifeMax" Value="1"/>
+        <EffectArray index="23" Operation="Multiply" Reference="Unit,VikingFighter,LifeStart" Value="1"/>
+        <EffectArray index="24" Reference="Unit,Wraith,LifeArmor" Value="0"/>
+        <EffectArray index="25" Reference="Unit,Wraith,LifeArmorLevel" Value="0"/>
+        <EffectArray index="26" Operation="Multiply" Reference="Unit,Wraith,LifeMax" Value="1"/>
+        <EffectArray index="27" Operation="Multiply" Reference="Unit,Wraith,LifeStart" Value="1"/>
+        <EffectArray index="28" Reference="Unit,Hercules,LifeArmor" Value="0"/>
+        <EffectArray index="29" Reference="Unit,Hercules,LifeArmorLevel" Value="0"/>
+        <EffectArray index="30" Operation="Multiply" Reference="Unit,Hercules,LifeMax" Value="1"/>
+        <EffectArray index="31" Operation="Multiply" Reference="Unit,Hercules,LifeStart" Value="1"/>
+        <EffectArray index="32" Reference="Unit,DukesRevenge,LifeArmor" Value="0"/>
+        <EffectArray index="33" Reference="Unit,DukesRevenge,LifeArmorLevel" Value="0"/>
+        <EffectArray index="34" Operation="Multiply" Reference="Unit,DukesRevenge,LifeMax" Value="1"/>
+        <EffectArray index="35" Operation="Multiply" Reference="Unit,DukesRevenge,LifeStart" Value="1"/>
+        <EffectArray index="36" Reference="Unit,DuskWing,LifeArmor" Value="0"/>
+        <EffectArray index="37" Reference="Unit,DuskWing,LifeArmorLevel" Value="0"/>
+        <EffectArray index="38" Operation="Multiply" Reference="Unit,DuskWing,LifeMax" Value="1"/>
+        <EffectArray index="39" Operation="Multiply" Reference="Unit,DuskWing,LifeStart" Value="1"/>
+        <EffectArray index="40" Reference="Unit,ScienceVessel,LifeArmor" Value="0"/>
+        <EffectArray index="41" Reference="Unit,ScienceVessel,LifeArmorLevel" Value="0"/>
+        <EffectArray index="42" Operation="Multiply" Reference="Unit,ScienceVessel,LifeMax" Value="1"/>
+        <EffectArray index="43" Operation="Multiply" Reference="Unit,ScienceVessel,LifeStart" Value="1"/>
+        <EffectArray index="44" Reference="Unit,HelsAngelAssault,LifeArmor" Value="0"/>
+        <EffectArray index="45" Reference="Unit,HelsAngelAssault,LifeArmorLevel" Value="0"/>
+        <EffectArray index="46" Operation="Multiply" Reference="Unit,HelsAngelAssault,LifeMax" Value="1"/>
+        <EffectArray index="47" Operation="Multiply" Reference="Unit,HelsAngelAssault,LifeStart" Value="1"/>
+        <EffectArray index="48" Reference="Unit,HelsAngelFighter,LifeArmor" Value="0"/>
+        <EffectArray index="49" Reference="Unit,HelsAngelFighter,LifeArmorLevel" Value="0"/>
+        <EffectArray index="50" Operation="Multiply" Reference="Unit,HelsAngelFighter,LifeMax" Value="1"/>
+        <EffectArray index="51" Operation="Multiply" Reference="Unit,HelsAngelFighter,LifeStart" Value="1"/>
     </CUpgrade>
 </Catalog>

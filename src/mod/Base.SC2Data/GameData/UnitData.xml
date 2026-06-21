@@ -425,6 +425,29 @@
         </CardLayouts>
     </CUnit>
 
+    <!-- ITEM 3a (v0.3.30): Psi Disruptor not buildable — same either/or card-collision class
+         as Barracks/Starport above, but on the SCV's BUILD sub-card. In libertystory the SCV
+         TBl1 sub-card appends BOTH HiveMindEmulator (TerranBuild,Build22) AND PsiDisruptor
+         (TerranBuild,Build8) at Row 2 Column 3 — only the lower-stream button (HiveMind)
+         renders, so the owner saw only the Hive Mind Emulator buildable. Move the PsiDisruptor
+         button to the free cell R1C3 (the merged TBl1 card occupies R1 only at C0/C1/C2).
+
+         INDEX RESOLUTION (merge-aware; the TBl1 sub-card is built ENTIRELY from index-less
+         appends across base→story, so the effective index = stream position): base liberty.sc2mod
+         contributes 9 buttons (0-8), then libertystory appends 7 (9-15): CommandCenterOrbRelay=9,
+         AutomatedRefinery=10, SupplyDepotDrop=11, PerditionTurret=12, HiveMindEmulator=13,
+         PsiDisruptor=14, BunkerFortified=15. So PsiDisruptor is merged index 14. The override
+         targets CardLayouts index="1" (the SCV's CardLayouts ordering is 0=main, 1=TBl1, 2=TBl2 —
+         libertystory targets them by that explicit index), overriding ONLY Row/Column so the
+         inherited AbilCmd/Face/Type survive by field-merge (the one-field-override technique).
+         Rule-9-safe: command cards are player-UI-only (enemies render no card); the build tech is
+         already granted. The Build8 Restricted state is cleared in libWoLU_GrantCampaignTech (3b). -->
+    <CUnit id="SCV">
+        <CardLayouts index="1" CardId="TBl1">
+            <LayoutButtons index="14" Row="1" Column="3"/>
+        </CardLayouts>
+    </CUnit>
+
     <!-- AP Medic kit: Restoration (ally debuff-cleanse) + Optical Flare (enemy blind).
          Appended (enemy-invisible cards). Medic vanilla AbilArray 4 / LayoutButtons 9 →
          appends 4,5 / 9,10; free card cells R2C3, R2C4. -->

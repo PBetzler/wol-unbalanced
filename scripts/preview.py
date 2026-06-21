@@ -143,8 +143,13 @@ def classify(kind, field):
         # ability energy cost — nested scalar Cost[0].Vital[Energy].
         if re.match(r"Cost\[\d+\]\.Vital\[", f):
             return GOOD, ""
-        # InfoArray[Train*/Research*].{Time, Charge.*, Cooldown.*} — nested scalars, apply.
-        if re.match(r"InfoArray\[(Train|Research)\w*\]\.(Time|Charge\.\w+|Cooldown\.\w+)$", f):
+        # InfoArray[Train*/Research*/Build*].{Time, Charge.*, Cooldown.*} — nested scalars, apply.
+        # Build* covers add-on build times (BarracksAddOns/FactoryAddOns/StarportAddOns
+        # InfoArray[BuildN].Time): the Time attr on a Build-indexed InfoArray entry is the SAME
+        # nested-scalar shape as Train/Research (an attr on the InfoArray element), so it IS
+        # per-player editable — the verified nested-scalar class (same as the merc-calldown
+        # InfoArray[Train].Resource[*] and EngineeringBayResearch InfoArray[Research].Time edits).
+        if re.match(r"InfoArray\[(Train|Research|Build)\w*\]\.(Time|Charge\.\w+|Cooldown\.\w+)$", f):
             return GOOD, ""
         # InfoArray[Train*].Resource[Minerals|Vespene] — the calldown's summon COST: an indexed
         # SCALAR nested under the InfoArray entry (same applies-per-player class as the unit's
