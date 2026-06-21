@@ -232,11 +232,13 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // once the owner confirms it in game (the "clean the markers up afterwards" rule).
     // aura     = WoLUSVHealAuraHeal life Change (expect 15 — the SV passive heal-aura per-tick HP;
     //            reads our clone straight from the LIVE catalog, so empty = the loaded build lacks it)
-    // ravmode  = literal "script" — the Raven point-defense is now the galaxy interceptor
-    //            (libWoLU_OnInterceptMissiles), NOT a static weapon (v0.3.25). The old raven=/ravturret=
-    //            catalog reads are gone (the Raven WeaponArray entry was removed).
-    // Healthy on v0.3.25: aura=15  ravmode=script.
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player) + " ravmode=script"));
+    // ravmode  = literal "ability" — the Raven point-defense now ORDERS the Raven to cast the
+    //            WoLURavenPDNullify ABILITY (= vanilla PointDefenseLaserDamage → engine nullify +
+    //            vanilla blue laser beam) via libWoLU_OnInterceptMissiles, NOT a raw UnitRemove and
+    //            NOT a static weapon. (Previous values: "script" = the old silent UnitRemove
+    //            interceptor; the older raven=/ravturret= catalog reads are gone.)
+    // Healthy: aura=15  ravmode=ability.
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player) + " ravmode=ability"));
     return true;
 }
 
@@ -503,18 +505,29 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
     return true;
 }
 
-// Raven SCRIPT point-defense (v0.3.25 — replaces the static PointDefenseLaserWoLU weapon, which
-// never auto-fired). For each of the player's living Ravens, find enemy missiles within radius 8
-// and remove them — a scripted "nullify nearby enemy missiles" that needs no weapon/turret on the
-// unit. Player-only (rule 9): only the human player's Ravens are enumerated; enemy missiles aimed
-// at OTHER targets that merely pass within 8 of a player Raven are also nullified, which is the
-// intended point-defense behavior (it protects the Raven's vicinity). Runs on a tight 0.25 s tick
-// (missiles are fast). Filter semantics (verified against the moebius reference
-// Lib2ECD74F3_gf_SingleTarget, which puts c_targetFilterMissile in param 3 to EXCLUDE missiles —
-// we do the logical inverse): UnitFilter(require-low, require-high, exclude-low, exclude-high) →
-// param 1 REQUIRES Missile (so ONLY missiles match), param 4 EXCLUDES Dead. c_targetFilterMissile
-// is a low-word filter (no -32 offset); c_targetFilterDead is high-word (uses -32). Do NOT put
-// Missile in the exclude params or it would drop exactly what we want.
+// Raven SCRIPT point-defense (replaces the static PointDefenseLaserWoLU weapon, which never
+// auto-fired). For each of the player's living Ravens, find enemy missiles within radius 8 and ORDER
+// the Raven to cast WoLURavenPDNullify (AbilData) at each one. That ability's <Effect> is the VANILLA
+// PointDefenseLaserDamage (CEffectModifyUnit, Hide + NullifyMissile, NO caster-identity validator), so
+// the engine nullifies the missile AND the vanilla blue laser beam (CActorBeamSimple
+// PointDefenseDroneAttackBeam, On Effect.PointDefenseLaserDamage.Start; At Caster, HostLaunch=
+// _Selectable→HostImpact=_Missile) draws from the Raven to the missile — matching the Point Defense
+// Drone exactly (the old UnitRemove was a SILENT nullify with no visual). Player-only (rule 9): only
+// the human player's Ravens are enumerated/ordered; enemy missiles aimed at OTHER targets that merely
+// pass within 8 of a player Raven are also intercepted, which is the intended point-defense behavior
+// (it protects the Raven's vicinity). Runs on a tight 0.25 s tick (missiles are fast).
+// Multi-missile per tick: each found missile gets its OWN queued cast via c_orderQueueAddToEnd (NOT
+// Replace, which would overwrite the previous order) so a salvo is intercepted one-per-queued-cast
+// (the ability is instant / 0-cost / 0-cooldown, so the queue drains immediately).
+// Filter semantics: UnitFilter(require-low, require-high, exclude-low, exclude-high). param 1 REQUIREs
+// Missile + Visible (so ONLY visible missiles match — don't order casts at un-targetable missiles);
+// param 4 EXCLUDEs Dead + Hidden (already-spent / unrevealed). Word confirmed against the moebius
+// reference (Lib2ECD74F3.galaxy): c_targetFilterMissile + c_targetFilterVisible are LOW-word (no -32);
+// c_targetFilterDead + c_targetFilterHidden are HIGH-word (use -32). Stasis/Invulnerable are OMITTED
+// here: their c_targetFilter* WORD (low vs high) is not present anywhere in the reference dump to
+// verify, and a wrong word would silently filter the wrong bit — Dead/Hidden cover the real cases
+// (a stasised/invulnerable missile is not a normal scenario for enemy missiles). Do NOT put Missile in
+// an exclude param or it would drop exactly what we want.
 bool libWoLU_OnInterceptMissiles (bool testConds, bool runActions) {
     unitgroup ravens;
     unit r;
@@ -531,15 +544,18 @@ bool libWoLU_OnInterceptMissiles (bool testConds, bool runActions) {
     for ( ; i >= 1; i -= 1 ) {
         r = UnitGroupUnitFromEnd(ravens, i);
         if (r != null) {
-            // Enemy missiles within radius 8 of this Raven. REQUIRE Missile (param 1), EXCLUDE Dead
-            // (param 4). UnitGroupAlliance(player, c_unitAllianceEnemy, ...) returns only enemy-owned
-            // entities, so player/ally missiles are never nullified.
-            missiles = UnitGroupAlliance(libWoLU_Player, c_unitAllianceEnemy, RegionCircle(UnitGetPosition(r), 8.0), UnitFilter((1 << c_targetFilterMissile), 0, 0, (1 << (c_targetFilterDead - 32))), 0);
+            // Enemy VISIBLE missiles within radius 8 of this Raven. REQUIRE Missile + Visible (param 1),
+            // EXCLUDE Dead + Hidden (param 4). UnitGroupAlliance(player, c_unitAllianceEnemy, ...) returns
+            // only enemy-owned entities, so player/ally missiles are never targeted.
+            missiles = UnitGroupAlliance(libWoLU_Player, c_unitAllianceEnemy, RegionCircle(UnitGetPosition(r), 8.0), UnitFilter((1 << c_targetFilterMissile) | (1 << c_targetFilterVisible), 0, 0, (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
             j = UnitGroupCount(missiles, c_unitCountAll);
             for ( ; j >= 1; j -= 1 ) {
                 m = UnitGroupUnitFromEnd(missiles, j);
                 if (m != null) {
-                    UnitRemove(m); // silent removal (UnitKill would play a death effect)
+                    // Order the Raven (caster r) to cast the vanilla PD nullify at the missile (m).
+                    // Command index 0 = Execute; the beam draws Raven->missile. AddToEnd queues each
+                    // missile's cast so multiple-per-tick don't overwrite each other.
+                    UnitIssueOrder(r, OrderTargetingUnit(AbilityCommand("WoLURavenPDNullify", 0), m), c_orderQueueAddToEnd);
                 }
             }
         }

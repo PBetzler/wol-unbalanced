@@ -476,6 +476,43 @@
         <AINotifyEffect value="IrradiateSet"/>
     </CAbilEffectTarget>
 
+    <!-- Raven SELF point-defense — SCRIPT-DRIVEN missile nullify that draws the REAL vanilla
+         Point-Defense-Drone laser beam (owner request: match the drone exactly, not a silent
+         removal). The galaxy interceptor (libWoLU_OnInterceptMissiles) orders the player's Ravens
+         to cast this ability at nearby enemy missiles via command index 0 = Execute.
+         WHY this works / WHY no clone of the effect: <Effect> points STRAIGHT at the VANILLA
+         PointDefenseLaserDamage (a CEffectModifyUnit with ModifyFlags Hide=1 + NullifyMissile=1) —
+         we do NOT clone it. That effect carries NO ValidatorArray (no caster-identity gate — the
+         "caster IS a Point Defense Drone" check lives only on the PointDefenseLaser SETs, which we
+         bypass entirely), so a Raven applying it to a missile nullifies the missile AND triggers the
+         vanilla beam: CActorBeamSimple PointDefenseDroneAttackBeam fires On
+         Effect.PointDefenseLaserDamage.Start; At Caster with HostLaunch=_Selectable (the caster Raven)
+         → HostImpact=_Missile, so the blue laser draws Raven→missile automatically, no new actor
+         needed. (The vanilla LAUNCH SOUND PointDefenseDroneAttackLaunchSound hosts on Subject=
+         "PointDefenseDrone" so it stays SILENT from a Raven — acceptable; the beam is the main visual.)
+         Per learnings §"no <Effect> defaults to own id": set <Effect index="0"> EXPLICITLY or the link
+         re-defaults to a nonexistent WoLURavenPDNullify effect.
+         Instant (PrepTime/FinishTime 0), no energy cost (empty <Cost>), no cooldown — fire-and-forget.
+         NOT an autocast (no AutoCast flags) — it is ordered ONLY by the script (keeps it out of CHECK9's
+         autocast intent spec). TargetFilters = enemy MISSILE only, matching the drone's effective filter
+         (require Missile+Visible before the ';', exclude Self/Player/Ally/Neutral/Stasis/Dead/Hidden/
+         Invulnerable after). Fresh ability (no parent=), so a bare value= is a clean replace — no
+         inherited slot-0 AND trap. Button gated WoLUHaveFlag for tidiness (it never appears on a card —
+         nothing surfaces it; it exists only to satisfy the command structure, ordered via index 0).
+         RULE 9: a static AbilArray add is global, so enemy Ravens also CARRY the ability, but the
+         script orders ONLY the human player's Ravens to cast it, and the button is flag-gated — so in
+         EFFECT only the player's Ravens nullify, and enemies are never ordered to. -->
+    <CAbilEffectTarget id="WoLURavenPDNullify">
+        <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
+        <Effect index="0" value="PointDefenseLaserDamage"/>
+        <Range value="8"/>
+        <PrepTime value="0"/>
+        <FinishTime value="0"/>
+        <Cost></Cost>
+        <TargetFilters value="Missile,Visible;Self,Player,Ally,Neutral,Stasis,Dead,Hidden,Invulnerable"/>
+        <CmdButtonArray index="Execute" DefaultButtonFace="PointDefenseDrone" Requirements="WoLUHaveFlag"/>
+    </CAbilEffectTarget>
+
     <!-- ============================================================================
          Command Center OP economy (user request): free, unlimited Calldown: MULE +
          Extra Supplies on the player's Command Center. Clones of the vanilla Orbital
