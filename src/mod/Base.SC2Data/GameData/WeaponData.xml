@@ -113,4 +113,17 @@
          static-weapon approach never auto-fired in game; replaced by the galaxy missile interceptor
          libWoLU_OnInterceptMissiles. Its whole effect/validator cluster was deleted too — see
          EffectData.xml / ValidatorData.xml / UnitData.xml.) -->
+
+    <!-- DukesRevenge (Jackson's Revenge) long-range cannons: bump Range 6→8 to match the Loki's
+         ArmageddonCannons (Range 8). DRCannonsG/DRCannonsA are DukesRevenge-EXCLUSIVE weapon ids
+         (no other unit links them — the vanilla BC fires ATSLaserBattery/ATALaserBattery), so a
+         same-id override is player-only (rule 9). Partial override = only Range changes; the
+         inherited MinimumRange=2 and all other fields merge through untouched. The short-range
+         DRBattlecruiserG/A (Range 2) + the fake/equipment display weapons are deliberately left alone. -->
+    <CWeaponLegacy id="DRCannonsG">
+        <Range value="8"/>
+    </CWeaponLegacy>
+    <CWeaponLegacy id="DRCannonsA">
+        <Range value="8"/>
+    </CWeaponLegacy>
 </Catalog>

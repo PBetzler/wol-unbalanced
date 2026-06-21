@@ -22,6 +22,29 @@
         <HostSiteOps Ops="SOpTargetPoint"/>
     </CActorModel>
 
+    <!-- Science Vessel auto-heal AURA visual (v0.3.25+): the WoLUSVHealAura behavior heals all
+         nearby friendlies +15 Life every 1 s (BehaviorData.xml → WoLUSVHealAuraSearch area enum →
+         WoLUSVHealAuraHeal CEffectModifyUnit, EffectData.xml), but the heal was INVISIBLE. This
+         plays a one-shot green heal glow over each healed unit on every WoLUSVHealAuraHeal tick.
+         REUSES the engine-loaded vanilla heal model token MedicHealModel (proven loaded — vanilla
+         Medivac/Medic/Bones/RaynorHealPack actors all use <Model value="MedicHealModel"/>; NO
+         hand-typed .m3). Precedent = vanilla RaynorHealPackModel (CActorModel
+         parent="ModelAnimationStyleOneShot", same Model + Effect.<id>.Start + Host _Unit +
+         SOpAttachOverhead, self-destructs when the one-shot anim ends —
+         mods/_reference/liberty.sc2campaign/ActorData.xml:9468). WoLUSVHealAuraHeal is an INSTANT
+         CEffectModifyUnit fired once per tick per target, so we bind to its .Start (not the
+         persistent .Start/.Stop channeled form) and let the one-shot auto-destroy. Host Subject=
+         "_Unit" = the searched friendly (the effect's target = the HEALED unit), so the pulse shows
+         over each healed unit. Player-only: WoLUSVHealAura is attached ONLY to the human player's
+         Science Vessels via libWoLU_AddBehaviorToType, so this effect (and its visual) never fires
+         on an enemy → the pulse never appears on enemy units. -->
+    <CActorModel id="WoLUSVHealAuraPulse" parent="ModelAnimationStyleOneShot">
+        <On Terms="Effect.WoLUSVHealAuraHeal.Start" Send="Create"/>
+        <Model value="MedicHealModel"/>
+        <Host Subject="_Unit"/>
+        <HostSiteOps Ops="SOpAttachOverhead"/>
+    </CActorModel>
+
     <!-- Actors for the extra elite mercs. A unit actor MUST inherit GenericUnitBase and
          declare unitName= (that's what creates the model on birth + drives weapon/attack
          visuals) — a bare <Model>-only actor renders a sphere with no attack (the v0.2.0

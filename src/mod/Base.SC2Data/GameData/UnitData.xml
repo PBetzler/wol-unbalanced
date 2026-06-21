@@ -285,8 +285,21 @@
          three buttons to them (player-exclusive hero → rule-9 safe). The attack-side buffs
          (fire-while-moving + ignore-armor, applied per-player in genlib on the DR weapons/
          effects) weren't visible — add a "fire while moving" passive display so the attack
-         upgrades show alongside the movement/armor boosts the user already saw. -->
+         upgrades show alongside the movement/armor boosts the user already saw.
+         LOKI-STAT BUMP (merc-only): the BASE stats below are raised to the Loki's
+         (LifeMax 700→1500, LifeArmor 3→4, EnergyMax 200→500, Speed 1.4062→3; LifeStart/
+         EnergyStart set to full so it spawns topped-off). DukesRevenge is a player-exclusive
+         standalone unit (no parent=, never in any WoL map, only summoned via the Merc Compound),
+         so direct stat edits here never reach the vanilla Battlecruiser or any enemy (rule 9).
+         genlib's per-player premium STILL applies on top (LifeArmor +2 → 6, Speed ×1.25 → 3.75);
+         LifeMax/EnergyMax have no genlib multiplier → land exactly at 1500/500. -->
     <CUnit id="DukesRevenge">
+        <LifeMax value="1500"/>
+        <LifeStart value="1500"/>
+        <LifeArmor value="4"/>
+        <EnergyMax value="500"/>
+        <EnergyStart value="500"/>
+        <Speed value="3"/>
         <AbilArray index="6" Link="DukesRevengeYamatoWoLU"/>
         <AbilArray index="7" Link="DukesRevengeMissilePodsWoLU"/>
         <AbilArray index="8" Link="DukesRevengeDefensiveMatrixWoLU"/>
