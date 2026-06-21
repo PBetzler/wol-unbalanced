@@ -227,7 +227,7 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     libWoLU_GrantCampaignTech(libWoLU_Player);
     // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
     // 10 s one is the canary you'll actually see after skipping the intro).
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced v__WOLU_VERSION__: data applied, upgrades & mercs granted."));
+    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced v__WOLU_VERSION__ (build __WOLU_BUILD__): data applied, upgrades & mercs granted."));
     // OPEN-POINTS diagnostic — keep ONLY the issues under active debug; REMOVE each marker
     // once the owner confirms it in game (the "clean the markers up afterwards" rule).
     // aura     = WoLUSVHealAuraHeal life Change (expect 15 — the SV passive heal-aura per-tick HP;
@@ -311,21 +311,32 @@ void libWoLU_DisableArmoryResearch (int p) {
     // a CAbilResearch button auto-HIDES natively once its target upgrade is QueuedOrBetter (the
     // button's Show requirement checks CountUpgrade[<upgrade>, QueuedOrBetter] == 0). So we GRANT
     // every vehicle/ship weapon+armor Level upgrade to the player UNCONDITIONALLY → the Armory's
-    // 12 base researches (Research3-14 = VehicleArmor1-3 / VehicleWeapons1-3 / ShipArmor1-3 /
-    // ShipWeapons1-3) all auto-hide. The wrapper researches (Research16-27,
-    // UltraCapacitors/VanadiumPlating variants) auto-hide once their UltraCapacitors/VanadiumPlating
-    // ROOT is complete, which BuyAllTech already grants. This is UNCONDITIONAL (rule 2: armory
-    // upgrades auto-unlocked), unlike libWoLU_SyncWeaponArmorLevels which only grants when the
-    // matching infantry upgrade is detected. NO double-apply with that sync: both are guarded by the
-    // SAME idempotent TechTreeUpgradeCount(... CompleteOnly) == 0 check, so a level is added only
-    // when count is 0 — whichever runs first wins, the other no-ops. These ids are the real
-    // effect-carrying BASE Level upgrades (learnings §"the two-family trap"); do NOT grant the
-    // icon-only UltraCapacitors/VanadiumPlating vehicle/ship wrappers. Each is a single-level upgrade
-    // (no MaxLevel field → MaxLevel 1), so level 1 IS max. Player-only via TechTreeUpgradeAddLevel(p,
+    // researches auto-hide. ArmoryResearch has TWO families of Level researches:
+    //   * Research3-14  → the 12 BASE Level upgrades Terran{Vehicle,Ship}{Weapons,Armors}Level{1,2,3}
+    //                     (the real effect-carrying ids — learnings §"the two-family trap").
+    //   * Research16-27 → the 12 WRAPPER Level upgrades
+    //                     Terran{Vehicle,Ship}{Weapons,Armors}{UltraCapacitors,VanadiumPlating}Level{1,2,3}
+    //                     (ICON-ONLY display variants — no real +damage/+armor EffectArray; verified
+    //                     against liberty.sc2campaign/UpgradeData.xml — every entry is a Weapon/Actor Icon Set).
+    // BOTH families must be GRANTED for ALL 24 buttons to auto-hide. The OLD comment claimed the
+    // wrappers "auto-hide once the UltraCapacitors/VanadiumPlating ROOT is complete, which BuyAllTech
+    // grants" — that was FALSE: the ROOT is not force-granted and the player starts before-lab
+    // (learnings §lab-state), so the wrapper-Level Show requirements (CountUpgrade[<wrapper>] == 0)
+    // stayed satisfied and the last 4 buttons kept showing. The wrapper Level ids exist in
+    // liberty.sc2campaign/UpgradeData.xml (parent=-chained off …UltraCapacitors/…VanadiumPlating) and
+    // have NO MaxLevel field (single-level → level 1 = max, same as the base Level ids), so granting
+    // level 1 is enough. CRITICAL: because the wrappers carry NO real effect, granting them adds NO
+    // double-damage/-armor — they ONLY satisfy the button's Show requirement so it hides; the real
+    // scaling lives on the BASE Level ids (still granted above). This is UNCONDITIONAL (rule 2: armory
+    // upgrades auto-unlocked), unlike libWoLU_SyncWeaponArmorLevels which only grants when the matching
+    // infantry upgrade is detected. NO double-apply with that sync: all grants are guarded by the SAME
+    // idempotent TechTreeUpgradeCount(... CompleteOnly) == 0 check, so a level is added only when count
+    // is 0 — whichever runs first wins, the other no-ops. Player-only via TechTreeUpgradeAddLevel(p,
     // ...) → no enemy reach (rule 9).
     n = 1;
     while (n <= 3) {
         lvl = IntToString(n);
+        // --- the 12 BASE Level upgrades (real effects; hide Research3-14) ---
         if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsLevel" + lvl, c_techCountCompleteOnly) == 0) {
             TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsLevel" + lvl, 1);
         }
@@ -337,6 +348,20 @@ void libWoLU_DisableArmoryResearch (int p) {
         }
         if (TechTreeUpgradeCount(p, "TerranShipArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
             TechTreeUpgradeAddLevel(p, "TerranShipArmorsLevel" + lvl, 1);
+        }
+        // --- the 12 WRAPPER Level upgrades (icon-only; hide Research16-27). Granting these adds NO
+        //     damage/armor — they ONLY satisfy the wrapper buttons' Show requirement so they hide. ---
+        if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsUltraCapacitorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
+            TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsUltraCapacitorsLevel" + lvl, 1);
+        }
+        if (TechTreeUpgradeCount(p, "TerranShipWeaponsUltraCapacitorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
+            TechTreeUpgradeAddLevel(p, "TerranShipWeaponsUltraCapacitorsLevel" + lvl, 1);
+        }
+        if (TechTreeUpgradeCount(p, "TerranVehicleArmorsVanadiumPlatingLevel" + lvl, c_techCountCompleteOnly) == 0) {
+            TechTreeUpgradeAddLevel(p, "TerranVehicleArmorsVanadiumPlatingLevel" + lvl, 1);
+        }
+        if (TechTreeUpgradeCount(p, "TerranShipArmorsVanadiumPlatingLevel" + lvl, c_techCountCompleteOnly) == 0) {
+            TechTreeUpgradeAddLevel(p, "TerranShipArmorsVanadiumPlatingLevel" + lvl, 1);
         }
         n = n + 1;
     }
@@ -506,7 +531,7 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
 }
 
 // Raven SCRIPT point-defense (replaces the static PointDefenseLaserWoLU weapon, which never
-// auto-fired). For each of the player's living Ravens, find enemy missiles within radius 8 and ORDER
+// auto-fired). For each of the player's living Ravens, find enemy missiles within radius 16 and ORDER
 // the Raven to cast WoLURavenPDNullify (AbilData) at each one. That ability's <Effect> is the VANILLA
 // PointDefenseLaserDamage (CEffectModifyUnit, Hide + NullifyMissile, NO caster-identity validator), so
 // the engine nullifies the missile AND the vanilla blue laser beam (CActorBeamSimple
@@ -514,8 +539,8 @@ bool libWoLU_OnPeriodic (bool testConds, bool runActions) {
 // _Selectable→HostImpact=_Missile) draws from the Raven to the missile — matching the Point Defense
 // Drone exactly (the old UnitRemove was a SILENT nullify with no visual). Player-only (rule 9): only
 // the human player's Ravens are enumerated/ordered; enemy missiles aimed at OTHER targets that merely
-// pass within 8 of a player Raven are also intercepted, which is the intended point-defense behavior
-// (it protects the Raven's vicinity). Runs on a tight 0.25 s tick (missiles are fast).
+// pass within 16 of a player Raven are also intercepted, which is the intended point-defense behavior
+// (it protects the Raven's vicinity). Runs on a tight 0.0625 s tick (~16x/s — missiles are fast).
 // Multi-missile per tick: each found missile gets its OWN queued cast via c_orderQueueAddToEnd (NOT
 // Replace, which would overwrite the previous order) so a salvo is intercepted one-per-queued-cast
 // (the ability is instant / 0-cost / 0-cooldown, so the queue drains immediately).
@@ -544,10 +569,10 @@ bool libWoLU_OnInterceptMissiles (bool testConds, bool runActions) {
     for ( ; i >= 1; i -= 1 ) {
         r = UnitGroupUnitFromEnd(ravens, i);
         if (r != null) {
-            // Enemy VISIBLE missiles within radius 8 of this Raven. REQUIRE Missile + Visible (param 1),
+            // Enemy VISIBLE missiles within radius 16 of this Raven. REQUIRE Missile + Visible (param 1),
             // EXCLUDE Dead + Hidden (param 4). UnitGroupAlliance(player, c_unitAllianceEnemy, ...) returns
             // only enemy-owned entities, so player/ally missiles are never targeted.
-            missiles = UnitGroupAlliance(libWoLU_Player, c_unitAllianceEnemy, RegionCircle(UnitGetPosition(r), 8.0), UnitFilter((1 << c_targetFilterMissile) | (1 << c_targetFilterVisible), 0, 0, (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
+            missiles = UnitGroupAlliance(libWoLU_Player, c_unitAllianceEnemy, RegionCircle(UnitGetPosition(r), 16.0), UnitFilter((1 << c_targetFilterMissile) | (1 << c_targetFilterVisible), 0, 0, (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0);
             j = UnitGroupCount(missiles, c_unitCountAll);
             for ( ; j >= 1; j -= 1 ) {
                 m = UnitGroupUnitFromEnd(missiles, j);
@@ -859,9 +884,9 @@ void libWoLU_InitLib () {
     // Graduating Range ticks every 3 s (the spec's interval), independent of the 2 s
     // behavior-maintenance pass above.
     TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnGraduateRange"), 3.0, c_timeGame);
-    // Raven script point-defense: a tight 0.25 s tick removes enemy missiles near the player's
-    // Ravens (missiles are fast, so a short interval matters). Player-scoped inside the handler.
-    TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnInterceptMissiles"), 0.25, c_timeGame);
+    // Raven script point-defense: a tight 0.0625 s tick (~16x/s) removes enemy missiles near the
+    // player's Ravens (missiles are fast, so a short interval matters). Player-scoped inside the handler.
+    TriggerAddEventTimePeriodic(TriggerCreate("libWoLU_OnInterceptMissiles"), 0.0625, c_timeGame);
 
     // Hyperion-hub handler (merc re-purchase + Skip-Prophecy button + diag; scoped to tstory01
     // inside the handler). Fires on BOTH game-time AND real-time passes: the story-mode hub may

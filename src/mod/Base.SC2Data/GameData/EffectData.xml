@@ -265,36 +265,39 @@
          Science Vessel Magellan: PASSIVE AUTO-HEAL AURA (v0.3.24 — replaces the abandoned
          Medivac-double-beam transplant, which did not heal in game: the Medivac heal-BEAM
          behavior system is fragile on a non-Medivac caster). This is a continuous, FREE
-         passive that heals ALL nearby friendly units (biological + mechanical + air) ~15 HP/s,
-         built on the basic life-add primitive — the same robust class as our WoLU* per-tick
-         buffs. Wiring: the buff WoLUSVHealAura (BehaviorData.xml) ticks Period 1.0 s and fires
-         WoLUSVHealAuraSearch, an area enum that applies WoLUSVHealAuraHeal (+15 Life) to each
-         friendly found. Player-only: the buff is attached ONLY to the human player's Science
-         Vessels via libWoLU_AddBehaviorToType (rule 9 — the Medivac + enemy SVs are untouched).
+         passive that heals ALL nearby friendly units (biological + mechanical + air, incl.
+         friendly STRUCTURES) ~16 HP/s, built on the basic life-add primitive — the same robust
+         class as our WoLU* per-tick buffs. Wiring: the buff WoLUSVHealAura (BehaviorData.xml)
+         ticks Period 0.0625 s and fires WoLUSVHealAuraSearch, an area enum that applies
+         WoLUSVHealAuraHeal (+1 Life) to each friendly found. GRANULAR (v0.3.x): tiny 1-HP steps
+         at 16 ticks/s so units no longer die between big 1-second heal chunks. Player-only: the
+         buff is attached ONLY to the human player's Science Vessels via libWoLU_AddBehaviorToType
+         (rule 9 — the Medivac + enemy SVs are untouched).
          ============================================================================ -->
 
-    <!-- Aura area search: every 1 s the buff fires this; it heals up to 12 friendlies in radius 7.
+    <!-- Aura area search: every tick the buff fires this; it heals up to 12 friendlies in radius 7.
          SearchFilters is the CRUCIO friendly-fire guard: the plane token `Visible` admits BOTH
          ground and air (the SV flies and heals air — do NOT require the Ground plane), and the
-         post-`;` EXCLUDE set drops Neutral, Enemy, Structure, Stasis, Dead, Hidden, Missile,
-         Invulnerable. Self/Player/Ally are NOT in the exclude set → they ARE healed (the SV heals
-         itself + its allies). This is exactly the existing SV-heal exclude set (the former
-         SVHealSearchWoLU, line ~418 before this rewrite) MINUS its Self exclusion. Because Enemy +
-         Neutral + Structure are excluded, the search can never hit an enemy or a structure — so the
-         aura cannot friendly-fire / leak a heal to the other side (rule 9 + the Crucio rule). -->
+         post-`;` EXCLUDE set drops Neutral, Enemy, Stasis, Dead, Hidden, Missile, Invulnerable.
+         Self/Player/Ally are NOT in the exclude set → they ARE healed (the SV heals itself + its
+         allies). HEAL BUILDINGS (v0.3.x): `Structure` was REMOVED from the exclude set so friendly
+         STRUCTURES now heal too (owner request). Enemy + Neutral remain excluded, so the search
+         can never hit an enemy — friendly structures are included, but enemy/neutral ones are NOT,
+         so the aura still cannot leak a heal to the other side (rule 9 + the Crucio rule). -->
     <CEffectEnumArea id="WoLUSVHealAuraSearch">
         <EditorCategories value="Race:Terran"/>
         <AreaArray Radius="7" MaxCount="12" Effect="WoLUSVHealAuraHeal"/>
-        <SearchFilters value="Visible;Neutral,Enemy,Structure,Stasis,Dead,Hidden,Missile,Invulnerable"/>
+        <SearchFilters value="Visible;Neutral,Enemy,Stasis,Dead,Hidden,Missile,Invulnerable"/>
     </CEffectEnumArea>
 
-    <!-- The per-tick heal: a generic life-add → heals bio AND mech (a CEffectModifyUnit Life
-         change is vital-agnostic, unlike CEffectCreateHealer). +15 Life/tick × Period 1.0 s =
-         ~15 HP/s (the brief's rate). NO <ImpactUnit> — an area-search-applied effect targets the
-         SEARCHED unit by default; adding Value="Caster" would redirect every tick onto the SV
+    <!-- The per-tick heal: a generic life-add → heals bio AND mech AND structures (a CEffectModifyUnit
+         Life change is vital-agnostic, unlike CEffectCreateHealer). GRANULAR (v0.3.x): +1 Life/tick ×
+         Period 0.0625 s = ~16 HP/s — tiny steps at 16 ticks/s instead of one big +15 every 1.0 s, so
+         units no longer die between heal chunks. NO <ImpactUnit> — an area-search-applied effect targets
+         the SEARCHED unit by default; adding Value="Caster" would redirect every tick onto the SV
          itself. NO energy cost. NO SearchFilters (this is a modify, not a search). -->
     <CEffectModifyUnit id="WoLUSVHealAuraHeal">
         <EditorCategories value="Race:Terran"/>
-        <VitalArray index="Life" Change="15"/>
+        <VitalArray index="Life" Change="1"/>
     </CEffectModifyUnit>
 </Catalog>

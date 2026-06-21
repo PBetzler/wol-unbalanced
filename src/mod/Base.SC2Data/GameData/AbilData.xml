@@ -505,7 +505,7 @@
     <CAbilEffectTarget id="WoLURavenPDNullify">
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
         <Effect index="0" value="PointDefenseLaserDamage"/>
-        <Range value="8"/>
+        <Range value="16"/>
         <PrepTime value="0"/>
         <FinishTime value="0"/>
         <Cost></Cost>

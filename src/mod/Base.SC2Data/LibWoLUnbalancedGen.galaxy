@@ -201,6 +201,9 @@ void libWoLUGen_Apply (int p) {
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoCount", p, "32", c_upgradeOperationSet);  // high count cap so TotalCargoSpace (32) is the binding limit — displayed slots == real capacity
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "MaxCargoSize", p, "8", c_upgradeOperationSet);  // admit large ground units (Thor=8) — vanilla 2 rejected them
     CatalogFieldValueModify(c_gameCatalogAbil, "BunkerTransport", "TotalCargoSpace", p, "32", c_upgradeOperationSet);  // 32-space bar fully usable: 32 marines, or 4 Thors, or any mix by space
+    CatalogFieldValueModify(c_gameCatalogUnit, "Bunker", "LifeMax", p, "4", c_upgradeOperationMultiply);  // Bunker: 4x HP (400 -> 1600) — owner: too squishy
+    CatalogFieldValueModify(c_gameCatalogUnit, "Bunker", "LifeStart", p, "4", c_upgradeOperationMultiply);  // Bunker: start at full new max
+    CatalogFieldValueModify(c_gameCatalogUnit, "Bunker", "LifeArmor", p, "3", c_upgradeOperationSet);  // Bunker: >=3 armor (vanilla 1, building-armor upgrades don't reach it) — set flat 3
     CatalogFieldValueModify(c_gameCatalogEffect, "C10CanisterRifle", "Amount", p, "20", c_upgradeOperationSet);  // Ghost rifle: base 10 -> 20
     CatalogFieldValueModify(c_gameCatalogEffect, "SpecterU", "Amount", p, "20", c_upgradeOperationSet);  // Spectre rifle: base 15 -> 20
     CatalogFieldValueModify(c_gameCatalogEffect, "JavelinMissileLaunchersDamage", "Amount", p, "35", c_upgradeOperationSet);  // Thor AA base -> 35 (player path uses the buffed clone)

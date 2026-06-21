@@ -160,22 +160,23 @@
 
     <!-- Science Vessel passive AUTO-HEAL AURA (v0.3.24 — REPLACES the abandoned Medivac-beam
          heal transplant, which didn't heal in game on a non-Medivac caster). A permanent hidden
-         buff that, every 1 s, fires WoLUSVHealAuraSearch (EffectData.xml) to heal ALL nearby
-         friendlies (bio + mech + air) +15 Life → ~15 HP/s, FREE. Built on the basic life-add
-         primitive (robust), not the fragile heal-beam system. Pattern = our own
-         WoLUDefMatrixOnDamage above (permanent hidden runtime-added buff, proven to persist) +
+         buff that, every 0.0625 s, fires WoLUSVHealAuraSearch (EffectData.xml) to heal ALL nearby
+         friendlies (bio + mech + air, incl. friendly STRUCTURES) +1 Life → ~16 HP/s, FREE. Built
+         on the basic life-add primitive (robust), not the fragile heal-beam system. Pattern = our
+         own WoLUDefMatrixOnDamage above (permanent hidden runtime-added buff, proven to persist) +
          the CBehaviorBuff periodic SCALARS <Period>/<PeriodicEffect> (NOT the *Array forms —
          those exist only on CEffectCreatePersistent; CBehaviorBuff periodics are scalars, verified
          vs liberty.sc2mod BehaviorData.xml CloakField/ChangelingDisguise). A permanent buff needs
-         NO <Duration>. Period 1.0 s × Change 15 = ~15 HP/s (the brief's rate). Applied player-only
-         to ScienceVessel via libWoLU_AddBehaviorToType (LibWoLUnbalanced.galaxy) — enemy SVs never
-         get it (rule 9). -->
+         NO <Duration>. GRANULAR (v0.3.x): Period 0.0625 s × Change 1 = ~16 HP/s — the same rate as
+         the old 1.0 s × 15 but in tiny 1-HP steps (16 ticks/s) so units no longer die between big
+         1-second heal chunks. Applied player-only to ScienceVessel via libWoLU_AddBehaviorToType
+         (LibWoLUnbalanced.galaxy) — enemy SVs never get it (rule 9). -->
     <CBehaviorBuff id="WoLUSVHealAura">
         <Alignment value="Positive"/>
         <BehaviorFlags index="Permanent" value="1"/>
         <InfoFlags index="Hidden" value="1"/>
         <EditorCategories value="Race:Terran,AbilityorEffectType:Units"/>
-        <Period value="1.0"/>
+        <Period value="0.0625"/>
         <PeriodicEffect value="WoLUSVHealAuraSearch"/>
     </CBehaviorBuff>
 

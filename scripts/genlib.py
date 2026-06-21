@@ -299,6 +299,14 @@ def emit():
         ("Abil", "BunkerTransport", "MaxCargoCount", "32", "Set", "high count cap so TotalCargoSpace (32) is the binding limit — displayed slots == real capacity"),
         ("Abil", "BunkerTransport", "MaxCargoSize", "8", "Set", "admit large ground units (Thor=8) — vanilla 2 rejected them"),
         ("Abil", "BunkerTransport", "TotalCargoSpace", "32", "Set", "32-space bar fully usable: 32 marines, or 4 Thors, or any mix by space"),
+        # Bunker durability (owner: too squishy). Vanilla Bunker (liberty.sc2mod) LifeMax=400,
+        # LifeStart=400, LifeArmor=1; no campaign layer overrides these. There is NO Bunker merc/
+        # hero/clone in WoL, so a single per-player Bunker edit suffices (no parity mirroring).
+        # LifeMax/LifeStart/LifeArmor are CHECK8-GOOD scalar field classes (apply per player).
+        # LifeStart ×4 so a freshly-built bunker spawns at the new max (400/1600 otherwise).
+        ("Unit", "Bunker", "LifeMax", "4", "Multiply", "Bunker: 4x HP (400 -> 1600) — owner: too squishy"),
+        ("Unit", "Bunker", "LifeStart", "4", "Multiply", "Bunker: start at full new max"),
+        ("Unit", "Bunker", "LifeArmor", "3", "Set", "Bunker: >=3 armor (vanilla 1, building-armor upgrades don't reach it) — set flat 3"),
         # damage flattening: the Amount edit raises the base (GOOD, applies per player); the paired
         # AttributeBonus[Light/Armored]=0 lines were REMOVED — they were no-ops (indexed-array element,
         # preview CHECK8). Net: the rifles ship with the base raised but the +vs-light/armored bonus

@@ -305,17 +305,32 @@ def write_version_files(mod_dir: str) -> None:
 
 
 def _stamp_version(mod_dir: str) -> None:
-    """Replace the __WOLU_VERSION__ token in the built galaxy lib with VERSION so the in-mission
-    canary subtitle reads back the EXACT live build — a definitive load-proof. The source carries
-    the literal token (so `git` never churns the version), and the shipped/installed copy carries
-    the real number; if the owner sees an OLD number (or none) in game, the install/load is stale,
-    not the code. Token lives only inside a string literal, so galaxy_lint on the source is happy."""
+    """Stamp the in-mission canary with the version + a per-build timestamp, and ENFORCE the
+    canary actually carries the current version.
+
+    VERSION (semantic) only bumps on a confirmed-working change or a verified bugfix — NOT on
+    every untested iteration (owner policy). So successive installs often SHARE a version; the
+    per-build `__WOLU_BUILD__` stamp (MMDD-HHMM) distinguishes them, so the owner can still tell
+    a fresh install apart in game without churning the version number. The source carries the
+    literal tokens (git never churns); the shipped/installed copy carries the real values — an
+    OLD number/stamp in game ⇒ stale install, not the code.
+
+    Enforcement (owner rule: "every release checks the canary version is updated"): after
+    injection, assert the built canary contains `WoL Unbalanced v<VERSION>`; raise if a broken or
+    forgotten injection ever leaves it stale."""
+    import datetime
     lib = os.path.join(mod_dir, "Base.SC2Data", "LibWoLUnbalanced.galaxy")
     with open(lib, "r", encoding="utf-8") as f:
         text = f.read()
-    if "__WOLU_VERSION__" in text:
-        with open(lib, "w", encoding="utf-8") as f:
-            f.write(text.replace("__WOLU_VERSION__", VERSION))
+    stamp = datetime.datetime.now().strftime("%m%d-%H%M")
+    text = text.replace("__WOLU_VERSION__", VERSION).replace("__WOLU_BUILD__", stamp)
+    with open(lib, "w", encoding="utf-8") as f:
+        f.write(text)
+    if f"WoL Unbalanced v{VERSION}" not in text:
+        raise SystemExit(
+            f"build: CANARY VERSION CHECK FAILED — the built lib does not carry "
+            f"'WoL Unbalanced v{VERSION}'. The __WOLU_VERSION__ token is missing/edited in "
+            f"src/mod/Base.SC2Data/LibWoLUnbalanced.galaxy — restore it so the canary stamps.")
 
 
 def build() -> None:
