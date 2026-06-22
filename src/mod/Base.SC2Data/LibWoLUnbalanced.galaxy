@@ -252,31 +252,9 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     // Visible proof the mod ran and the grant executed (fires at 1 s and 10 s; the
     // 10 s one is the canary you'll actually see after skipping the intro).
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoL Unbalanced v__WOLU_VERSION__ (build __WOLU_BUILD__): data applied, upgrades & mercs granted."));
-    // OPEN-POINTS diagnostic — keep ONLY the issues under active debug; REMOVE each marker
-    // once the owner confirms it in game (the "clean the markers up afterwards" rule).
-    // aura     = WoLUSVHealAuraHeal life Change (expect 1 — the granular SV heal-aura per-tick HP, ~16x/s;
-    //            reads our clone straight from the LIVE catalog, so empty = the loaded build lacks it)
-    // ravmode  = literal "behavior" — the Raven point-defense is now the PASSIVE periodic behavior
-    //            WoLURavenPointDefense (→ WoLURavenPDSearch → vanilla PointDefenseLaserDamage → engine
-    //            nullify + vanilla blue laser beam), which fires regardless of the Raven's order queue so
-    //            it works WHILE THE RAVEN MOVES. (Previous values: "ability" = the script-order interceptor
-    //            that queued behind the move order; "script" = the older silent UnitRemove.)
-    // Healthy: aura=1  ravmode=behavior.
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player) + " ravmode=behavior"));
-    // INFANTRY-SCALING readback diagnostic (SECOND subtitle line — keeps the first line short). After the
-    // rework, vehicle/ship levels come SOLELY from libWoLU_SyncWeaponArmorLevels matching the infantry
-    // research level — so these counts are the verification that the scaling tracks infantry, NOT a static
-    // 3/3 grant. Expected readings:
-    //   shipArm   = TerranShipArmorsLevel3 (the BASE ship-armor id the sync grants — carries the real effect)
-    //   shipArmVP = TerranShipArmorsVanadiumPlatingLevel3 (the icon-only WRAPPER variant — the sync never
-    //               grants it, so it should ALWAYS read 0)
-    //   shipWpn   = TerranShipWeaponsLevel3 (the BASE ship-weapon id)
-    // At infantry 0/0 → shipArm=0, shipWpn=0 (no infantry research yet, so no vehicle/ship level). At
-    // infantry 3/3 (Eng-Bay weapons+armor level 3 researched) → shipArm=1, shipWpn=1 (the level-3 base ids
-    // granted to match). shipArmVP stays 0 in BOTH cases (a nonzero shipArmVP would mean the dead wrapper
-    // family slipped back in = double-apply). Read level 1/2 by checking the …Level1/…Level2 ids if needed.
-    // (Diagnostic only — do NOT change any upgrade grant on the strength of this; report the readback.)
-    UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU levels: shipArm=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipArmorsLevel3", c_techCountCompleteOnly)) + " shipArmVP=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipArmorsVanadiumPlatingLevel3", c_techCountCompleteOnly)) + " shipWpn=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipWeaponsLevel3", c_techCountCompleteOnly))));
+    // (Per-issue diagnostic subtitles removed — all the v0.3.30 fixes are owner-confirmed in game,
+    // per the "clean the markers up afterwards" rule. The versioned canary above stays as the
+    // permanent load-proof; add a focused diag line back here only when a new issue is under debug.)
     return true;
 }
 
