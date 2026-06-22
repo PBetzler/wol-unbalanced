@@ -10,4 +10,109 @@
     <CRequirement id="WoLUNoFlagReq">
         <NodeArray index="Use" Link="WoLUNotCountFlag"/>
     </CRequirement>
+
+    <!-- ============================================================================================
+         ARMORY VEHICLE/SHIP RESEARCH-BUTTON HIDE (rule-9-safe, flag-gated; same-id overrides).
+         The 24 Armory vehicle/ship weapon+armor Level research buttons' CRequirements are overridden
+         here so their Show points at the WoLUHideArmory_* AND nodes (RequirementNodeData.xml), which
+         AND the vanilla effective Show node with WoLUNotCountFlag. Human player has the flag → Show
+         fails → button hidden; enemy Armories (no flag) → vanilla Show → vanilla button (rule 9).
+         The vehicle/ship levels themselves now scale with infantry research via the galaxy sync —
+         the static max-grant + grant-to-hide are removed (see LibWoLUnbalanced.galaxy
+         libWoLU_DisableArmoryResearch). A same-id <CRequirement> override merges onto the vanilla
+         definition; we RE-STATE the Use node explicitly on the Level-2/3 buttons (re-pointing the
+         existing vanilla Use node id verbatim) so the inherited Use is unambiguous and only Show is
+         changed. Level-1 buttons have no Use in vanilla, so we set only Show. ============================ -->
+
+    <!-- BASE 12 -->
+    <CRequirement id="LearnTerranVehicleArmor1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleArmor1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleArmor2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleArmor2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleArmorsLevel1CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleArmor3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleArmor3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleArmorsLevel2CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleWeapon1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleWeapon1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleWeapon2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleWeapon2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleWeaponsLevel1CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleWeapon3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleWeapon3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleWeaponsLevel2CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipArmor1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipArmor1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipArmor2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipArmor2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipArmorsLevel1CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipArmor3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipArmor3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipArmorsLevel2CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipWeapon1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipWeapon1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipWeapon2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipWeapon2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipWeaponsLevel1CompleteOnly"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipWeapon3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipWeapon3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipWeaponsLevel2CompleteOnly"/>
+    </CRequirement>
+
+    <!-- WRAPPER 12 (the Use node ids carry load-bearing numeric suffixes — verbatim). -->
+    <CRequirement id="LearnTerranVehicleWeaponUltraCapacitors1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleWeaponUltraCapacitors1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleWeaponUltraCapacitors2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleWeaponUltraCapacitors2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleWeaponsUltraCapacitorsLevel1CompleteOnly1834932227"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleWeaponUltraCapacitors3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleWeaponUltraCapacitors3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleWeaponsUltraCapacitorsLevel2CompleteOnly894233239"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipWeaponUltraCapacitors1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipWeaponUltraCapacitors1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipWeaponUltraCapacitors2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipWeaponUltraCapacitors2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipWeaponsUltraCapacitorsLevel1CompleteOnly285961020"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipWeaponUltraCapacitors3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipWeaponUltraCapacitors3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipWeaponsUltraCapacitorsLevel2CompleteOnly1004646809"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleArmorVanadiumPlating1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleArmorVanadiumPlating1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleArmorVanadiumPlating2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleArmorVanadiumPlating2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleArmorsVanadiumPlatingLevel1CompleteOnly1121594928"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranVehicleArmorVanadiumPlating3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranVehicleArmorVanadiumPlating3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranVehicleArmorsVanadiumPlatingLevel2CompleteOnly2517918925"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipArmorVanadiumPlating1">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipArmorVanadiumPlating1"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipArmorVanadiumPlating2">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipArmorVanadiumPlating2"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipArmorsVanadiumPlatingLevel1CompleteOnly3052852033"/>
+    </CRequirement>
+    <CRequirement id="LearnTerranShipArmorVanadiumPlating3">
+        <NodeArray index="Show" Link="WoLUHideArmory_LearnTerranShipArmorVanadiumPlating3"/>
+        <NodeArray index="Use" Link="CountUpgradeTerranShipArmorsVanadiumPlatingLevel2CompleteOnly1864353859"/>
+    </CRequirement>
 </Catalog>

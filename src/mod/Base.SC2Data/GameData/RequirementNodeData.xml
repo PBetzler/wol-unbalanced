@@ -6,4 +6,122 @@
     <CRequirementNot id="WoLUNotCountFlag">
         <OperandArray index="0" value="WoLUCountFlag"/>
     </CRequirementNot>
+
+    <!-- ============================================================================================
+         ARMORY VEHICLE/SHIP RESEARCH-BUTTON HIDE (rule-9-safe, flag-gated).
+         The 24 Armory vehicle/ship weapon+armor Level research buttons must be hidden for the HUMAN
+         player (their levels now scale with the infantry research via libWoLU_SyncWeaponArmorLevels),
+         while ENEMY Armories keep their vanilla buttons. Each node below ANDs the vanilla EFFECTIVE
+         Show node (verbatim from the libertystory/liberty dependency chain) with WoLUNotCountFlag
+         (NOT having WoLUnbalancedFlag). The human player HAS the flag → WoLUNotCountFlag is false →
+         the AND is false → the button's Show fails → it is hidden. Enemy players never get the flag
+         → WoLUNotCountFlag is true → the AND collapses to the vanilla node → vanilla behavior. This
+         is the Shaped-Blast flag-gate pattern applied to a UI Show requirement; command cards are
+         player-UI-only so enemies are untouched in effect (rule 9). The 24 CRequirement ids that
+         point Show at these nodes are overridden in RequirementData.xml (same-id, merge-safe).
+         CRequirementAnd operands are index-less <OperandArray value="..."/> entries (verified vanilla
+         form, e.g. AndNotCountUpgradeTerranVehicleArmorsLevel1QueuedOrBetterNotCountUpgradeVanadium
+         PlatingCompleteOnly in the libertystory reference). The vanilla operand node ids are all
+         defined in the reference chain (confirmed by id-resolution sweep). ============================ -->
+
+    <!-- BASE 12 (vanilla effective Show from the libertystory override layer) -->
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleArmor1">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleArmorsLevel1QueuedOrBetterNotCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleArmor2">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleArmorsLevel2QueuedOrBetterNotCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleArmor3">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleArmorsLevel3QueuedOrBetterNotCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleWeapon1">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleWeaponsLevel1QueuedOrBetterNotCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleWeapon2">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleWeaponsLevel2QueuedOrBetterNotCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleWeapon3">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleWeaponsLevel3QueuedOrBetterNotCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipArmor1">
+        <OperandArray value="AndNotCountUpgradeTerranShipArmorsLevel1QueuedOrBetterNotCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipArmor2">
+        <OperandArray value="AndNotCountUpgradeTerranShipArmorsLevel2QueuedOrBetterNotCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipArmor3">
+        <OperandArray value="AndNotCountUpgradeTerranShipArmorsLevel3QueuedOrBetterNotCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipWeapon1">
+        <OperandArray value="AndNotCountUpgradeTerranShipWeaponsLevel1QueuedOrBetterNotCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipWeapon2">
+        <OperandArray value="AndNotCountUpgradeTerranShipWeaponsLevel2QueuedOrBetterNotCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipWeapon3">
+        <OperandArray value="AndNotCountUpgradeTerranShipWeaponsLevel3QueuedOrBetterNotCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+
+    <!-- WRAPPER 12 (vanilla effective Show from the liberty.sc2campaign layer; the …CompleteOnly
+         operands include load-bearing numeric suffixes — copied verbatim from the reference). -->
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleWeaponUltraCapacitors1">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleWeaponsUltraCapacitorsLevel1QueuedOrBetterCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleWeaponUltraCapacitors2">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleWeaponsUltraCapacitorsLevel2QueuedOrBetterCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleWeaponUltraCapacitors3">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleWeaponsUltraCapacitorsLevel3QueuedOrBetterCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipWeaponUltraCapacitors1">
+        <OperandArray value="AndNotCountUpgradeTerranShipWeaponsUltraCapacitorsLevel1QueuedOrBetterCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipWeaponUltraCapacitors2">
+        <OperandArray value="AndNotCountUpgradeTerranShipWeaponsUltraCapacitorsLevel2QueuedOrBetterCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipWeaponUltraCapacitors3">
+        <OperandArray value="AndNotCountUpgradeTerranShipWeaponsUltraCapacitorsLevel3QueuedOrBetterCountUpgradeUltraCapacitorsCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleArmorVanadiumPlating1">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleArmorsVanadiumPlatingLevel1QueuedOrBetterCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleArmorVanadiumPlating2">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleArmorsVanadiumPlatingLevel2QueuedOrBetterCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranVehicleArmorVanadiumPlating3">
+        <OperandArray value="AndNotCountUpgradeTerranVehicleArmorsVanadiumPlatingLevel3QueuedOrBetterCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipArmorVanadiumPlating1">
+        <OperandArray value="AndNotCountUpgradeTerranShipArmorsVanadiumPlatingLevel1QueuedOrBetterCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipArmorVanadiumPlating2">
+        <OperandArray value="AndNotCountUpgradeTerranShipArmorsVanadiumPlatingLevel2QueuedOrBetterCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
+    <CRequirementAnd id="WoLUHideArmory_LearnTerranShipArmorVanadiumPlating3">
+        <OperandArray value="AndNotCountUpgradeTerranShipArmorsVanadiumPlatingLevel3QueuedOrBetterCountUpgradeVanadiumPlatingCompleteOnly"/>
+        <OperandArray value="WoLUNotCountFlag"/>
+    </CRequirementAnd>
 </Catalog>

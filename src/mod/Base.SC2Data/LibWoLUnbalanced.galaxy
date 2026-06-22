@@ -263,16 +263,19 @@ bool libWoLU_OnGrantTech (bool testConds, bool runActions) {
     //            that queued behind the move order; "script" = the older silent UnitRemove.)
     // Healthy: aura=1  ravmode=behavior.
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU check: aura=" + CatalogFieldValueGet(c_gameCatalogEffect, "WoLUSVHealAuraHeal", "VitalArray[Life].Change", libWoLU_Player) + " ravmode=behavior"));
-    // ITEM-3 upgrade-level diagnostic (SECOND subtitle line — keeps the first line short). The owner
-    // reports air units (Raven/Viking) appearing +3 over other air units, but no static catalog
-    // asymmetry was found (they sit in the same Ship/Vehicle real families). These runtime level counts
-    // let the owner read back whether any one level id is granted at count>1 (a double-grant) at 3/3:
-    //   shipArm   = TerranShipArmorsLevel3 (the BASE armor id our sync grants — carries the real effect)
-    //   shipArmVP = TerranShipArmorsVanadiumPlatingLevel3 (the icon-only WRAPPER variant — should be 0
-    //               from our sync, which grants only the base ids)
-    //   shipWpn   = TerranShipWeaponsLevel3 (the BASE weapon id)
-    // A nonzero shipArmVP alongside shipArm=1 would mean both families granted = double-apply. (Diagnostic
-    // only — do NOT change any upgrade grant on the strength of this; report the readback.)
+    // INFANTRY-SCALING readback diagnostic (SECOND subtitle line — keeps the first line short). After the
+    // rework, vehicle/ship levels come SOLELY from libWoLU_SyncWeaponArmorLevels matching the infantry
+    // research level — so these counts are the verification that the scaling tracks infantry, NOT a static
+    // 3/3 grant. Expected readings:
+    //   shipArm   = TerranShipArmorsLevel3 (the BASE ship-armor id the sync grants — carries the real effect)
+    //   shipArmVP = TerranShipArmorsVanadiumPlatingLevel3 (the icon-only WRAPPER variant — the sync never
+    //               grants it, so it should ALWAYS read 0)
+    //   shipWpn   = TerranShipWeaponsLevel3 (the BASE ship-weapon id)
+    // At infantry 0/0 → shipArm=0, shipWpn=0 (no infantry research yet, so no vehicle/ship level). At
+    // infantry 3/3 (Eng-Bay weapons+armor level 3 researched) → shipArm=1, shipWpn=1 (the level-3 base ids
+    // granted to match). shipArmVP stays 0 in BOTH cases (a nonzero shipArmVP would mean the dead wrapper
+    // family slipped back in = double-apply). Read level 1/2 by checking the …Level1/…Level2 ids if needed.
+    // (Diagnostic only — do NOT change any upgrade grant on the strength of this; report the readback.)
     UIDisplayMessage(PlayerGroupAll(), c_messageAreaSubtitle, StringToText("WoLU levels: shipArm=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipArmorsLevel3", c_techCountCompleteOnly)) + " shipArmVP=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipArmorsVanadiumPlatingLevel3", c_techCountCompleteOnly)) + " shipWpn=" + IntToString(TechTreeUpgradeCount(libWoLU_Player, "TerranShipWeaponsLevel3", c_techCountCompleteOnly))));
     return true;
 }
@@ -336,86 +339,33 @@ void libWoLU_SyncWeaponArmorLevels (int p) {
 
 void libWoLU_DisableArmoryResearch (int p) {
     int i;
-    int n;
-    string lvl;
-    // The Armory ONLY researches vehicle/ship weapon+armor LEVELS, and every one is redundant:
-    // the Engineering Bay's infantry upgrades now grant the vehicle+ship equivalents
-    // (libWoLU_SyncWeaponArmorLevels) and rule 2 auto-purchases all armory tech anyway.
+    // The Armory ONLY researches vehicle/ship weapon+armor LEVELS, and we never want the player to
+    // research them directly: the vehicle/ship levels now SCALE WITH the infantry research instead.
     //
-    // GRANT-TO-HIDE (v0.3.25 — the buttons kept SHOWING despite the TechTreeAbilityAllow loop):
-    // a CAbilResearch button auto-HIDES natively once its target upgrade is QueuedOrBetter (the
-    // button's Show requirement checks CountUpgrade[<upgrade>, QueuedOrBetter] == 0). So we GRANT
-    // every vehicle/ship weapon+armor Level upgrade to the player UNCONDITIONALLY → the Armory's
-    // researches auto-hide. ArmoryResearch has TWO families of Level researches:
-    //   * Research3-14  → the 12 BASE Level upgrades Terran{Vehicle,Ship}{Weapons,Armors}Level{1,2,3}
-    //                     (the real effect-carrying ids — learnings §"the two-family trap").
-    //   * Research16-27 → the 12 WRAPPER Level upgrades
-    //                     Terran{Vehicle,Ship}{Weapons,Armors}{UltraCapacitors,VanadiumPlating}Level{1,2,3}
-    //                     (icon-only in their OWN body, BUT parent=-chained off the wrapper ROOTs).
-    // BOTH families must be GRANTED for ALL 24 buttons to auto-hide. The OLD comment claimed the
-    // wrappers "auto-hide once the UltraCapacitors/VanadiumPlating ROOT is complete, which BuyAllTech
-    // grants" — that was FALSE: the ROOT is not force-granted and the player starts before-lab
-    // (learnings §lab-state), so the wrapper-Level Show requirements (CountUpgrade[<wrapper>] == 0)
-    // stayed satisfied and the last 4 buttons kept showing. The wrapper Level ids exist in
-    // liberty.sc2campaign/UpgradeData.xml (parent=-chained off …UltraCapacitors/…VanadiumPlating) and
-    // have NO MaxLevel field (single-level → level 1 = max, same as the base Level ids), so granting
-    // level 1 is enough.
+    // NEW FLOW (the infantry-scaling rework — replaces the v0.3.25–v0.3.31 grant-to-hide):
+    //   * vehicle/ship weapon+armor levels come SOLELY from libWoLU_SyncWeaponArmorLevels, which grants
+    //     the BASE Terran{Vehicle,Ship}{Weapons,Armors}Level{N} ids to MATCH the player's infantry
+    //     weapons/armor research level N (0 infantry → 0 vehicle/ship; infantry 3/3 → vehicle/ship
+    //     3/3). Mercs/heroes scale identically because those base-Level upgrades' real per-unit effects
+    //     are GLOBAL EffectArrays reached by every unit id, and the player gets them per-player via the
+    //     sync. NO static max-grant happens here anymore — the OLD unconditional grant of the 12 base +
+    //     12 wrapper Level upgrades to max was the "+3 over-tune" (it stacked 3/3 on top of whatever the
+    //     sync had granted), so it is REMOVED.
+    //   * the Armory's research BUTTONS are hidden for the human player via a FLAG-GATED Show
+    //     requirement in RequirementData.xml: each of the 24 ArmoryResearch Level buttons points at a
+    //     CRequirement whose Show is a CRequirementAnd of the vanilla effective Show node AND
+    //     WoLUNotCountFlag (NOT having WoLUnbalancedFlag). The human player HAS the flag → the AND is
+    //     false → the button is hidden for the human; enemy Armories (no flag) keep their vanilla
+    //     buttons (rule-9-safe — the Shaped-Blast flag-gate pattern). No grant-to-hide is needed, so
+    //     the wrapper Level grants are gone too.
     //
-    // ITEM 1b CORRECTION (v0.3.30): the OLD comment ALSO claimed the wrapper Level ids "carry NO real
-    // effect" — that too was FALSE. A wrapper LevelN's OWN body is icon-only, but it INHERITS the
-    // wrapper ROOT's REAL per-unit stat (Weapon Level / Effect Amount / LifeArmor / +5% HP) via
-    // parent= — exactly the same inheritance that makes the base TerranVehicleArmorsLevel1 (icon-only
-    // body) apply +1 armor through parent="TerranVehicleArmors". So granting the wrapper LevelN here
-    // was silently adding a SECOND +3 on top of family A (the base Level ids) — the owner's "+3
-    // over-tuned levels" bug. We KEEP the grant (it is what hides the buttons) but NEUTRALIZE the
-    // wrapper ROOTs in UpgradeData.xml (ITEM 1b: every real stat Value→0, every ×1.05 HP Multiply→1),
-    // so the still-granted wrapper LevelN now inherits a zeroed stat and contributes 0 levels — the
-    // grant's ONLY remaining effect is to satisfy the button's Show requirement so it hides. The real
-    // scaling lives on the BASE Level ids (still granted above). This is UNCONDITIONAL (rule 2: armory
-    // upgrades auto-unlocked), unlike libWoLU_SyncWeaponArmorLevels which only grants when the matching
-    // infantry upgrade is detected. NO double-apply with that sync: all grants are guarded by the SAME
-    // idempotent TechTreeUpgradeCount(... CompleteOnly) == 0 check, so a level is added only when count
-    // is 0 — whichever runs first wins, the other no-ops. Player-only via TechTreeUpgradeAddLevel(p,
-    // ...) → no enemy reach (rule 9).
-    n = 1;
-    while (n <= 3) {
-        lvl = IntToString(n);
-        // --- the 12 BASE Level upgrades (real effects; hide Research3-14) ---
-        if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsLevel" + lvl, 1);
-        }
-        if (TechTreeUpgradeCount(p, "TerranShipWeaponsLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranShipWeaponsLevel" + lvl, 1);
-        }
-        if (TechTreeUpgradeCount(p, "TerranVehicleArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranVehicleArmorsLevel" + lvl, 1);
-        }
-        if (TechTreeUpgradeCount(p, "TerranShipArmorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranShipArmorsLevel" + lvl, 1);
-        }
-        // --- the 12 WRAPPER Level upgrades (hide Research16-27). The wrapper LevelN INHERIT a REAL
-        //     stat from their wrapper ROOT via parent= — which is exactly why we NEUTRALIZE those
-        //     ROOTs in UpgradeData.xml (ITEM 1b: stat→0). With the ROOT zeroed, granting these adds
-        //     NO damage/armor; the grant ONLY satisfies the wrapper buttons' Show requirement so they
-        //     hide. (Do NOT remove this grant — without it the last 4 Armory buttons reappear.) ---
-        if (TechTreeUpgradeCount(p, "TerranVehicleWeaponsUltraCapacitorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranVehicleWeaponsUltraCapacitorsLevel" + lvl, 1);
-        }
-        if (TechTreeUpgradeCount(p, "TerranShipWeaponsUltraCapacitorsLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranShipWeaponsUltraCapacitorsLevel" + lvl, 1);
-        }
-        if (TechTreeUpgradeCount(p, "TerranVehicleArmorsVanadiumPlatingLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranVehicleArmorsVanadiumPlatingLevel" + lvl, 1);
-        }
-        if (TechTreeUpgradeCount(p, "TerranShipArmorsVanadiumPlatingLevel" + lvl, c_techCountCompleteOnly) == 0) {
-            TechTreeUpgradeAddLevel(p, "TerranShipArmorsVanadiumPlatingLevel" + lvl, 1);
-        }
-        n = n + 1;
-    }
-    // Belt-and-suspenders: also DISABLE every ArmoryResearch command. 0..30 covers all of them
-    // regardless of the exact command-index offset; a disable on a non-existent index is a harmless
-    // no-op. The grant-to-hide above is the primary mechanism; this keeps the commands disallowed
-    // even if a button slips the native auto-hide.
+    // This function now ONLY runs the belt-and-suspenders disable loop below.
+    //
+    // Belt-and-suspenders: DISABLE every ArmoryResearch command for the human player. 0..30 covers all
+    // of them regardless of the exact command-index offset; a disable on a non-existent index is a
+    // harmless no-op. The flag-gated Show requirement is the primary hide mechanism; this keeps the
+    // commands disallowed even if a button slips the requirement. Player-only via TechTreeAbilityAllow(p,
+    // ...) → enemy Armories untouched (rule 9).
     i = 0;
     while (i <= 30) {
         TechTreeAbilityAllow(p, AbilityCommand("ArmoryResearch", i), false);
