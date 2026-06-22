@@ -6,7 +6,7 @@ root="$(git rev-parse --show-toplevel)"
 hooks="$root/.git/hooks"
 mkdir -p "$hooks"
 
-for h in pre-commit; do
+for h in pre-commit pre-push; do
   src="$root/scripts/hooks/$h"
   [ -f "$src" ] || continue
   chmod +x "$src"

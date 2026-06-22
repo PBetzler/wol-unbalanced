@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Pre-push gate for WoL Unbalanced: a RELEASE (a v<semver> tag) must also ship the Nightmare
+# variant WHEN the Nightmare base is provided locally (CLAUDE.md "Repo Hygiene & Releases").
+#
+# CI auto-builds only the STANDARD zip on a v* tag (it has none of the third-party inputs);
+# the Nightmare zip is a LOCAL build + manual `gh release upload`, the step most easily
+# forgotten. So when mods/Nightmare/extracted/ is present, BLOCK pushing a v<version> tag
+# unless dist/WoL-Unbalanced-Nightmare-v<version>.zip has been built. (The published-release
+# half — confirming the zip was actually uploaded — is scripts/check_release_assets.py, run
+# after CI publishes.) When the Nightmare base is absent, this hook is a no-op.
+#
+# Bypass with `git push --no-verify`. Install (once; .git/hooks is not versioned):
+#   scripts/hooks/install.sh
+set -uo pipefail
+root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$root" || exit 0
+
+# Only enforce when the third-party Nightmare base is provided locally.
+[ -f "$root/mods/Nightmare/extracted/NightmareMod.SC2Mod" ] || exit 0
+
+fail=0
+# stdin (one line per ref being pushed): <local ref> <local oid> <remote ref> <remote oid>
+while read -r local_ref local_oid remote_ref remote_oid; do
+  # Skip ref deletions (local oid is all zeros).
+  case "$local_oid" in *[!0]*) : ;; *) continue ;; esac
+  case "$remote_ref" in
+    refs/tags/v[0-9]*)
+      ver="${remote_ref#refs/tags/v}"
+      zip="dist/WoL-Unbalanced-Nightmare-v${ver}.zip"
+      if [ ! -f "$root/$zip" ]; then
+        echo "pre-push: BLOCKED — release v${ver} must ship the Nightmare variant (the Nightmare base is present locally)."
+        echo "  Missing: $zip"
+        echo "  Build it first:  python3 scripts/build.py package nightmare"
+        echo "  Then re-push the tag. After CI publishes the release, upload + verify:"
+        echo "    gh release upload v${ver} $zip"
+        echo "    python3 scripts/check_release_assets.py"
+        fail=1
+      fi
+      ;;
+  esac
+done
+
+if [ "$fail" -ne 0 ]; then
+  echo "pre-push: blocking the release tag. Build the Nightmare zip, or 'git push --no-verify' to bypass."
+  exit 1
+fi
+exit 0
