@@ -298,9 +298,19 @@
          is touched. RULE 9: WoL never grants these wrapper ROOTs (or the wrapper LevelN)
          to enemies (only our per-player libWoLU_DisableArmoryResearch grants the LevelN
          to the human), so this global static edit is effectively player-only; enemy
-         vehicles/ships are untouched. -->
+         vehicles/ships are untouched.
 
-    <CUpgrade id="TerranVehicleWeaponsUltraCapacitors">  <!-- 68 entries restated, stat zeroed -->
+         v0.3.31 UPDATE — the ROOT-zero override below did NOT neutralize the inherited
+         stat in game (owner still saw 6/6), because the campaign defines these 4 wrapper
+         ROOTs default="1" (ref UpgradeData.xml:221/318/394/467) and our non-default same-id
+         ROOT-zero override did not replace the template. The PRIMARY neutralizer is now the
+         parent re-point of the 12 wrapper LevelN to the BODYLESS Talent super-roots
+         UltraCapacitors / VanadiumPlating (see the block after these ROOTs) — with a bodyless
+         parent the LevelN inherits ZERO stat regardless of the ROOT state. The ROOT-zero
+         overrides below (now carrying default="1" to match the campaign template) are kept
+         as belt-and-suspenders safety nets. -->
+
+    <CUpgrade default="1" id="TerranVehicleWeaponsUltraCapacitors">  <!-- 68 entries restated, stat zeroed -->
         <EffectArray index="0" Reference="Weapon,ThorsHammer,Level" Value="0"/>
         <EffectArray index="1" Reference="Weapon,JavelinMissileLaunchers,Level" Value="0"/>
         <EffectArray index="2" Reference="Effect,ThorsHammerDamage,Amount" Value="0"/>
@@ -370,7 +380,7 @@
         <EffectArray index="66" Reference="Weapon,ArcliteShockCannon,RateMultiplier" Value="0"/>
         <EffectArray index="67" Reference="Weapon,Predator,RateMultiplier" Value="0"/>
     </CUpgrade>
-    <CUpgrade id="TerranShipWeaponsUltraCapacitors">  <!-- 48 entries restated, stat zeroed -->
+    <CUpgrade default="1" id="TerranShipWeaponsUltraCapacitors">  <!-- 48 entries restated, stat zeroed -->
         <EffectArray index="0" Reference="Weapon,BacklashRockets,Level" Value="0"/>
         <EffectArray index="1" Reference="Effect,BacklashRocketsU,Amount" Value="0"/>
         <EffectArray index="2" Reference="Weapon,ATSLaserBattery,Level" Value="0"/>
@@ -420,7 +430,7 @@
         <EffectArray index="46" Reference="Weapon,DRCannonsG,RateMultiplier" Value="0"/>
         <EffectArray index="47" Reference="Weapon,DRBattlecruiserFakeG,RateMultiplier" Value="0"/>
     </CUpgrade>
-    <CUpgrade id="TerranVehicleArmorsVanadiumPlating">  <!-- 46 entries restated, stat zeroed -->
+    <CUpgrade default="1" id="TerranVehicleArmorsVanadiumPlating">  <!-- 46 entries restated, stat zeroed -->
         <EffectArray index="0" Reference="Unit,Thor,LifeArmorLevel" Value="0"/>
         <EffectArray index="1" Reference="Unit,Thor,LifeArmor" Value="0"/>
         <EffectArray index="2" Operation="Multiply" Reference="Unit,Thor,LifeMax" Value="1"/>
@@ -468,7 +478,7 @@
         <EffectArray index="44" Operation="Multiply" Reference="Unit,Predator,LifeMax" Value="1"/>
         <EffectArray index="45" Operation="Multiply" Reference="Unit,Predator,LifeStart" Value="1"/>
     </CUpgrade>
-    <CUpgrade id="TerranShipArmorsVanadiumPlating">  <!-- 52 entries restated, stat zeroed -->
+    <CUpgrade default="1" id="TerranShipArmorsVanadiumPlating">  <!-- 52 entries restated, stat zeroed -->
         <EffectArray index="0" Reference="Unit,Banshee,LifeArmorLevel" Value="0"/>
         <EffectArray index="1" Reference="Unit,Banshee,LifeArmor" Value="0"/>
         <EffectArray index="2" Operation="Multiply" Reference="Unit,Banshee,LifeMax" Value="1"/>
@@ -522,4 +532,47 @@
         <EffectArray index="50" Operation="Multiply" Reference="Unit,HelsAngelFighter,LifeMax" Value="1"/>
         <EffectArray index="51" Operation="Multiply" Reference="Unit,HelsAngelFighter,LifeStart" Value="1"/>
     </CUpgrade>
+
+    <!-- ================================================================================
+         ITEM 1b PRIMARY NEUTRALIZER (v0.3.31): RE-POINT the 12 wrapper LevelN parents to
+         the BODYLESS Talent super-roots. The wrapper LevelN
+         (Terran{Vehicle,Ship}{Weapons,Armors}{UltraCapacitors,VanadiumPlating}Level{1,2,3})
+         are still GRANTED to the human by libWoLU_DisableArmoryResearch ONLY so the
+         libertystory Armory buttons auto-hide. In their OWN body each LevelN carries just
+         <Icon>, <ScoreAmount>, and icon Set EffectArrays — the real +1/level STAT is
+         INHERITED from its stat-bearing wrapper ROOT via parent=. The v0.3.30 ROOT-zero
+         overrides did NOT neutralize that inherited stat in game (the campaign ROOTs are
+         default="1" — ref UpgradeData.xml:221/318/394/467 — so our non-default same-id
+         override did not replace the template; owner still read 6/6).
+
+         FIX: re-point each LevelN's parent= to the BODYLESS Talent super-root
+         (UltraCapacitors for weapons, VanadiumPlating for armor — ref UpgradeData.xml:670/674:
+         only <EditorCategories> + the UpgradeCheat flag, NO EffectArray, NO parent ⇒ inherits
+         ZERO stat). These are parent-ONLY self-closing same-id overrides: setting just the
+         parent= attribute changes the parent while the LevelN's OWN body (its icon Set
+         entries) is preserved by field-merge (re-parenting is reference-keyed, not positional)
+         — so the icon Sets are NOT orphaned, the Armory button still hides on grant, and icons
+         still show. With the parent now bodyless the LevelN adds 0 levels/armor/HP, regardless
+         of the ROOT state. This is the PRIMARY neutralizer; the ROOT-zero overrides above +
+         their default="1" are belt-and-suspenders safety nets.
+
+         RULE 9: same player-only-in-effect basis as the ROOT-zero block above — WoL grants
+         these wrapper LevelN only to the human (libWoLU_DisableArmoryResearch); enemies never
+         get them, so this global static re-parent is effectively player-only. Family A (base
+         Terran{Vehicle,Ship}{Weapons,Armors}LevelN) remains the SINGLE +3 scaling source. -->
+
+    <!-- 6 WEAPON LevelN → bodyless UltraCapacitors (0 stat) -->
+    <CUpgrade id="TerranVehicleWeaponsUltraCapacitorsLevel1" parent="UltraCapacitors"/>
+    <CUpgrade id="TerranVehicleWeaponsUltraCapacitorsLevel2" parent="UltraCapacitors"/>
+    <CUpgrade id="TerranVehicleWeaponsUltraCapacitorsLevel3" parent="UltraCapacitors"/>
+    <CUpgrade id="TerranShipWeaponsUltraCapacitorsLevel1" parent="UltraCapacitors"/>
+    <CUpgrade id="TerranShipWeaponsUltraCapacitorsLevel2" parent="UltraCapacitors"/>
+    <CUpgrade id="TerranShipWeaponsUltraCapacitorsLevel3" parent="UltraCapacitors"/>
+    <!-- 6 ARMOR LevelN → bodyless VanadiumPlating (0 stat) -->
+    <CUpgrade id="TerranVehicleArmorsVanadiumPlatingLevel1" parent="VanadiumPlating"/>
+    <CUpgrade id="TerranVehicleArmorsVanadiumPlatingLevel2" parent="VanadiumPlating"/>
+    <CUpgrade id="TerranVehicleArmorsVanadiumPlatingLevel3" parent="VanadiumPlating"/>
+    <CUpgrade id="TerranShipArmorsVanadiumPlatingLevel1" parent="VanadiumPlating"/>
+    <CUpgrade id="TerranShipArmorsVanadiumPlatingLevel2" parent="VanadiumPlating"/>
+    <CUpgrade id="TerranShipArmorsVanadiumPlatingLevel3" parent="VanadiumPlating"/>
 </Catalog>

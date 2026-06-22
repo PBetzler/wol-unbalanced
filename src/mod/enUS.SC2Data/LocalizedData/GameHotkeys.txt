@@ -1,12 +1,29 @@
 Button/Hotkey/MagrailWoLU=U
 Button/Hotkey/SpiderMineWoLU=Y
-# Elite-merc calldown hotkeys (Merc Compound). Letters chosen OUTSIDE the standard-merc
-# set (AP convention D/J/I/H/A/P/G/C) so they don't double-set on the compound card.
-# Owner to confirm no in-game collision. Mnemonic where free: M=Medic, R=Reaper, N=coNdor,
-# T=Thor/joTun, W=Wraith, S=Senior Ghost.
-Button/Hotkey/HireMercMedic=M
-Button/Hotkey/HireMercReaper=R
+# Barracks either/or train pair: Ghost (vanilla, R0C3) keeps its vanilla hotkey; the
+# Spectre train button (R0C4 cell, face id `Spectre`) gets "S" so both branch units are
+# usable. Distinct cells (audit merge_unit_card: Ghost idx3, Spectre idx15) + distinct
+# hotkeys = no collision. NOTE: hotkeys key on Button/Hotkey/<ButtonId>, NOT Unit/Name —
+# CHECK12-safe (no vanilla unit re-identified).
+Button/Hotkey/Spectre=S
+# Merc Compound calldown hotkeys (all 14 mercs share ONE SummonMercenaries card on the
+# MercCompound unit). Matched to the Archipelago source where one exists; collisions
+# resolved to distinct keys (AP never put them all on one card, WoLU does). Pairwise
+# distinct on the merc card. AP collisions resolved: Thor keeps AP J, DukesRevenge -> R
+# (Revenge); SiegeBreakers keeps AP G, Wraith -> W (Wraith/Winged). No AP source: Condor
+# (Hellion) = N (coNdor), Senior Ghost = U (free, unambiguous; S is the cross-card Spectre
+# key so kept clear of it).
+Button/Hotkey/HireMercMedic=K
+Button/Hotkey/HireMercReaper=E
 Button/Hotkey/HireMercHellion=N
-Button/Hotkey/HireMercThor=T
+Button/Hotkey/HireMercThor=J
 Button/Hotkey/HireMercWraith=W
-Button/Hotkey/HireMercSeniorGhost=S
+Button/Hotkey/HireMercSeniorGhost=U
+Button/Hotkey/HireDukesRevenge=R
+Button/Hotkey/HireKelmorianMiners=P
+Button/Hotkey/HireDevilDogs=D
+Button/Hotkey/HireHammerSecurities=H
+Button/Hotkey/HireSpartanCompany=C
+Button/Hotkey/HireSiegeBreakers=G
+Button/Hotkey/HireHelsAngels=A
+Button/Hotkey/HireDuskWing=I
