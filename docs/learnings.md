@@ -525,29 +525,33 @@ gotcha; authoritative details live in the code/plan, not here.
   Thor ground attack's muzzle+impact live on `CActorAction id="ThorAttack"`
   `effectAttack="ThorsHammerDamage"` (LaunchAssets `ThorHandGunAttackLaunch` + ImpactMap
   `ThorHandGunAttackImpact`). When WeaponData reroutes weapon `ThorsHammer`'s `Effect` to
-  `ThorsHammerWoLUSet` (a `CEffectSet` firing two validator-gated CHILDREN
-  `ThorsHammerDamageVanillaWoLU`/`…WoLU`, both `parent="ThorsHammerDamage"`), NOBODY fires
-  the bare `ThorsHammerDamage` id anymore → the action never matches → the ground muzzle
-  AND impact vanish for EVERY Thor (player AND enemy). The *air* attack survived because
-  its launch effect id (`JavelinMissileLaunchersLM`) was preserved, so `ThorAAAttack`'s
-  `effectLaunch` still matched. **Fix: re-bind a (cloned) action to the actually-fired
-  child effect id(s) — one `CActorAction parent="<vanilla action>"` per validator-gated
-  branch, overriding only `effectAttack`/`effectImpact`** (e.g. `ThorAttackVanillaWoLU`
-  → `ThorsHammerDamageVanillaWoLU` restores the ENEMY muzzle, `ThorAttackWoLU` →
-  `ThorsHammerDamageWoLU` restores the PLAYER muzzle). Each unit fires exactly ONE child
-  (validator-gated) → one action per child = exactly one muzzle per shot per audience, NO
-  double-firing. This is rule-9-NEUTRAL (restoring the enemy's vanilla appearance is
-  desired, not a buff) and cosmetic-only (no damage change). **Restate the
-  `LaunchAttachQuery`/`LaunchAssets`/`ImpactMap` verbatim on the clone** rather than
-  relying solely on `parent=` attribute-merge, so the muzzle is unambiguous. CHECK3/4 SKIP
-  actors (their parents are base-CASC `GenericUnit*`/vanilla actor ids the ref dump lacks),
-  so audit will NOT catch a typo'd effect id here — resolve each `effectAttack`/`effectImpact`
-  id against our `EffectData.xml` by hand. **Watch for a hero that fires a DIFFERENT
-  weapon/effect:** Odin (the Thor hero) attacks with weapon `Odin` → effect `OdinDamage`
+  `ThorsHammerWoLUSet` (a `CEffectSet`), if that set's members are `parent=`-CLONES with
+  NEW ids (`ThorsHammerDamageVanillaWoLU`/`…WoLU`), NOBODY fires the bare `ThorsHammerDamage`
+  id anymore → the action never matches → the ground muzzle AND impact vanish for EVERY Thor
+  (player AND enemy). The *air* attack survived because its launch effect id
+  (`JavelinMissileLaunchersLM`) was preserved, so `ThorAAAttack`'s `effectLaunch` still matched.
+  **⚠️ CORRECTED FIX (v0.3.31 — supersedes the action-clone re-bind below).** The PROVEN-WORKING
+  fix is the **Trigger-Override shape**: re-include the UNMODIFIED vanilla delivery/damage effect
+  (`ThorsHammerDamage`) as **member[0] of the reroute set**, so the bare id STILL FIRES → the
+  UNTOUCHED vanilla `CActorAction id="ThorAttack"` keeps matching and its muzzle/impact fire again,
+  with ZERO action clones. The set's other member stays the player-only `WoLUHasFlag`-gated buffed
+  clone. This is the SAME non-detaching shape the Wraith sets already use
+  (`WraithGTriggerOverrideSet` keeps `WraithGLaunchMissile` as member[0]); see the reroute-universe
+  table below. **The earlier "fix" — clone the vanilla action (`parent="<vanilla action>"` +
+  re-specify `effectAttack`/`effectImpact` to the new child id) — does NOT re-bind in-game**: it
+  shipped v0.3.11 → v0.3.30 and the owner STILL saw no muzzle/launch flash/projectile/impact on the
+  Jotun-Thor + Viking ground attacks. Those action clones (`ThorAttack{Vanilla,}WoLU`,
+  `VikingAssaultAttack{Vanilla,}WoLU`, `ThorAAAttack{Vanilla,}WoLU`, `WreckingCrewAssaultAttackWoLU`)
+  were DELETED in v0.3.31. Do NOT re-attempt action-clone re-binding. **Tradeoff of the
+  Trigger-Override shape:** the player's primary target takes BOTH the un-gated vanilla base hit AND
+  the buffed splash clone (≈ a partial damage double on the primary) — ACCEPTED here (balance is an
+  explicit non-goal; the mod is "funnily overpowered"). The un-gated vanilla member is also exactly
+  what enemies fire (rule-9-neutral). **Watch for a hero that fires a DIFFERENT weapon/effect:**
+  Odin (the Thor hero) attacks with weapon `Odin` → effect `OdinDamage`
   (actors `OdinLeftAttack`/`OdinRightAttack`), NOT `ThorsHammer`/`ThorsHammerDamage` — we
-  never rerouted the `Odin` weapon, so Odin's ground muzzle was never broken and needs no
-  action clone. Always check the hero's actual weapon id before assuming the base-unit fix
-  covers it. [STATIC root-cause + fix; muzzle render is GAME-confirmed by the owner.]
+  never rerouted the `Odin` weapon, so Odin's ground muzzle was never broken. Always check the
+  hero's actual weapon id before assuming the base-unit fix covers it.
+  [STATIC root-cause + corrected fix; muzzle render is GAME-pending owner re-confirm for v0.3.31.]
 - **The SAME reroute-detaches-the-action trap bit the VIKING ground gatling and the Hel's
   Angels merc — fixed identically.** The vanilla `CActorAction id="VikingAssaultAttack"`
   `effectAttack="TwinGatlingCannons"` carries the ground launch sound (`VikingAssault_AttackLaunch`),
@@ -557,13 +561,16 @@ gotcha; authoritative details live in the code/plan, not here.
   bare `TwinGatlingCannons` id → those assets detached for EVERY Viking (player AND enemy). NB the
   Viking ground gatling is NOT a missile/beam (no `CActorMissile`/`CActorBeam` keyed to
   `TwinGatlingCannons` in the dump) — the visual is purely launch-sound + impact-sound + blood, so
-  "no projectile" really meant "those assets stopped firing." Fix = the Thor pattern: two
-  `CActorAction parent="VikingAssaultAttack"` clones (`VikingAssaultAttackVanillaWoLU` → enemy child,
-  `VikingAssaultAttackWoLU` → player child), each restating the vanilla `LaunchAttachQuery`/both
-  `ImpactMap` entries/`LaunchAssets` verbatim. The merc weapon `WreckingCrewAssault` is rerouted to a
-  SINGLE un-gated clone `WreckingCrewAssaultWoLU` (player-exclusive, no flag gate), so its
-  `CActorAction id="WreckingCrewAssaultAttack"` (vanilla body identical to VikingAssaultAttack) needs
-  only ONE clone `WreckingCrewAssaultAttackWoLU`. (v0.3.x — `ActorData.xml`.)
+  "no projectile" really meant "those assets stopped firing." **CORRECTED FIX (v0.3.31) = the
+  Trigger-Override shape** (NOT the action-clone re-bind, which never took): re-include the unmodified
+  vanilla `TwinGatlingCannons` as member[0] of `TwinGatlingCannonsWoLUSet` so the vanilla
+  `VikingAssaultAttack` keeps firing, with the player-only `WoLUHasFlag` clone as the other member.
+  The Hel's Angels merc weapon `WreckingCrewAssault` was converted from a bare-clone reroute to a
+  **set** `WreckingCrewAssaultWoLUSet = [WreckingCrewAssault (vanilla, member[0]), WreckingCrewAssaultWoLU
+  (the splash clone)]` so the vanilla `CActorAction id="WreckingCrewAssaultAttack"` keeps firing for the
+  merc (player-exclusive → no flag gate needed). The old action clones
+  `VikingAssaultAttack{Vanilla,}WoLU` + `WreckingCrewAssaultAttackWoLU` were DELETED. (v0.3.31 —
+  `EffectData.xml`/`WeaponData.xml`.)
 - **And it bit the THOR/JOTUN ANTI-AIR impact — the third instance, found by a full reroute-universe
   sweep.** An `ImpactEffect` reroute on a `CEffectLaunchMissile` detaches the same way a weapon-`Effect`
   reroute does, but ONLY the `effectImpact`-bound asset: our `EffectData.xml` reroutes
@@ -573,35 +580,63 @@ gotcha; authoritative details live in the code/plan, not here.
   `effectImpact="JavelinMissileLaunchersDamage"` stopped matching → the AA impact sound
   (`Thor_AntiAirAttackImpact`) went silent for EVERY Thor. The `effectLaunch="JavelinMissileLaunchersLM"`
   binding (launch sound `Thor_AntiAirAttackLaunch`) and the `CActorMissile unitName="ThorAAWeapon"` rocket
-  trail were PRESERVED — the launch-missile id + `AmmoUnit` are unchanged. Fix = the two-clone pattern
-  (`ThorAAAttackVanillaWoLU`/`ThorAAAttackWoLU`, `parent="ThorAAAttack"`, override ONLY `effectImpact`,
-  restate `LaunchAttachQuery`+`ImpactMap` verbatim) but **OMIT `LaunchAssets`** — the launch sound rides
-  `effectLaunch` (un-rerouted), so it still fires once via the unmodified parent; restating it would
-  double the launch sound. (Contrast the Viking case, which restates `LaunchAssets` because the Viking
-  launch sound rides the *rerouted* `effectAttack`.) Note the player child carries a **`Buffed` infix**
-  (`…DamageBuffedWoLU`, unlike the ground `ThorsHammerDamageWoLU`) — a copy-paste from the ground template
-  drops it and silently re-detaches; resolve the exact child ids by hand. (v0.3.x — `ActorData.xml`.)
-- **THE COMPLETE REROUTE UNIVERSE (audited v0.3.x — check this list before adding any new reroute).** Every
-  place our static XML reroutes a weapon `<Effect>` / missile `ImpactEffect` to a `*WoLU(Set)` clone, and
-  whether an effect-bound actor detached:
-  | Reroute (id → target) | File | Clone children | Actor DETACHED? | Fix |
-  |---|---|---|---|---|
-  | `ThorsHammer.Effect` → `ThorsHammerWoLUSet` | WeaponData | `…DamageVanillaWoLU`/`…DamageWoLU` (parent=`ThorsHammerDamage`) | YES — `ThorAttack effectAttack` (ground muzzle+impact) | `ThorAttack{Vanilla,}WoLU` |
-  | `TwinGatlingCannon.Effect` → `TwinGatlingCannonsWoLUSet` | WeaponData | `…VanillaWoLU`/`…WoLU` (parent=`TwinGatlingCannons`) | YES — `VikingAssaultAttack effectAttack` (ground launch+impact sound+blood) | `VikingAssaultAttack{Vanilla,}WoLU` |
-  | `WreckingCrewAssault.Effect` → `WreckingCrewAssaultWoLU` | WeaponData | single un-gated (parent=`WreckingCrewAssault`) | YES — `WreckingCrewAssaultAttack effectAttack` (merc, player-only) | `WreckingCrewAssaultAttackWoLU` (one clone) |
-  | `JavelinMissileLaunchersLM.ImpactEffect` → `JavelinMissileLaunchersDamageWoLUSet` | EffectData | `…DamageVanillaWoLU`/`…DamageBuffedWoLU` (parent=`JavelinMissileLaunchersDamage`) | YES — `ThorAAAttack effectImpact` (AA impact sound only; launch sound+trail preserved) | `ThorAAAttack{Vanilla,}WoLU` |
-  | `WraithA.Effect` → `WraithATriggerOverrideSet` | WeaponData | set = `[WraithAPersistent, WoLUWraithTriggerOverrideApply]` | **NO** — set WRAPS the vanilla `WraithAPersistent` (kept as element 0); the whole sub-chain (`WraithA{Left,Right}LaunchMissile`→`WraithAU`, missiles `WraithAirWeapon{Left,Right}`) is unchanged → all actors (`WraithAirAttack{Left,Right}`, the two missiles) fire | none needed |
-  | `WraithG.Effect` → `WraithGTriggerOverrideSet` | WeaponData | set = `[WraithGLaunchMissile, WoLUWraithTriggerOverrideApply]` | **NO** — set WRAPS the vanilla `WraithGLaunchMissile` (kept as element 0); sub-chain (`→WraithGU`, missile `WraithGroundWeapon`) unchanged → `WraithGroundAttack`+missile fire | none needed |
-  | `EMPShockwaveLaunchWoLU`/`…SearchWoLU` (SV BW EMP) | EffectData | new player-only ability, NOT a vanilla reroute | **NO** — reuses `AmmoUnit="EMP2Weapon"` so `CActorMissile id="GhostEMPAttackMissile" unitName="EMP2Weapon"` (bound by unit-name, not effect id) fires | none needed |
-  **The decisive distinction:** a reroute SET that includes the original delivery effect as a member
-  (`WraithAPersistent`/`WraithGLaunchMissile` — the Wraith "trigger-override" pattern, which only ADDS an
-  on-fire buff alongside the unchanged delivery) does NOT detach anything — every actor below that id still
-  fires. A reroute SET whose members are `parent=`-CLONES of the damage/impact id (the Thor/Viking "Shaped-
-  Blast" pattern, which REPLACES the fired id) DOES detach the `effectAttack`/`effectImpact`-bound actor.
-  And a `CActorMissile`'s `unitName=` binds to the spawned `AmmoUnit`, NEVER to the impact/launch effect id —
-  so rerouting an `ImpactEffect` never detaches the rocket trail, only the `effectImpact`-bound `CActorAction`.
+  trail were PRESERVED — the launch-missile id + `AmmoUnit` are unchanged. **CORRECTED FIX (v0.3.31) =
+  the Trigger-Override shape** (NOT the action-clone re-bind): re-include the unmodified vanilla
+  `JavelinMissileLaunchersDamage` as member[0] of `JavelinMissileLaunchersDamageWoLUSet`, so the bare id
+  still impacts → the UNTOUCHED vanilla `CActorAction id="ThorAAAttack"`
+  (`effectImpact="JavelinMissileLaunchersDamage"`) keeps matching and the AA impact sound fires again; the
+  player-only `JavelinMissileLaunchersDamageBuffedWoLU` (`WoLUHasFlag`) stays the other member. The old
+  action clones `ThorAAAttack{Vanilla,}WoLU` were DELETED. (v0.3.31 — `EffectData.xml`.)
+- **THE COMPLETE REROUTE UNIVERSE (re-audited v0.3.31 — check this list before adding any new reroute).** Every
+  place our static XML reroutes a weapon `<Effect>` / missile `ImpactEffect` to a `*WoLU(Set)` clone, the SET
+  SHAPE (after the v0.3.31 Trigger-Override conversion), and whether an effect-bound actor detaches:
+  | Reroute (id → target) | File | Set members (v0.3.31) | Actor DETACHED? |
+  |---|---|---|---|
+  | `ThorsHammer.Effect` → `ThorsHammerWoLUSet` | WeaponData | `[ThorsHammerDamage (vanilla, un-gated), ThorsHammerDamageWoLU (WoLUHasFlag splash)]` | **NO** — member[0] keeps `ThorAttack effectAttack` firing (ground muzzle+impact restored) |
+  | `TwinGatlingCannon.Effect` → `TwinGatlingCannonsWoLUSet` | WeaponData | `[TwinGatlingCannons (vanilla, un-gated), TwinGatlingCannonsWoLU (WoLUHasFlag splash+mech)]` | **NO** — member[0] keeps `VikingAssaultAttack effectAttack` firing (launch+impact sound+blood restored) |
+  | `WreckingCrewAssault.Effect` → `WreckingCrewAssaultWoLUSet` | WeaponData | `[WreckingCrewAssault (vanilla, un-gated), WreckingCrewAssaultWoLU (splash clone)]` (merc, player-only — no flag gate) | **NO** — member[0] keeps `WreckingCrewAssaultAttack effectAttack` firing |
+  | `JavelinMissileLaunchersLM.ImpactEffect` → `JavelinMissileLaunchersDamageWoLUSet` | EffectData | `[JavelinMissileLaunchersDamage (vanilla, un-gated), JavelinMissileLaunchersDamageBuffedWoLU (WoLUHasFlag)]` | **NO** — member[0] keeps `ThorAAAttack effectImpact` firing (AA impact sound restored; launch sound+trail were always preserved) |
+  | `WraithA.Effect` → `WraithATriggerOverrideSet` | WeaponData | `[WraithAPersistent (vanilla), WoLUWraithTriggerOverrideApply (on-fire buff)]` | **NO** — set WRAPS the vanilla delivery; sub-chain unchanged → all actors fire |
+  | `WraithG.Effect` → `WraithGTriggerOverrideSet` | WeaponData | `[WraithGLaunchMissile (vanilla), WoLUWraithTriggerOverrideApply (on-fire buff)]` | **NO** — set WRAPS the vanilla delivery; `WraithGroundAttack`+missile fire |
+  | `C10CanisterRifleWoLU.Effect` → `C10CanisterRifleWoLUSet` | WeaponData | `[C10CanisterRifle (vanilla, un-gated), C10CanisterRifleWoLU (+50% clone, 30/+15 Light)]` (merc, player-only — no flag gate) | **NO** — member[0] keeps `GhostAttack effectAttack="C10CanisterRifle"` firing (merc rifle muzzle/impact + bunker-launch + blood restored). Owner-APPROVED the resulting damage increase (base ~20/+10 Light + the 30/+15 Light clone). `<DisplayEffect>` stays `C10CanisterRifleWoLU`; the set is un-gated so CHECK11 reports "vanilla delivery — no damage clone" and skips the panel compare. (v0.3.31 — `EffectData.xml`/`WeaponData.xml`.) |
+  | `EMPShockwaveLaunchWoLU`/`…SearchWoLU` (SV BW EMP) | EffectData | new player-only ability, NOT a vanilla reroute | **NO** — reuses `AmmoUnit="EMP2Weapon"` so `CActorMissile … unitName="EMP2Weapon"` (bound by unit-name) fires |
+  **THE DECISIVE DISTINCTION (the v0.3.31 correction):** a reroute SET that INCLUDES THE ORIGINAL
+  delivery/damage effect as a member (the Wraith "trigger-override" pattern — AND now the Thor/Viking/Hel's
+  Angels ground + Thor AA sets) does NOT detach anything: the untouched vanilla `CActorAction` still fires
+  because the EXACT id it binds to still executes. A reroute SET whose members are ONLY `parent=`-CLONES with
+  NEW ids (the old "Shaped-Blast" shape that REPLACED the fired id) DOES detach the `effectAttack`/
+  `effectImpact`-bound actor. **Cloning the vanilla CActorAction (`parent="<vanilla action>"` + a re-specified
+  `effectAttack`/`effectImpact` to the new child id) does NOT re-bind in-game** — it shipped v0.3.11 → v0.3.30
+  and the owner never saw the muzzle/impact return; those action clones were DELETED in v0.3.31. And a
+  `CActorMissile`'s `unitName=` binds to the spawned `AmmoUnit`, NEVER to the impact/launch effect id — so
+  rerouting an `ImpactEffect` never detaches the rocket trail, only the `effectImpact`-bound `CActorAction`.
   **Before adding any new `*WoLU(Set)` reroute, ask: does the player end up firing a clone of the id an actor
-  binds to? If yes, add the per-validator-branch action/actor clone(s) restating the vanilla assets verbatim.**
+  binds to? If yes — make the reroute a SET that re-includes the ORIGINAL vanilla effect as member[0]
+  (Trigger-Override), do NOT clone the action.** Accepted tradeoff: the player's primary target then takes the
+  vanilla hit AND the buffed clone (on-theme overpowered).
+- **The Senior Ghost rifle (`C10CanisterRifleWoLU` weapon on `MercSeniorGhost`) was the LAST still-detaching
+  reroute — FIXED v0.3.31 (Trigger-Override), owner-approved.** The Ghost rifle's muzzle/impact live on
+  `CActorAction id="GhostAttack" effectAttack="C10CanisterRifle"` (`liberty.sc2mod/ActorData.xml:14578`; sounds
+  `Ghost_AttackLaunch`/`Ghost_AttackImpact` + `Ghost_BunkerAttackLaunch` + `BloodTargetImpact`; it is a hitscan
+  rifle, NO missile/beam actor). The vanilla `C10CanisterRifle` weapon has NO explicit `<Effect>`
+  (`liberty.sc2mod/WeaponData.xml:573`), so it fires the effect id `C10CanisterRifle` (the
+  no-Effect-defaults-to-own-id rule), which is what `GhostAttack` binds. The Senior Ghost's weapon clone had
+  set `<Effect value="C10CanisterRifleWoLU"/>` → the merc fired the NEW id `C10CanisterRifleWoLU` → `GhostAttack`
+  no longer matched → the merc's rifle muzzle/impact sound + blood reaction DETACHED. **Fix = the Trigger-Override
+  shape**: `<Effect>` → a set `C10CanisterRifleWoLUSet = [C10CanisterRifle (vanilla, un-gated — restores the
+  GhostAttack action + delivers the player-resolved base ~20/+10 Light hit), C10CanisterRifleWoLU (the +50%
+  clone, 30/+15 Light)]`. The merc's primary target now takes BOTH the base hit AND the +50% clone — the owner
+  EXPLICITLY APPROVED this damage increase (it stacks ON the +50% accuracy fix; balance is a non-goal). The
+  weapon keeps `<DisplayEffect value="C10CanisterRifleWoLU"/>` (the +50% clone the player showcases); since the
+  set's clone member is UN-gated (not `WoLUHasFlag`), CHECK11 reports "vanilla delivery — no damage clone" and
+  skips the panel compare — verified green. `C10CanisterRifle` (the effect) is NOT redefined/renamed anywhere in
+  our `src/`, so the re-included member resolves to the pristine vanilla effect and genlib's per-player
+  `C10CanisterRifle.Amount=20`/`+10 Light` reaches it. **Base Ghost / Nova / Tosh are UNAFFECTED**: base Ghost
+  fires the vanilla `C10CanisterRifle` weapon (`liberty.sc2mod/UnitData.xml:5059`) → `GhostAttack` matches;
+  **Nova fires the SEPARATE `Nova` weapon → `Nova` effect** (Amount 30, no Light; `liberty.sc2campaign/
+  WeaponData.xml:914` + `EffectData.xml:5124`), NOT `C10CanisterRifle` at all; only `MercSeniorGhost`'s
+  WeaponArray points at the `C10CanisterRifleWoLU` weapon clone. [STATIC root-cause + fix; muzzle render is
+  GAME-pending owner re-confirm.]
 - **The unit-info DAMAGE PANEL reads a weapon's `<DisplayEffect>` (or `<Effect>` if `DisplayEffect` is
   absent), NOT the actually-fired effect — so rerouting `<Effect>`/`ImpactEffect` to a clone leaves the panel
   showing the WRONG number, and you must REPOINT `DisplayEffect` to the player's fired clone to make it
@@ -621,11 +656,14 @@ gotcha; authoritative details live in the code/plan, not here.
   is untouched, and enemy command cards / damage panels are never rendered to the player, so showing the
   buffed number globally harms nothing. (A per-player `DisplayEffect` LINK edit would NOT work — weapon/effect
   link edits are the known no-op class; the static repoint is the only mechanism.) **Non-divergent cases the
-  check correctly leaves alone:** (a) a reroute where the weapon has NO `DisplayEffect` → the panel falls back
-  to `<Effect>`, which we already rerouted to the clone, so it reads the player's value directly (Hel's Angels
-  `WreckingCrewAssault`); (b) the Thor GROUND clone adds only splash, no `Amount`/`AttributeBonus` delta →
-  panel 45 == actual 45; (c) the Wraith trigger-override sets WRAP the unchanged vanilla delivery effect (no
-  damage clone) → the real damage stays the vanilla `WraithAU`/`WraithGU` the panel already shows. `DisplayAttackCount`
+  check correctly leaves alone:** (a) the Hel's Angels `WreckingCrewAssault` weapon has NO `DisplayEffect` and
+  its `<Effect>` now points at the Trigger-Override SET `WreckingCrewAssaultWoLUSet`, whose members are the
+  un-gated vanilla `WreckingCrewAssault` + the un-gated `WreckingCrewAssaultWoLU` splash clone — neither carries
+  a `WoLUHasFlag` gate, so CHECK11 finds no flag-gated damage member and reports "vanilla delivery — no damage
+  clone" (no divergence), the same MATCH result it gave before the set conversion; (b) the Thor GROUND clone
+  adds only splash, no `Amount`/`AttributeBonus` delta → panel 45 == actual 45; (c) the Wraith trigger-override
+  sets WRAP the unchanged vanilla delivery effect (no damage clone) → the real damage stays the vanilla
+  `WraithAU`/`WraithGU` the panel already shows. `DisplayAttackCount`
   is a constant multiplier applied identically to old and new `DisplayEffect`, so a per-hit repoint keeps the
   ×N total correct — the check compares the per-hit `Amount`+`AttributeBonus` tuple. **OUT of scope (panel
   already == actual, or no per-unit fix exists):** Ghost/Spectre rifle "+vs Light/Armored" (display already

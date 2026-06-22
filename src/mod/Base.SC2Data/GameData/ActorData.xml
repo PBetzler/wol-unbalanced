@@ -227,124 +227,18 @@
 
     <!-- (MercLiberator/MercLiberatorAG/MercValkyrie actors removed with their units.) -->
 
-    <!-- Thor GROUND-attack muzzle + impact restore (base Thor, MercThor/Jotun).
-         The vanilla CActorAction id="ThorAttack" (mods/_reference/liberty.sc2mod/ActorData.xml)
-         binds effectAttack="ThorsHammerDamage" — the launch muzzle (ThorHandGunAttackLaunch) and
-         impact (ThorHandGunAttackImpact) fire only when an effect with that EXACT id fires.
-         WeaponData.xml reroutes weapon ThorsHammer's Effect to ThorsHammerWoLUSet (a CEffectSet);
-         that set fires two CHILDREN — ThorsHammerDamageVanillaWoLU (WoLUNoFlag -> enemies) and
-         ThorsHammerDamageWoLU (WoLUHasFlag -> player splash) — and NOBODY fires the bare
-         ThorsHammerDamage id anymore. The action matches the exact effect id (NOT parent-chain
-         descendants), so it stopped firing -> the ground muzzle/impact vanished for EVERY Thor.
-         Fix: re-bind the action to the two effect ids that are ACTUALLY fired, one CActorAction
-         per validator-gated branch. Each unit fires exactly ONE child (validator-gated), so one
-         action per child = exactly one muzzle/impact per shot per audience (NO double-muzzle).
-         Reuse the vanilla LaunchAttachQuery (AMFilterWeaponSetA0 AMPatternThor) + the vanilla
-         ThorHandGunAttackLaunch/ThorHandGunAttackImpact models + sounds verbatim (restated, not
-         only inherited, so the muzzle is unambiguous regardless of parent attribute-merge).
-         Cosmetic ONLY — no gameplay/damage change. (Odin uses the SEPARATE weapon "Odin" ->
-         effect "OdinDamage", which we never rerouted -> Odin's ground muzzle was never broken;
-         no Odin action needed. The AA attack still works: its launch effect id
-         JavelinMissileLaunchersLM was preserved, so ThorAAAttack's effectLaunch still matches.) -->
-    <CActorAction id="ThorAttackVanillaWoLU" parent="ThorAttack" effectAttack="ThorsHammerDamageVanillaWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA0 AMPatternThor"/>
-        <LaunchAssets Model="ThorHandGunAttackLaunch" Sound="Thor_HandGunAttackLaunch"/>
-        <ImpactMap index="None" Model="ThorHandGunAttackImpact" Sound="Thor_HandGunAttackImpact"/>
-    </CActorAction>
-    <CActorAction id="ThorAttackWoLU" parent="ThorAttack" effectAttack="ThorsHammerDamageWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA0 AMPatternThor"/>
-        <LaunchAssets Model="ThorHandGunAttackLaunch" Sound="Thor_HandGunAttackLaunch"/>
-        <ImpactMap index="None" Model="ThorHandGunAttackImpact" Sound="Thor_HandGunAttackImpact"/>
-    </CActorAction>
-
-    <!-- Thor ANTI-AIR (AA) impact-SOUND restore (base Thor, MercThor/Jotun). SAME detachment
-         class as the Thor/Viking GROUND fixes above. The vanilla CActorAction id="ThorAAAttack"
-         (mods/_reference/liberty.sc2mod/ActorData.xml:16392) binds effectImpact="JavelinMissileLaunchersDamage"
-         — the AA impact sound (Thor_AntiAirAttackImpact) fires only when an effect with that EXACT
-         id impacts. EffectData.xml:74-81 reroutes CEffectLaunchMissile id="JavelinMissileLaunchersLM"'s
-         ImpactEffect to JavelinMissileLaunchersDamageWoLUSet (a CEffectSet); that set fires two
-         validator-gated CHILDREN — JavelinMissileLaunchersDamageVanillaWoLU (WoLUNoFlag -> enemy Thors)
-         and JavelinMissileLaunchersDamageBuffedWoLU (WoLUHasFlag -> player), both
-         parent="JavelinMissileLaunchersDamage" — and NOBODY fires the bare JavelinMissileLaunchersDamage
-         id directly anymore. A CActorAction matches the EXACT effect id (NOT parent-chain descendants),
-         so effectImpact="JavelinMissileLaunchersDamage" stopped matching -> the AA impact sound vanished
-         for EVERY Thor (player AND enemy). NB the launch sound (Thor_AntiAirAttackLaunch) and the
-         missile trail (CActorMissile unitName="ThorAAWeapon") were NEVER broken: ThorAAAttack's
-         effectLaunch="JavelinMissileLaunchersLM" (the launch-missile id) + the AmmoUnit are unchanged.
-         Fix: re-bind a (cloned) action to each ACTUALLY-fired child effect id, one CActorAction per
-         validator-gated branch (ThorAAAttackVanillaWoLU -> enemy child, ThorAAAttackWoLU -> player
-         child), overriding ONLY effectImpact and restating the vanilla LaunchAttachQuery + ImpactMap
-         verbatim. effectLaunch (launch sound) is inherited UNCHANGED from the parent ThorAAAttack, so
-         LaunchAssets is intentionally OMITTED here (the launch sound still fires once via the
-         unmodified parent's preserved effectLaunch -> no double launch sound). Each unit fires exactly
-         ONE child (mutually-exclusive validators) -> one action per child = exactly one impact sound
-         per shot per audience (NO double-impact). Cosmetic ONLY — no gameplay/damage change.
-         Rule-9-NEUTRAL (restoring the enemy's vanilla impact sound is desired, not a buff).
-         CHECK3/4 SKIP actors, so resolve each effectImpact id by hand: both children are defined in
-         EffectData.xml:83/89 (parent="JavelinMissileLaunchersDamage"). (Odin uses the SEPARATE weapon
-         "Odin" -> effect "OdinDamage", which we never rerouted -> Odin's AA was never broken; no Odin
-         action needed.) -->
-    <CActorAction id="ThorAAAttackVanillaWoLU" parent="ThorAAAttack" effectImpact="JavelinMissileLaunchersDamageVanillaWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA1 AMPatternThorAA"/>
-        <ImpactMap index="None" Sound="Thor_AntiAirAttackImpact"/>
-    </CActorAction>
-    <CActorAction id="ThorAAAttackWoLU" parent="ThorAAAttack" effectImpact="JavelinMissileLaunchersDamageBuffedWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA1 AMPatternThorAA"/>
-        <ImpactMap index="None" Sound="Thor_AntiAirAttackImpact"/>
-    </CActorAction>
-
-    <!-- Viking GROUND-attack launch/impact restore (base Viking, VikingAssault).
-         IDENTICAL class to the Thor fix above. The vanilla CActorAction id="VikingAssaultAttack"
-         (mods/_reference/liberty.sc2mod/ActorData.xml:16597) binds effectAttack="TwinGatlingCannons"
-         — the launch-muzzle sound (VikingAssault_AttackLaunch), impact sound
-         (Viking_AssaultAttackImpact) and flesh blood-reaction (BloodTargetImpact) fire only when an
-         effect with that EXACT id fires. WeaponData.xml reroutes weapon TwinGatlingCannon's Effect
-         to TwinGatlingCannonsWoLUSet (a CEffectSet); that set fires two validator-gated CHILDREN —
-         TwinGatlingCannonsVanillaWoLU (WoLUNoFlag -> enemies) and TwinGatlingCannonsWoLU
-         (WoLUHasFlag -> player splash + AttributeBonus[Mechanical]) — and NOBODY fires the bare
-         TwinGatlingCannons id anymore. A CActorAction matches the EXACT effect id (NOT parent-chain
-         descendants), so it stopped firing -> the ground launch/impact assets vanished for EVERY
-         Viking (player AND enemy). (The Viking ground gatling is NOT a missile/beam — there is no
-         CActorMissile/CActorBeam keyed to TwinGatlingCannons in the reference dump — so the visual
-         is launch sound + impact sound + flesh blood-reaction only.)
-         Fix: re-bind a (cloned) action to each ACTUALLY-fired child effect id, one CActorAction
-         per validator-gated branch (VikingAssaultAttackVanillaWoLU -> enemy child restores the
-         ENEMY assets, VikingAssaultAttackWoLU -> player child restores the PLAYER assets). Each
-         unit fires exactly ONE child (validator-gated) -> one action per child = exactly one
-         launch/impact per shot per audience (NO double-fire). LaunchAttachQuery + both ImpactMap
-         entries + LaunchAssets restated VERBATIM from the vanilla action (not only inherited via
-         parent=, so the assets are unambiguous). Cosmetic ONLY — no gameplay/damage change.
-         Rule-9-NEUTRAL (restoring the enemy's vanilla appearance is desired, not a buff).
-         CHECK3/4 SKIP actors, so resolve each effectAttack id by hand: both children are defined
-         in EffectData.xml:107/110 (parent="TwinGatlingCannons"). -->
-    <CActorAction id="VikingAssaultAttackVanillaWoLU" parent="VikingAssaultAttack" effectAttack="TwinGatlingCannonsVanillaWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA0"/>
-        <ImpactMap index="None" Sound="Viking_AssaultAttackImpact"/>
-        <ImpactMap index="Flesh" ModelReaction="BloodTargetImpact"/>
-        <LaunchAssets Sound="VikingAssault_AttackLaunch"/>
-    </CActorAction>
-    <CActorAction id="VikingAssaultAttackWoLU" parent="VikingAssaultAttack" effectAttack="TwinGatlingCannonsWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA0"/>
-        <ImpactMap index="None" Sound="Viking_AssaultAttackImpact"/>
-        <ImpactMap index="Flesh" ModelReaction="BloodTargetImpact"/>
-        <LaunchAssets Sound="VikingAssault_AttackLaunch"/>
-    </CActorAction>
-
-    <!-- Hel's Angels (Viking merc) GROUND-attack launch/impact restore. SAME detachment as the
-         base Viking, but a SINGLE clone suffices: the merc ground weapon WreckingCrewAssault is
-         rerouted to a SINGLE un-gated player-exclusive splash clone WreckingCrewAssaultWoLU
-         (WeaponData.xml:65-67 — no flag gate, no enemy uses this merc weapon), so only ONE child
-         effect ever fires. The vanilla CActorAction id="WreckingCrewAssaultAttack"
-         (mods/_reference/campaigns/liberty.sc2campaign/ActorData.xml:17134) binds
-         effectAttack="WreckingCrewAssault" (the bare id, now never fired) -> detached for the merc
-         too. Re-bind one action to the actually-fired clone id, restating its launch/impact body
-         VERBATIM. Cosmetic only; the merc is player-exclusive so rule 9 is moot.
-         effectAttack id WreckingCrewAssaultWoLU resolved by hand: defined EffectData.xml:121
-         (parent="WreckingCrewAssault"). -->
-    <CActorAction id="WreckingCrewAssaultAttackWoLU" parent="WreckingCrewAssaultAttack" effectAttack="WreckingCrewAssaultWoLU">
-        <LaunchAttachQuery Methods="AMFilterWeaponSetA0"/>
-        <ImpactMap index="None" Sound="Viking_AssaultAttackImpact"/>
-        <ImpactMap index="Flesh" ModelReaction="BloodTargetImpact"/>
-        <LaunchAssets Sound="VikingAssault_AttackLaunch"/>
-    </CActorAction>
+    <!-- (REMOVED v0.3.31 — the Thor/Viking/Hel's-Angels GROUND + Thor/Jotun AA action-clone
+         re-binds: ThorAttack{Vanilla,}WoLU, ThorAAAttack{Vanilla,}WoLU, VikingAssaultAttack{Vanilla,}WoLU,
+         WreckingCrewAssaultAttackWoLU. These cloned the vanilla CActorAction (parent="<vanilla action>"
+         + a re-specified effectAttack/effectImpact pointing at the rerouted child effect ids) to try to
+         restore the launch muzzle / impact / blood that the weapon-Effect reroute detached. They did NOT
+         re-bind in-game: shipped v0.3.11 -> v0.3.30, the owner still saw NO muzzle/launch flash, no
+         projectile, no impact on the Jotun/Thor + Viking ground attacks. The WORKING fix is the
+         Trigger-Override shape applied in EffectData.xml / WeaponData.xml: each reroute SET now
+         RE-INCLUDES the UNMODIFIED vanilla delivery/damage effect as member[0]
+         (ThorsHammerDamage / JavelinMissileLaunchersDamage / TwinGatlingCannons / WreckingCrewAssault),
+         so the bare id STILL FIRES and the UNTOUCHED vanilla CActorActions (ThorAttack, ThorAAAttack,
+         VikingAssaultAttack, WreckingCrewAssaultAttack) keep matching -> their muzzle/impact actors fire
+         again with zero action clones. See docs/learnings.md (the reroute-universe section). The vanilla
+         actions are intentionally left UNTOUCHED here. -->
 </Catalog>

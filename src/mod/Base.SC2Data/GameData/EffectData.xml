@@ -35,18 +35,24 @@
 
     <!-- Thor ground attack with sieged-tank-style splash. The vanilla ThorsHammer
          weapon's Effect is overridden to this set (WeaponData.xml) — keeping the
-         weapon id so attack animations still fire. The set is GLOBAL (enemy Thors
-         fire it too), so per-player isolation happens HERE at the effect level (the
-         campaign's Shaped Blast pattern): both branches are validator-gated on the
-         flag upgrade only the human player has — splash for us, exact vanilla damage
-         for everyone else. -->
+         weapon id so attack animations still fire.
+         TRIGGER-OVERRIDE shape (the proven non-detaching pattern, cf. the Wraith
+         WraithGTriggerOverrideSet): member[0] is the UNMODIFIED vanilla effect
+         ThorsHammerDamage, so the bare id STILL FIRES for everyone -> the vanilla
+         CActorAction id="ThorAttack" (effectAttack="ThorsHammerDamage") keeps matching
+         and its ground muzzle (ThorHandGunAttackLaunch) + impact (ThorHandGunAttackImpact)
+         are RESTORED for every Thor (player AND enemy). The vanilla member also deals the
+         enemy's exact vanilla damage (rule-9-neutral). member[1] is the player-only
+         WoLUHasFlag-gated splash clone (added damage/splash for us). NB: the player's
+         primary target therefore takes BOTH the vanilla base hit AND the splash clone
+         (~a partial double on the primary) — ACCEPTED (balance is a non-goal; the mod is
+         "funnily overpowered"). This REPLACES the earlier action-clone re-bind approach
+         (ThorAttack{Vanilla,}WoLU in ActorData.xml), which did NOT re-bind in-game
+         (shipped v0.3.11->0.3.30, owner still saw no muzzle/impact). -->
     <CEffectSet id="ThorsHammerWoLUSet">
-        <EffectArray value="ThorsHammerDamageVanillaWoLU"/>
+        <EffectArray value="ThorsHammerDamage"/>
         <EffectArray value="ThorsHammerDamageWoLU"/>
     </CEffectSet>
-    <CEffectDamage id="ThorsHammerDamageVanillaWoLU" parent="ThorsHammerDamage">
-        <ValidatorArray value="WoLUNoFlag"/>
-    </CEffectDamage>
     <CEffectDamage id="ThorsHammerDamageWoLU" parent="ThorsHammerDamage">
         <ValidatorArray value="WoLUHasFlag"/>
         <Kind value="Splash"/>
@@ -64,25 +70,27 @@
          radius is only 0.5 (ground ThorsHammer = 1.6/2.5). AreaArray is an INDEXED field
          (per-player CatalogFieldValueModify is a no-op — same class as the unresolved
          AttributeBonus[Light] flatten), so this uses the established Shaped-Blast clone
-         pattern (cf. ThorsHammerWoLUSet): override the AA missile's ImpactEffect to a set
-         with a vanilla branch (WoLUNoFlag, for enemy Thors) and a player-only buffed branch
-         (WoLUHasFlag) carrying the bigger splash. The missile VISUAL binds to the LM's
-         AmmoUnit (ThorAAWeapon), not the impact effect, so re-pointing ImpactEffect keeps
-         the rocket trail; the impact explosion actor is bound to
-         Effect.JavelinMissileLaunchersDamage.* and still fires on the vanilla branch (the
-         buffed clone reuses identical splash geometry, so the impact reads the same). -->
+         pattern (cf. ThorsHammerWoLUSet): override the AA missile's ImpactEffect to a set.
+         TRIGGER-OVERRIDE shape: member[0] is the UNMODIFIED vanilla effect
+         JavelinMissileLaunchersDamage, so the bare id STILL impacts for everyone -> the
+         vanilla CActorAction id="ThorAAAttack" (effectImpact="JavelinMissileLaunchersDamage")
+         keeps matching and its AA impact sound (Thor_AntiAirAttackImpact) is RESTORED for
+         every Thor (player AND enemy); the vanilla member also deals the enemy's exact
+         vanilla AA damage (rule-9-neutral). member[1] is the player-only WoLUHasFlag buffed
+         splash clone. The missile VISUAL binds to the LM's AmmoUnit (ThorAAWeapon), not the
+         impact effect, so re-pointing ImpactEffect was always keeping the rocket trail; the
+         launch sound rides effectLaunch (un-rerouted). NB the player's primary air target
+         takes BOTH the vanilla base AA hit AND the buffed splash clone — ACCEPTED (on-theme
+         overpowered). This REPLACES the earlier action-clone re-bind (ThorAAAttack{Vanilla,}WoLU),
+         which did NOT re-bind in-game. -->
     <CEffectLaunchMissile id="JavelinMissileLaunchersLM">
         <ImpactEffect value="JavelinMissileLaunchersDamageWoLUSet"/>
     </CEffectLaunchMissile>
     <CEffectSet id="JavelinMissileLaunchersDamageWoLUSet">
         <EditorCategories value="Race:Terran"/>
-        <EffectArray value="JavelinMissileLaunchersDamageVanillaWoLU"/>
+        <EffectArray value="JavelinMissileLaunchersDamage"/>
         <EffectArray value="JavelinMissileLaunchersDamageBuffedWoLU"/>
     </CEffectSet>
-    <!-- Enemy / unflagged branch: exact vanilla AA damage (radius 0.5, 8 +4 vs light). -->
-    <CEffectDamage id="JavelinMissileLaunchersDamageVanillaWoLU" parent="JavelinMissileLaunchersDamage">
-        <ValidatorArray value="WoLUNoFlag"/>
-    </CEffectDamage>
     <!-- Player branch: 35/rocket flat (HIP floor, no light bonus) + splash matching the
          ground weapon (1.6/2.5). Air-plane enemy-only SearchFilters (Crucio pattern), so
          the AA splash never friendly-fires our own air units. -->
@@ -108,19 +116,42 @@
         <Amount value="30"/>
         <AttributeBonus index="Light" value="15"/>
     </CEffectDamage>
+    <!-- Senior Ghost (MercSeniorGhost, player-exclusive) rifle TRIGGER-OVERRIDE set. Same shape as
+         WreckingCrewAssaultWoLUSet above (merc-only -> NO flag gate): member[0] is the UNMODIFIED
+         vanilla effect C10CanisterRifle, so the bare id STILL FIRES -> the vanilla
+         CActorAction id="GhostAttack" (effectAttack="C10CanisterRifle") keeps matching and the
+         merc's rifle muzzle/impact (Ghost_AttackLaunch / Ghost_AttackImpact sounds + bunker-launch +
+         BloodTargetImpact) are RESTORED. The vanilla member also delivers the player-resolved base hit
+         (genlib's per-player C10CanisterRifle.Amount=20 / +10 Light reaches it). member[1] is the
+         existing +50% clone C10CanisterRifleWoLU (30 / +15 Light, unchanged). The Senior Ghost's
+         primary target now takes BOTH the base hit (~20 / +10 Light) AND the +50% clone (30 / +15
+         Light) — owner-APPROVED damage increase (balance is an explicit non-goal). The hitscan rifle
+         has no missile/beam actor, so only GhostAttack's launch/impact assets were detached; this
+         re-includes the bare id to re-attach them. The weapon's <Effect> points at this set
+         (WeaponData.xml); <DisplayEffect> stays C10CanisterRifleWoLU. Base Ghost / Nova / Tosh are
+         UNAFFECTED (base Ghost fires vanilla C10CanisterRifle; Nova fires the separate Nova weapon ->
+         Nova effect; only MercSeniorGhost's WeaponArray points at the C10CanisterRifleWoLU weapon). -->
+    <CEffectSet id="C10CanisterRifleWoLUSet">
+        <EffectArray value="C10CanisterRifle"/>
+        <EffectArray value="C10CanisterRifleWoLU"/>
+    </CEffectSet>
 
-    <!-- Viking ground (Assault) Shredder Rounds + Anti-Mechanical Munition. Same Shaped-Blast
-         pattern as ThorsHammerWoLUSet above: vanilla branch (WoLUNoFlag) for enemy Vikings,
-         buffed branch (WoLUHasFlag) for the player = radial splash + bonus vs Mechanical.
-         GROUND plane SearchFilters (Crucio enemy-only pattern). "Line" splash is approximated
-         as concentric radii (legacy weapons can't express true line geometry). -->
+    <!-- Viking ground (Assault) Shredder Rounds + Anti-Mechanical Munition. Same
+         TRIGGER-OVERRIDE shape as ThorsHammerWoLUSet above: member[0] is the UNMODIFIED
+         vanilla effect TwinGatlingCannons, so the bare id STILL FIRES for everyone -> the
+         vanilla CActorAction id="VikingAssaultAttack" (effectAttack="TwinGatlingCannons")
+         keeps matching and its launch sound (VikingAssault_AttackLaunch) + impact sound
+         (Viking_AssaultAttackImpact) + flesh blood-reaction (BloodTargetImpact) are RESTORED
+         for every Viking (player AND enemy); the vanilla member also deals the enemy's exact
+         vanilla damage (rule-9-neutral). member[1] is the player-only WoLUHasFlag splash +
+         AttributeBonus[Mechanical] clone. NB the player's primary ground target takes BOTH the
+         vanilla base hit AND the buffed clone — ACCEPTED (on-theme overpowered). GROUND plane
+         SearchFilters (Crucio enemy-only pattern). This REPLACES the earlier action-clone
+         re-bind (VikingAssaultAttack{Vanilla,}WoLU), which did NOT re-bind in-game. -->
     <CEffectSet id="TwinGatlingCannonsWoLUSet">
-        <EffectArray value="TwinGatlingCannonsVanillaWoLU"/>
+        <EffectArray value="TwinGatlingCannons"/>
         <EffectArray value="TwinGatlingCannonsWoLU"/>
     </CEffectSet>
-    <CEffectDamage id="TwinGatlingCannonsVanillaWoLU" parent="TwinGatlingCannons">
-        <ValidatorArray value="WoLUNoFlag"/>
-    </CEffectDamage>
     <CEffectDamage id="TwinGatlingCannonsWoLU" parent="TwinGatlingCannons">
         <ValidatorArray value="WoLUHasFlag"/>
         <Kind value="Splash"/>
@@ -130,6 +161,19 @@
         <AreaArray Radius="1.5" Fraction="0.5"/>
         <AttributeBonus index="Mechanical" value="20"/>
     </CEffectDamage>
+    <!-- Hel's Angels merc ground attack. TRIGGER-OVERRIDE set (player-exclusive, no flag
+         gate needed): member[0] is the UNMODIFIED vanilla effect WreckingCrewAssault, so the
+         bare id STILL FIRES -> the vanilla CActorAction id="WreckingCrewAssaultAttack"
+         (effectAttack="WreckingCrewAssault") keeps matching and its launch sound
+         (VikingAssault_AttackLaunch) + impact sound (Viking_AssaultAttackImpact) + flesh
+         blood-reaction are RESTORED for the merc; member[1] is the splash + mech-bonus clone.
+         The merc's target takes the vanilla base hit AND the splash clone (on-theme overpowered;
+         the merc is player-exclusive so rule 9 is moot). The weapon's <Effect> points at this set
+         (WeaponData.xml). This REPLACES the earlier action-clone re-bind (WreckingCrewAssaultAttackWoLU). -->
+    <CEffectSet id="WreckingCrewAssaultWoLUSet">
+        <EffectArray value="WreckingCrewAssault"/>
+        <EffectArray value="WreckingCrewAssaultWoLU"/>
+    </CEffectSet>
     <!-- Hel's Angels merc ground splash (player-exclusive — no flag gate). Bigger radii +
          mech bonus than the base for the merc % advantage. -->
     <CEffectDamage id="WreckingCrewAssaultWoLU" parent="WreckingCrewAssault">

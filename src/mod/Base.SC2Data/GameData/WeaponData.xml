@@ -79,23 +79,33 @@
 
     <!-- Hel's Angels (Viking merc, player-exclusive): same Shredder + Anti-Mech as the base
          Viking, scaled up for the merc % advantage. No flag gate needed (no enemy uses this
-         merc weapon); redirect the weapon's Effect to a splash clone (keeps the weapon id so
-         attack visuals bind). -->
+         merc weapon); redirect the weapon's Effect to the TRIGGER-OVERRIDE set
+         WreckingCrewAssaultWoLUSet (member[0] = the unmodified vanilla WreckingCrewAssault effect,
+         which keeps the vanilla CActorAction id="WreckingCrewAssaultAttack" firing -> the ground
+         launch/impact muzzle is RESTORED; member[1] = the splash clone). Earlier this pointed at
+         the bare clone WreckingCrewAssaultWoLU, which detached the action's muzzle/impact. -->
     <CWeaponLegacy id="WreckingCrewAssault">
-        <Effect value="WreckingCrewAssaultWoLU"/>
+        <Effect value="WreckingCrewAssaultWoLUSet"/>
     </CWeaponLegacy>
 
     <!-- Senior Ghost (MercSeniorGhost) rifle clone — player-exclusive, NO flag gate (no enemy
-         uses MercSeniorGhost; same single-un-gated-clone pattern as WreckingCrewAssault above).
+         uses MercSeniorGhost; same TRIGGER-OVERRIDE pattern as WreckingCrewAssault above).
          parent="C10CanisterRifle" inherits Range/Period/etc., so the merc keeps the base Ghost's
          +1 LTS range (genlib's per-player C10CanisterRifle.Range=7 reaches this child via read-
-         time parent inheritance — the GAME-confirmed Thor precedent). Both Effect and
-         DisplayEffect point at C10CanisterRifleWoLU (30, +15 Light = the player's 20×1.5 baked),
-         so the unit FIRES 30 and the panel SHOWS 30 — they can't diverge (CHECK11 GREEN). The
-         MercSeniorGhost unit overrides its WeaponArray to this clone (UnitData.xml). Do NOT add a
-         genlib Range edit for this id — the parent edit already covers it. -->
+         time parent inheritance — the GAME-confirmed Thor precedent). Do NOT add a genlib Range
+         edit for this id — the parent edit already covers it.
+         <Effect> = the TRIGGER-OVERRIDE set C10CanisterRifleWoLUSet (EffectData.xml), whose
+         member[0] is the UNMODIFIED vanilla C10CanisterRifle, so the bare id STILL FIRES -> the
+         vanilla CActorAction id="GhostAttack" (effectAttack="C10CanisterRifle") keeps matching and
+         the merc's rifle muzzle/impact (Ghost_AttackLaunch/Ghost_AttackImpact) are RESTORED. The
+         set's member[1] is the +50% clone C10CanisterRifleWoLU (30 / +15 Light). The merc's target
+         now takes the base hit (~20 / +10 Light) AND the +50% clone — owner-APPROVED damage
+         increase. <DisplayEffect> stays C10CanisterRifleWoLU (the +50% clone the player intends to
+         showcase); CHECK11 treats the un-gated set as "vanilla delivery — no damage clone" and skips
+         the panel compare (the clone member is ungated, not WoLUHasFlag). The MercSeniorGhost unit
+         overrides its WeaponArray to this weapon (UnitData.xml). -->
     <CWeaponLegacy id="C10CanisterRifleWoLU" parent="C10CanisterRifle">
-        <Effect value="C10CanisterRifleWoLU"/>
+        <Effect value="C10CanisterRifleWoLUSet"/>
         <DisplayEffect value="C10CanisterRifleWoLU"/>
     </CWeaponLegacy>
 
